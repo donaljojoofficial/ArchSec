@@ -19,6 +19,10 @@ class ProjectAnalysis(models.Model):
     security_score = models.IntegerField(default=0)
     risk_category = models.CharField(max_length=20, default="Unknown")
 
+    critical_risks = models.TextField(blank=True)
+    immediate_actions = models.TextField(blank=True)
+
+
 
     def __str__(self):
         return f"Analysis for {self.project.name} ({self.created_at})"
