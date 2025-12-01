@@ -20,7 +20,10 @@ class ProjectAnalysis(models.Model):
     risk_category = models.CharField(max_length=20, default="Unknown")
 
     critical_risks = models.TextField(blank=True)
-    immediate_actions = models.TextField(blank=True)
+    executive_summary = models.TextField(blank=True)
+    top_risks = models.TextField(blank=True)
+    immediate_actions = models.TextField(blank=True, null=True)
+
 
 
 

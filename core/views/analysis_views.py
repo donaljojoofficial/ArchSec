@@ -36,6 +36,17 @@ def extract_section(text, header):
             section = section.split(next_header, 1)[0]
             break
 
+    if subsection in block:
+        sub = block.split(subsection, 1)[1]
+
+        # end at next subsection if exists
+        for end_key in ["Top Risks", "Immediate Actions"]:
+            if end_key in sub and end_key != subsection:
+                sub = sub.split(end_key, 1)[0]
+                break
+
+        return sub.strip()    
+
     return section.strip()
 
 
@@ -84,18 +95,27 @@ Make sure each section begins with its header in uppercase.
     sdls_recommendations = extract_section(generated_text, "SECURE SDLC")
     cost_estimation = extract_section(generated_text, "COST ESTIMATION")
     testing_plan = extract_section(generated_text, "SECURITY TESTING PLAN")
+    # Extract executive summary and sub-sections
+    top_risks = extract_subsection(generated_text, "EXECUTIVE SUMMARY", "Top 3 critical risks")
+    immediate_actions = extract_subsection(generated_text, "EXECUTIVE SUMMARY", "Immediate actions recommended")
+
 
     # Save analysis
     analysis = ProjectAnalysis.objects.create(
-        project=project,
-        user=request.user,
-        executive_summary=executive_summary,
-        architecture=architecture,
-        threat_model=threat_model,
-        cost_estimation=cost_estimation,
-        sdls_recommendations=sdls_recommendations,
-        testing_plan=testing_plan,
+    project=project,
+    user=request.user,
+
+    executive_summary=executive_summary,
+    top_risks=top_risks,
+    immediate_actions=immediate_actions,
+
+    architecture=architecture,
+    threat_model=threat_model,
+    cost_estimation=cost_estimation,
+    sdls_recommendations=sdls_recommendations,
+    testing_plan=testing_plan,
     )
+
 
     # Apply hybrid security scoring
     score, category = calculate_final_security_score(project)
