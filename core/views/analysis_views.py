@@ -8,6 +8,8 @@ from django.template.loader import render_to_string
 from weasyprint import HTML
 from core.services.security_scoring import calculate_final_security_score
 from django.contrib import messages
+import re
+                    
 
 
 
@@ -74,6 +76,9 @@ def extract_subsection(text, main_header, keyword):
 
     return part.strip().lstrip("-•").strip()
 
+def extract_score(text, label):
+    match = re.search(rf"{label}\s*[:\-]\s*(\d)", text, re.IGNORECASE)
+    return int(match.group(1)) if match else 0
 
 
 # =====================================================
@@ -84,8 +89,9 @@ def generate_analysis(request, project_id):
     project = get_object_or_404(Project, id=project_id, user=request.user)
 
     prompt = f"""
-You are a security architect AI. Generate a structured secure system analysis for the following project:
+You are a Senior Secure Software Architect AI. Generate a fully structured and highly technical secure system analysis for the following project.
 
+PROJECT INPUT:
 Name: {project.name}
 Description: {project.description}
 Platform: {project.platform}
@@ -94,22 +100,57 @@ Scale: {project.scale}
 Budget: {project.budget}
 Risk Level: {project.risk_level}
 
-Your response must contain sections with EXACT HEADERS:
+OUTPUT REQUIREMENTS:
+Use the following EXACT SECTION HEADERS:
 
 EXECUTIVE SUMMARY
 SYSTEM ARCHITECTURE
 THREAT MODEL
-SECURE SDLC
+SECURE SDLC RECOMMENDATIONS
 COST ESTIMATION
 SECURITY TESTING PLAN
 
-EXECUTIVE SUMMARY must include:
+EXECUTIVE SUMMARY MUST INCLUDE:
 - Overall security posture (1–2 sentences)
-- Top 3 critical risks
-- Immediate actions recommended
+- Top 3 Critical Risks (bullet points)
+- Immediate Security Actions Required (bullet points)
+
+SYSTEM ARCHITECTURE MUST INCLUDE:
+- Logical architecture
+- Data flow overview
+- Trust boundaries
+- Authentication & authorization model
+
+THREAT MODEL MUST INCLUDE:
+- STRIDE breakdown
+- Relevant OWASP Top 10 links
+- Attack surface summary
+
+SECURE SDLC RECOMMENDATIONS MUST INCLUDE:
+- Phase-wise practices
+- Mandatory security gates
+- Required tools (SAST, DAST, SCA, SCA, SAST etc.)
+
+COST ESTIMATION MUST INCLUDE:
+- Security cost impact (low/medium/high)
+- Resource estimation for implementation
+
+SECURITY TESTING PLAN MUST INCLUDE:
+- Pentesting scope
+- Automated testing tools
+- Continuous security monitoring suggestions
+
+Format everything cleanly using markdown bullets.
+
+Provide two numerical scores:
+LIKELIHOOD SCORE (1–5)
+IMPACT SCORE (1–5)
 """
 
     generated_text = generate_ai_analysis(prompt)
+
+    likelihood = extract_score(generated_text, "LIKELIHOOD SCORE")
+    impact = extract_score(generated_text, "IMPACT SCORE")
 
     # Extract top-level sections
     executive_summary = extract_section(generated_text, "EXECUTIVE SUMMARY")
@@ -123,6 +164,7 @@ EXECUTIVE SUMMARY must include:
     top_risks = extract_subsection(generated_text, "EXECUTIVE SUMMARY", "Top 3 critical risks")
     immediate_actions = extract_subsection(generated_text, "EXECUTIVE SUMMARY", "Immediate actions recommended")
 
+    
     # Save analysis
     analysis = ProjectAnalysis.objects.create(
         project=project,
@@ -137,6 +179,9 @@ EXECUTIVE SUMMARY must include:
         cost_estimation=cost_estimation,
         sdls_recommendations=sdls_recommendations,
         testing_plan=testing_plan,
+
+        likelihood=likelihood,
+        impact=impact,
     )
 
     # Apply hybrid security scoring
