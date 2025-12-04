@@ -10,19 +10,24 @@ from core.services.security_scoring import calculate_final_security_score
 from django.contrib import messages
 
 
-# -------------------------------
-# Section Extractor
-# -------------------------------
+
+# =====================================================
+# SECTION EXTRACTOR
+# =====================================================
 def extract_section(text, header):
     """
-    Extract content under a section header until the next known header.
+    Extract content under a given UPPERCASE header until the next header.
     """
+    text = text or ""
+    header = header.strip().upper()
+
     if header not in text:
         return ""
 
+    # Cut everything before header
     section = text.split(header, 1)[1]
 
-    NEXT_HEADERS = [
+    HEADERS = [
         "EXECUTIVE SUMMARY",
         "SYSTEM ARCHITECTURE",
         "THREAT MODEL",
@@ -31,33 +36,53 @@ def extract_section(text, header):
         "SECURITY TESTING PLAN",
     ]
 
-    for next_header in NEXT_HEADERS:
-        if next_header in section and next_header != header:
-            section = section.split(next_header, 1)[0]
+    # Stop when next header appears
+    for h in HEADERS:
+        if h != header and h in section:
+            section = section.split(h, 1)[0]
             break
-
-    if subsection in block:
-        sub = block.split(subsection, 1)[1]
-
-        # end at next subsection if exists
-        for end_key in ["Top Risks", "Immediate Actions"]:
-            if end_key in sub and end_key != subsection:
-                sub = sub.split(end_key, 1)[0]
-                break
-
-        return sub.strip()    
 
     return section.strip()
 
 
-# -------------------------------
-# Generate Analysis
-# -------------------------------
+
+# =====================================================
+# SUB-SECTION EXTRACTOR (Top risks, immediate actions)
+# =====================================================
+def extract_subsection(text, main_header, keyword):
+    """
+    Extracts a bullet-point subsection from EXECUTIVE SUMMARY.
+    Example:
+      extract_subsection(text, "EXECUTIVE SUMMARY", "Top 3 critical risks")
+    """
+    main_section = extract_section(text, main_header)
+    main_lower = main_section.lower()
+    keyword_lower = keyword.lower()
+
+    if keyword_lower not in main_lower:
+        return ""
+
+    # Extract starting at keyword
+    part = main_lower.split(keyword_lower, 1)[1]
+
+    # Limit by next sentence or next bullet
+    stops = ["- ", "•", "\n\n", "immediate actions", "overall"]
+    for stop in stops:
+        if stop in part:
+            part = part.split(stop, 1)[0]
+            break
+
+    return part.strip().lstrip("-•").strip()
+
+
+
+# =====================================================
+# GENERATE ANALYSIS
+# =====================================================
 @login_required
 def generate_analysis(request, project_id):
     project = get_object_or_404(Project, id=project_id, user=request.user)
 
-    # Enhanced prompt with EXECUTIVE SUMMARY section
     prompt = f"""
 You are a security architect AI. Generate a structured secure system analysis for the following project:
 
@@ -82,40 +107,37 @@ EXECUTIVE SUMMARY must include:
 - Overall security posture (1–2 sentences)
 - Top 3 critical risks
 - Immediate actions recommended
-
-Make sure each section begins with its header in uppercase.
 """
 
     generated_text = generate_ai_analysis(prompt)
 
-    # Extract sections
+    # Extract top-level sections
     executive_summary = extract_section(generated_text, "EXECUTIVE SUMMARY")
     architecture = extract_section(generated_text, "SYSTEM ARCHITECTURE")
     threat_model = extract_section(generated_text, "THREAT MODEL")
     sdls_recommendations = extract_section(generated_text, "SECURE SDLC")
     cost_estimation = extract_section(generated_text, "COST ESTIMATION")
     testing_plan = extract_section(generated_text, "SECURITY TESTING PLAN")
-    # Extract executive summary and sub-sections
+
+    # Extract subsections from EXECUTIVE SUMMARY
     top_risks = extract_subsection(generated_text, "EXECUTIVE SUMMARY", "Top 3 critical risks")
     immediate_actions = extract_subsection(generated_text, "EXECUTIVE SUMMARY", "Immediate actions recommended")
 
-
     # Save analysis
     analysis = ProjectAnalysis.objects.create(
-    project=project,
-    user=request.user,
+        project=project,
+        user=request.user,
 
-    executive_summary=executive_summary,
-    top_risks=top_risks,
-    immediate_actions=immediate_actions,
+        executive_summary=executive_summary,
+        top_risks=top_risks,
+        immediate_actions=immediate_actions,
 
-    architecture=architecture,
-    threat_model=threat_model,
-    cost_estimation=cost_estimation,
-    sdls_recommendations=sdls_recommendations,
-    testing_plan=testing_plan,
+        architecture=architecture,
+        threat_model=threat_model,
+        cost_estimation=cost_estimation,
+        sdls_recommendations=sdls_recommendations,
+        testing_plan=testing_plan,
     )
-
 
     # Apply hybrid security scoring
     score, category = calculate_final_security_score(project)
@@ -128,9 +150,10 @@ Make sure each section begins with its header in uppercase.
     return redirect("view_analysis", analysis_id=analysis.id)
 
 
-# -------------------------------
-# View Single Analysis
-# -------------------------------
+
+# =====================================================
+# VIEW ANALYSIS
+# =====================================================
 @login_required
 def view_analysis(request, analysis_id):
     analysis = get_object_or_404(ProjectAnalysis, id=analysis_id, user=request.user)
@@ -140,21 +163,22 @@ def view_analysis(request, analysis_id):
     })
 
 
-# -------------------------------
-# Analysis History
-# -------------------------------
+
+# =====================================================
+# ANALYSIS HISTORY
+# =====================================================
 @login_required
 def history_analysis(request, project_id):
     project = get_object_or_404(Project, id=project_id, user=request.user)
-
     analyses = ProjectAnalysis.objects.filter(project=project).order_by("-created_at")
+
     scores = [a.security_score for a in analyses if a.security_score > 0]
 
     trend_data = {
         "highest": max(scores) if scores else 0,
         "lowest": min(scores) if scores else 0,
         "average": sum(scores)/len(scores) if scores else 0,
-        "improving": scores[-1] < scores[0] if len(scores) > 1 else False
+        "improving": scores[-1] < scores[0] if len(scores) > 1 else False,
     }
 
     return render(request, "core/analysis_history.html", {
@@ -164,23 +188,25 @@ def history_analysis(request, project_id):
     })
 
 
-# -------------------------------
-# Export PDF
-# -------------------------------
+
+# =====================================================
+# EXPORT PDF
+# =====================================================
 @login_required
 def download_analysis_pdf(request, analysis_id):
     analysis = get_object_or_404(ProjectAnalysis, id=analysis_id, user=request.user)
     project = analysis.project
 
-    html_content = render_to_string("core/analysis_pdf.html", {
+    html = render_to_string("core/analysis_pdf.html", {
         "analysis": analysis,
         "project": project
     })
 
-    pdf_file = HTML(string=html_content).write_pdf()
+    pdf_file = HTML(string=html).write_pdf()
 
-    response = HttpResponse(pdf_file, content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename=\"analysis_{analysis_id}.pdf\"'
+    response = HttpResponse(pdf_file, content_type="application/pdf")
+    response["Content-Disposition"] = f'attachment; filename="analysis_{analysis_id}.pdf"'
+
     return response
 
 

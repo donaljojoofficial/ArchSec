@@ -23,6 +23,8 @@ class ProjectAnalysis(models.Model):
     executive_summary = models.TextField(blank=True)
     top_risks = models.TextField(blank=True)
     immediate_actions = models.TextField(blank=True, null=True)
+    likelihood = models.IntegerField(default=0)   # 1–5
+    impact = models.IntegerField(default=0)       # 1–5
 
 
 
