@@ -1,10 +1,10 @@
-# PlaniX — Secure Development & Planning Assistant
+# ArchSec — Secure Development & Planning Assistant
 
 ---
 
-PlaniX – AI-Powered Secure Development & Planning Platform
+ArchSec – AI-Powered Secure Development & Planning Platform
 
-PlaniX is an AI-integrated platform designed to help developers, engineers, and security professionals plan, design, and evaluate secure software systems from the ground up.
+ArchSec is an AI-integrated platform designed to help developers, engineers, and security professionals plan, design, and evaluate secure software systems from the ground up.
 It streamlines secure system design, threat modeling, cost estimation, and security testing strategy — all inside a single, intelligent web application built using Python Django and deployed in GitHub Codespaces.
 
 
@@ -12,7 +12,7 @@ It streamlines secure system design, threat modeling, cost estimation, and secur
 
 🚀 Project Overview
 
-Modern software development faces challenges like insecure architectures, unclear threat models, unpredictable cost estimation, and scattered security practices. PlaniX solves these issues by providing an AI-powered Secure Development & Planning Assistant that generates:
+Modern software development faces challenges like insecure architectures, unclear threat models, unpredictable cost estimation, and scattered security practices. ArchSec solves these issues by providing an AI-powered Secure Development & Planning Assistant that generates:
 
 Secure architecture recommendations
 
@@ -29,7 +29,7 @@ SDLC + DevSecOps guidance
 Full downloadable reports
 
 
-PlaniX is built for developers, students, and security engineers who need fast, consistent, and reliable security planning in one place.
+ArchSec is built for developers, students, and security engineers who need fast, consistent, and reliable security planning in one place.
 
 
 ---
@@ -390,9 +390,9 @@ Follow standard Git branching and PR practices.
 
 ---
 
-🚀 Development Plan – PlaniX
+🚀 Development Plan – ArchSec
 
-PlaniX is developed in multiple structured phases to ensure reliability, modularity, and clarity.
+ArchSec is developed in multiple structured phases to ensure reliability, modularity, and clarity.
 The plan below outlines the complete roadmap from setup to deployment.
 
 
@@ -400,7 +400,7 @@ The plan below outlines the complete roadmap from setup to deployment.
 
 1. Project Overview
 
-PlaniX is an AI-powered secure software development planning assistant.
+ArchSec is an AI-powered secure software development planning assistant.
 It helps engineers and developers generate:
 
 System architecture
@@ -420,7 +420,7 @@ Security testing recommendations
 Compliance mapping (OWASP, ISO, NIST)
 
 
-PlaniX acts as a Secure Development Co-Pilot, built using Python Django and AI-driven analysis.
+ArchSec acts as a Secure Development Co-Pilot, built using Python Django and AI-driven analysis.
 
 
 ---

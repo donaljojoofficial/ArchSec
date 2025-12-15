@@ -1,8 +1,8 @@
-# PlaniX Project Status Report
+# ArchSec Project Status Report
 
 ## 1. Overview
 
-This report details the current development status of the PlaniX project by comparing the goals in the README.md file with the existing codebase.
+This report details the current development status of the ArchSec project by comparing the goals in the README.md file with the existing codebase.
 
 ## 2. Completed Phases and Features
 
@@ -73,7 +73,7 @@ Here is a prioritized list of the next steps to move the project forward.
 
 ## 5. Suggested Improvements
 
-Here are some suggested improvements to enhance the PlaniX platform, categorized by area.
+Here are some suggested improvements to enhance the ArchSec platform, categorized by area.
 
 ### Core Functionality
 - **Interactive Cost Estimation:** Allow users to adjust parameters (e.g., server size, expected traffic) and see the cost estimations update dynamically.

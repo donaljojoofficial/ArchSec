@@ -1,4 +1,4 @@
-# PlaniX Project TODO
+# ArchSec Project TODO
 
 This file tracks the development progress based on the phases outlined in the `README.md`.
 
