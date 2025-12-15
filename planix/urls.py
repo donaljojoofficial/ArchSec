@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from core.views.dashboard_views import dashboard
 from core.views.project_views import create_project
 from core.views.analysis_views import generate_analysis, view_analysis, history_analysis, download_analysis_pdf
@@ -8,6 +8,7 @@ from core.views.export_views import export_analysis_history_zip
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("accounts/", include("django.contrib.auth.urls")),
 
     # Project actions
     path("project/create/", create_project, name="create_project"),
