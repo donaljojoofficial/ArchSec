@@ -1,7 +1,84 @@
-<h2>Create New Project</h2>
+{% extends 'base.html' %}
 
-<form method="POST">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Create Project</button>
-</form>
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">Create New Project</h2>
+        </div>
+        <div class="card-body">
+            <form method="POST">
+                {% csrf_token %}
+
+                <fieldset>
+                    <legend>Basic Information</legend>
+                    <div class="form-group">
+                        {{ form.name.label_tag }}
+                        {{ form.name }}
+                    </div>
+                    <div class="form-group">
+                        {{ form.description.label_tag }}
+                        {{ form.description }}
+                    </div>
+                    <div class="form-group">
+                        {{ form.platform.label_tag }}
+                        {{ form.platform }}
+                    </div>
+                    <div class="form-group">
+                        {{ form.tech_stack.label_tag }}
+                        {{ form.tech_stack }}
+                    </div>
+                    <div class="form-group">
+                        {{ form.scale.label_tag }}
+                        {{ form.scale }}
+                    </div>
+                    <div class="form-group">
+                        {{ form.budget.label_tag }}
+                        {{ form.budget }}
+                    </div>
+                    <div class="form-group">
+                        {{ form.risk_level.label_tag }}
+                        {{ form.risk_level }}
+                    </div>
+                </fieldset>
+
+                <hr>
+
+                <fieldset>
+                    <legend>Structured Data</legend>
+                    <p class="text-muted">Select all that apply and add any other relevant details.</p>
+
+                    <div class="accordion" id="structuredDataAccordion">
+                        {% for field_name, field in form.fields.items %}
+                            {% if '_manual' not in field_name and field_name not in 'name,description,platform,tech_stack,scale,budget,risk_level' %}
+                                <div class="card">
+                                    <div class="card-header" id="heading-{{ field_name }}">
+                                        <h5 class="mb-0">
+                                            <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse-{{ field_name }}" aria-expanded="false" aria-controls="collapse-{{ field_name }}">
+                                                {{ field.label|title }}
+                                            </button>
+                                        </h5>
+                                    </div>
+                                    <div id="collapse-{{ field_name }}" class="collapse" aria-labelledby="heading-{{ field_name }}" data-parent="#structuredDataAccordion">
+                                        <div class="card-body">
+                                            <div class="form-group">
+                                                {{ form[field_name] }}
+                                            </div>
+                                            <div class="form-group">
+                                                {{ form[field_name|add:'_manual'].label_tag }}
+                                                {{ form[field_name|add:'_manual'] }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </fieldset>
+
+                <button type="submit" class="btn btn-primary mt-3">Create Project</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -28,5 +28,9 @@ class Project(models.Model):
     risk_level = models.CharField(max_length=20, choices=RISK_LEVEL_CHOICES)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    # New structured data fields
+    structured_data = models.JSONField(default=dict, blank=True)
+    system_design_data = models.JSONField(default=dict, blank=True)
+
     def __str__(self):
         return self.name

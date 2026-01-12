@@ -3,7 +3,6 @@ from django.contrib.auth.decorators import login_required
 from core.forms import ProjectForm
 from core.models.project import Project
 
-
 @login_required
 def create_project(request):
     if request.method == "POST":
@@ -11,7 +10,10 @@ def create_project(request):
         if form.is_valid():
             project = form.save(commit=False)
             project.user = request.user
+            # Extract and save structured data
+            project.structured_data = form.get_structured_data()
             project.save()
+            # form.save_m2m()  # If you had any many-to-many fields
             return redirect("dashboard")
     else:
         form = ProjectForm()

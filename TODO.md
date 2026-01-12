@@ -4,6 +4,19 @@ This file tracks the development progress based on the phases outlined in the `R
 
 ---
 
+### Database Schema Hotfix (2026-01-12)
+- **Status:** Partially Complete
+- **Tasks:**
+    - [x] Inspect `core/models/project.py` for `structured_data` field.
+    - [x] Confirm `Project` model has `JSONField` for `structured_data`.
+    - [x] Manually create migration `0010_auto_20260112_1200.py` for the missing column.
+    - [ ] Apply the new migration to the database.
+    - [ ] Verify the dashboard and ORM queries work as expected.
+- **Notes:**
+    - The `run_shell_command` tool is disabled in the current environment, so the `migrate` command could not be run. The migration file has been created, but the database schema has not been updated. The user will need to run `python manage.py migrate` to apply the changes.
+
+---
+
 ### Phase 1: Environment & Base Setup (Week 1) ✅
 - **Status:** Mostly Complete
 - **Tasks:**
@@ -86,3 +99,36 @@ This file tracks the development progress based on the phases outlined in the `R
         - [ ] Render
         - [ ] Railway
         - [ ] Or Django + PostgreSQL hosting
+
+---
+
+### Project Idea Submission Module Upgrade
+- **Status:** Not Started
+- **Tasks:**
+    - [x] **1. Update Project model:**
+        - [x] Use JSONField to store structured sections:
+            - `requirements`, `users`, `architecture`, `technology`, `security`,
+            - `performance`, `database`, `testing`, `deployment`, `monitoring`,
+            - `compliance`, `privacy`, `scalability`, `infrastructure`
+        - [x] Keep backward compatibility
+    - [x] **2. Update project creation form:**
+        - [x] For each section, provide common selectable options
+        - [x] Provide an optional input field
+        - [x] Group inputs logically
+    - [x] **3. Update project creation template:**
+        - [x] Use sectioned UI (accordion or fieldsets)
+        - [x] Keep it readable and not overwhelming
+    - [x] **4. Update project save logic:**
+        - [x] Merge dropdown + manual inputs correctly into JSON fields
+    - [x] **5. Update AI analysis prompt:**
+        - [x] Pass structured data with clear section headers
+        - [x] Do not flatten JSON into plain text
+    - [x] **6. Update security scoring logic:**
+        - [x] Penalize missing security/monitoring/compliance data
+        - [x] Reward mature architecture choices
+    - [x] **7. Update dashboard:**
+        - [x] Show completeness indicators
+        - [x] Warn for missing critical sections
+    - [x] **8. Update TODO.md:**
+        - [x] Add all above tasks
+        - [x] Mark completed tasks clearly

@@ -1,38 +1,81 @@
 {% extends 'base.html' %}
+
 {% block content %}
-<h2>Your Projects</h2>
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Your Projects</h2>
+        <a href="{% url 'create_project' %}" class="btn btn-primary">+ New Project</a>
+    </div>
 
-<a href="{% url 'create_project' %}">+ New Project</a>
+    <div class="card">
+        <div class="card-body">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">Project</th>
+                        <th scope="col">Completeness</th>
+                        <th scope="col">Last Risk Score</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for project in projects %}
+                        <tr>
+                            <td>
+                                {{ project.name }}
+                                {% if project.missing_critical %}
+                                    <span class="ml-2" data-toggle="tooltip" data-placement="top" title="Missing critical sections: {{ project.missing_critical|join:', ' }}">
+                                        ⚠️
+                                    </span>
+                                {% endif %}
+                                <br>
+                                <small class="text-muted">{{ project.platform }} | Created: {{ project.created_at|date:"Y-m-d" }}</small>
+                            </td>
+                            <td>
+                                <div class="progress" style="height: 20px;">
+                                    <div class="progress-bar" role="progressbar" style="width: {{ project.completeness_percentage }}%;" aria-valuenow="{{ project.completeness_percentage }}" aria-valuemin="0" aria-valuemax="100">
+                                        {{ project.completeness_percentage|floatformat:0 }}%
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                {% if project.analyses.last %}
+                                    {% with analysis=project.analyses.last %}
+                                        {% if analysis.risk_category == "High Risk" %}
+                                            <span class="badge bg-danger">High — {{ analysis.security_score }}</span>
+                                        {% elif analysis.risk_category == "Medium Risk" %}
+                                            <span class="badge bg-warning text-dark">Medium — {{ analysis.security_score }}</span>
+                                        {% else %}
+                                            <span class="badge bg-success">Low — {{ analysis.security_score }}</span>
+                                        {% endif %}
+                                    {% endwith %}
+                                {% else %}
+                                    <span class="badge bg-secondary">Not Analyzed</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{% url 'generate_analysis' project.id %}" class="btn btn-sm btn-primary">Analyze</a>
+                                <a href="{% url 'analysis_history' project.id %}" class="btn btn-sm btn-info">History</a>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center">
+                                <p>No projects yet. Create your first one to get started!</p>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 
+<script>
+// Enable tooltips
+$(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+})
+</script>
 
-<ul>
-    {% for project in projects %}
-        <li>
-             {{ project.name }} — {{ project.platform }} — {{ project.created_at }}
-
-    <!-- Add this action link -->
-    <a href="{% url 'generate_analysis' project.id %}">
-        Generate Secure Analysis
-    </a>
-    
-    <a href="{% url 'analysis_history' project.id %}" class="btn btn-info mt-2">
-        View Analysis History
-    </a>
-
-    {% if project.analyses.last %}
-    {% with analysis=project.analyses.last %}
-        {% if analysis.risk_category == "High Risk" %}
-            <span class="badge bg-danger">High Risk — {{ analysis.security_score }}</span>
-        {% elif analysis.risk_category == "Medium Risk" %}
-            <span class="badge bg-warning text-dark">Medium Risk — {{ analysis.security_score }}</span>
-        {% else %}
-            <span class="badge bg-success">Low Risk — {{ analysis.security_score }}</span>
-        {% endif %}
-    {% endwith %}
-    {% endif %}
-        </li>
-    {% empty %}
-        <p>No projects yet.</p>
-    {% endfor %}
-</ul>
 {% endblock %}

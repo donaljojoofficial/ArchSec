@@ -88,20 +88,41 @@ def extract_score(text, label):
 def generate_analysis(request, project_id):
     project = get_object_or_404(Project, id=project_id, user=request.user)
 
+    # Prepare structured data for the prompt
+    structured_data_str = ""
+    if project.structured_data:
+        for section, data in project.structured_data.items():
+            structured_data_str += f"## {section.upper().replace('_', ' ')}\n"
+            if data.get('options'):
+                structured_data_str += "Selected Options:\n"
+                for option in data['options']:
+                    structured_data_str += f"- {option}\n"
+            if data.get('manual_input'):
+                structured_data_str += "Manual Input:\n"
+                structured_data_str += f"{data['manual_input']}\n"
+            structured_data_str += "\n"
+
     prompt = f"""
 You are a Senior Secure Software Architect AI. Generate a fully structured and highly technical secure system analysis for the following project.
 
-PROJECT INPUT:
+Use the structured details as the primary source of truth. The basic project info is for context.
+
+---
+BASIC PROJECT INFO:
 Name: {project.name}
 Description: {project.description}
 Platform: {project.platform}
 Tech Stack: {project.tech_stack}
 Scale: {project.scale}
-Budget: {project.budget}
+Budget: ${project.budget:,.0f}
 Risk Level: {project.risk_level}
+---
+STRUCTURED PROJECT DETAILS:
+{structured_data_str}
+---
 
 OUTPUT REQUIREMENTS:
-Use the following EXACT SECTION HEADERS:
+Use the following EXACT SECTION HEADERS in markdown:
 
 EXECUTIVE SUMMARY
 SYSTEM ARCHITECTURE
@@ -116,33 +137,31 @@ EXECUTIVE SUMMARY MUST INCLUDE:
 - Immediate Security Actions Required (bullet points)
 
 SYSTEM ARCHITECTURE MUST INCLUDE:
-- Logical architecture
-- Data flow overview
-- Trust boundaries
-- Authentication & authorization model
+- Logical architecture based on the structured data provided.
+- Data flow overview.
+- Trust boundaries.
+- Authentication & authorization model.
 
 THREAT MODEL MUST INCLUDE:
-- STRIDE breakdown
-- Relevant OWASP Top 10 links
-- Attack surface summary
+- STRIDE breakdown.
+- Relevant OWASP Top 10 risks.
+- Attack surface summary.
 
 SECURE SDLC RECOMMENDATIONS MUST INCLUDE:
-- Phase-wise practices
-- Mandatory security gates
-- Required tools (SAST, DAST, SCA, SCA, SAST etc.)
+- Phase-wise practices.
+- Mandatory security gates.
+- Required tools (SAST, DAST, SCA).
 
 COST ESTIMATION MUST INCLUDE:
-- Security cost impact (low/medium/high)
-- Resource estimation for implementation
+- Security cost impact (low/medium/high).
+- Resource estimation for implementation.
 
 SECURITY TESTING PLAN MUST INCLUDE:
-- Pentesting scope
-- Automated testing tools
-- Continuous security monitoring suggestions
+- Pentesting scope.
+- Automated testing tools.
+- Continuous security monitoring suggestions.
 
-Format everything cleanly using markdown bullets.
-
-Provide two numerical scores:
+Provide two numerical scores at the very end:
 LIKELIHOOD SCORE (1–5)
 IMPACT SCORE (1–5)
 """
@@ -156,7 +175,7 @@ IMPACT SCORE (1–5)
     executive_summary = extract_section(generated_text, "EXECUTIVE SUMMARY")
     architecture = extract_section(generated_text, "SYSTEM ARCHITECTURE")
     threat_model = extract_section(generated_text, "THREAT MODEL")
-    sdls_recommendations = extract_section(generated_text, "SECURE SDLC")
+    sdls_recommendations = extract_section(generated_text, "SECURE SDLC RECOMMENDATIONS")
     cost_estimation = extract_section(generated_text, "COST ESTIMATION")
     testing_plan = extract_section(generated_text, "SECURITY TESTING PLAN")
 
