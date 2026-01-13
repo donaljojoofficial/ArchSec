@@ -49,25 +49,31 @@
                     <p class="text-muted">Select all that apply and add any other relevant details.</p>
 
                     <div class="accordion" id="structuredDataAccordion">
-                        {% for field_name, field in form.fields.items %}
-                            {% if '_manual' not in field_name and field_name not in 'name,description,platform,tech_stack,scale,budget,risk_level' %}
+                        {% for field in form %}
+                            {% if '_manual' not in field.name and field.name not in 'name,description,platform,tech_stack,scale,budget,risk_level' %}
                                 <div class="card">
-                                    <div class="card-header" id="heading-{{ field_name }}">
+                                    <div class="card-header" id="heading-{{ field.name }}">
                                         <h5 class="mb-0">
-                                            <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse-{{ field_name }}" aria-expanded="false" aria-controls="collapse-{{ field_name }}">
+                                            <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse-{{ field.name }}" aria-expanded="false" aria-controls="collapse-{{ field.name }}">
                                                 {{ field.label|title }}
                                             </button>
                                         </h5>
                                     </div>
-                                    <div id="collapse-{{ field_name }}" class="collapse" aria-labelledby="heading-{{ field_name }}" data-parent="#structuredDataAccordion">
+                                    <div id="collapse-{{ field.name }}" class="collapse" aria-labelledby="heading-{{ field.name }}" data-parent="#structuredDataAccordion">
                                         <div class="card-body">
                                             <div class="form-group">
-                                                {{ form[field_name] }}
+                                                {{ field }}
                                             </div>
-                                            <div class="form-group">
-                                                {{ form[field_name|add:'_manual'].label_tag }}
-                                                {{ form[field_name|add:'_manual'] }}
-                                            </div>
+                                            {% for manual_field in form %}
+                                                {% with manual_name=field.name|add:"_manual" %}
+                                                    {% if manual_field.name == manual_name %}
+                                                    <div class="form-group">
+                                                        {{ manual_field.label_tag }}
+                                                        {{ manual_field }}
+                                                    </div>
+                                                    {% endif %}
+                                                {% endwith %}
+                                            {% endfor %}
                                         </div>
                                     </div>
                                 </div>
