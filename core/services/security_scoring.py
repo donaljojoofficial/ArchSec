@@ -1,6 +1,11 @@
 from core.models.project import Project
-from core.services.ai_client import generate_ai_analysis
-import json
+
+def determine_risk_category(score):
+    if score > 70:
+        return "High"
+    if score > 40:
+        return "Medium"
+    return "Low"
 
 def calculate_rule_score(project: Project):
     score = 0
@@ -55,52 +60,12 @@ def calculate_rule_score(project: Project):
     return max(0, min(score, 100))
 
 
-def get_ai_risk_adjustment(project: Project):
-    structured_data_str = json.dumps(project.structured_data, indent=2)
-
-    prompt = f"""
-As a security risk analyst, rate the overall security risk of this system on a scale of 1-10, where 10 is the highest risk.
-Consider BOTH the basic info and the detailed structured data. The structured data provides the most important clues.
-Return ONLY a single number (1-10).
-
----
-BASIC PROJECT INFO:
-Name: {project.name}
-Description: {project.description}
-Platform: {project.platform}
-Risk Level: {project.risk_level}
-Scale: {project.scale}
----
-STRUCTURED PROJECT DETAILS:
-{structured_data_str}
----
-
-Return ONLY a single number (1-10).
-"""
-
-    response = generate_ai_analysis(prompt)
-
-    try:
-        ai_value = int("".join(filter(str.isdigit, response)))
-        return max(1, min(ai_value, 10))
-    except (ValueError, TypeError):
-        return 5  # Fallback to a neutral score if AI fails
-
-
-def determine_risk_category(score: int):
-    if score >= 70:
-        return "High Risk"
-    elif score >= 40:
-        return "Medium Risk"
-    return "Low Risk"
-
-
-def calculate_final_security_score(project: Project):
+def calculate_final_security_score(project: Project, ai_risk_adjustment: int = 0):
     base_score = calculate_rule_score(project)
-    ai_adjustment = get_ai_risk_adjustment(project)
 
-    # AI adjustment has a stronger effect now
-    final_score = base_score + (ai_adjustment * 3)
+    # The AI risk adjustment is now passed in directly.
+    # A positive value increases risk score, negative decreases.
+    final_score = base_score + ai_risk_adjustment
 
     # Final hard clamp
     final_score = max(0, min(final_score, 100))

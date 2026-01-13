@@ -3,19 +3,14 @@ import google.generativeai as genai
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
-# Configure Gemini if key exists
 if GEMINI_API_KEY:
     genai.configure(api_key=GEMINI_API_KEY)
 
 _cached_model = None
 
-
 def _get_available_model():
-    """
-    Fetch available Gemini models and select one that supports generateContent.
-    """
+    """Fetches and caches the best available Gemini model."""
     global _cached_model
-
     if _cached_model:
         return _cached_model
 
@@ -24,93 +19,64 @@ def _get_available_model():
 
     try:
         models = genai.list_models()
-
         preferred_order = [
-            "gemini-2.5-flash",
-            "gemini-flash-latest",
-            "gemini-2.5-pro",
-            "gemini-pro-latest",
+            "gemini-1.5-flash-latest",
+            "gemini-1.5-pro-latest",
+            "gemini-pro",
         ]
-
         available = [
             m.name.replace("models/", "")
             for m in models
             if "generateContent" in m.supported_generation_methods
         ]
-
         for model in preferred_order:
             if model in available:
                 _cached_model = model
                 return model
-
-        if available:
-            print(f"Available models: {available}")
-            _cached_model = available[0]
-            return available[0]
-
-        print("No models available.")
-        return "ERROR: No models available that support 'generateContent'."
-
+        return "ERROR: No suitable models available."
     except Exception as e:
-        print(f"Error listing models: {e}")
-        return f"ERROR: Could not list models from Gemini. Details: {e}"
-
+        return f"ERROR: Could not list Gemini models: {e}"
 
 def generate_ai_analysis(prompt):
-    """
-SYSTEM ARCHITECTURE
-- Multi-tier architecture with presentation, application, and data layers
-- Secure API gateway enforcing authentication and rate limiting
-- Encrypted data storage using industry-standard cryptography
-- Logging and monitoring pipeline for audit and incident response
-
-THREAT MODEL (STRIDE + OWASP)
-- Spoofing: enforce MFA and token-based identity
-- Tampering: input validation and integrity checks
-- Repudiation: centralized immutable audit logs
-- Information Disclosure: encryption in transit and at rest
-- Denial of Service: WAF + throttling controls
-- Elevation of Privilege: RBAC with least privilege principles
-- OWASP Top 10 mapped to mitigation controls
-
-SECURE SDLC PLAN
-- Requirements phase includes threat modeling checkpoints
-- Secure design reviews before implementation stages
-- Static code analysis integrated into CI pipeline
-- Dependency scanning and SBOM tracking
-- Pre-deployment penetration testing
-- Continuous security monitoring after release
-
-COST ESTIMATION
-- Development effort: medium complexity, 3–5 engineer months
-- Hosting and infrastructure: scalable cloud deployment
-- Security tooling cost ranges provided per testing model
-- Optional add-on: managed security services considerations
-
-SECURITY TESTING PLAN
-- SAST, DAST, IAST, and SCA toolchain alignment
-- API fuzz testing and business logic abuse detection
-- Automated regression security suite
-- Red-team simulation and reporting cycle
-"""
-
-
+    """Generates security analysis using a Gemini model, ensuring JSON output."""
     if not GEMINI_API_KEY:
-        return "ERROR: No Gemini API key configured."
+        return '{"error": "No Gemini API key configured."}'
 
     model_name = _get_available_model()
+    if model_name.startswith("ERROR:"):
+        return f'{{"error": "{model_name}"}}'
 
-    if not model_name or model_name.startswith("ERROR:"):
-        return model_name or "ERROR: No supported Gemini model available. Please ensure your API key is correct and that you have access to a model that supports 'generateContent'."
+    json_instruction = """
+    IMPORTANT: Your entire response MUST be a single, valid JSON object.
+    Do not include any text, notes, or explanations before or after the JSON.
+    Do not use markdown formatting (e.g., ```json).
+
+    The JSON object must conform to the following schema:
+    {
+      "executive_summary": "string",
+      "architecture": "string",
+      "threat_model": "string",
+      "secure_sdlc": "string",
+      "cost_estimation": "string",
+      "testing_plan": "string",
+      "likelihood_score": "integer (1-5)",
+      "impact_score": "integer (1-5)",
+      "risk_adjustment": "integer (-30 to +30)",
+      "key_risks": ["string"],
+      "recommendations": ["string"]
+    }
+    """
+
+    full_prompt = f"{prompt}\n\n{json_instruction}"
 
     try:
         model = genai.GenerativeModel(model_name)
-        response = model.generate_content(prompt)
-
-        if hasattr(response, "text"):
-            return response.text
-
-        return "ERROR: No text response from model."
-
+        generation_config = genai.types.GenerationConfig(
+            response_mime_type="application/json"
+        )
+        response = model.generate_content(
+            full_prompt, generation_config=generation_config
+        )
+        return response.text
     except Exception as e:
-        return f"AI Error: {str(e)}"
+        return f'{{"error": "AI Error: {str(e)}"}}'

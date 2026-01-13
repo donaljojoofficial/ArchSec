@@ -1,94 +1,21 @@
+import json
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from core.models.project import Project
-from core.models.project_analysis import ProjectAnalysis
-from core.services.ai_client import generate_ai_analysis
+from django.contrib import messages
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from weasyprint import HTML
+
+from core.models.project import Project
+from core.models.project_analysis import ProjectAnalysis
+from core.services.ai_client import generate_ai_analysis
 from core.services.security_scoring import calculate_final_security_score
-from django.contrib import messages
-import re
-                    
 
 
-
-# =====================================================
-# SECTION EXTRACTOR
-# =====================================================
-def extract_section(text, header):
-    """
-    Extract content under a given UPPERCASE header until the next header.
-    """
-    text = text or ""
-    header = header.strip().upper()
-
-    if header not in text:
-        return ""
-
-    # Cut everything before header
-    section = text.split(header, 1)[1]
-
-    HEADERS = [
-        "EXECUTIVE SUMMARY",
-        "SYSTEM ARCHITECTURE",
-        "THREAT MODEL",
-        "SECURE SDLC",
-        "COST ESTIMATION",
-        "SECURITY TESTING PLAN",
-    ]
-
-    # Stop when next header appears
-    for h in HEADERS:
-        if h != header and h in section:
-            section = section.split(h, 1)[0]
-            break
-
-    return section.strip()
-
-
-
-# =====================================================
-# SUB-SECTION EXTRACTOR (Top risks, immediate actions)
-# =====================================================
-def extract_subsection(text, main_header, keyword):
-    """
-    Extracts a bullet-point subsection from EXECUTIVE SUMMARY.
-    Example:
-      extract_subsection(text, "EXECUTIVE SUMMARY", "Top 3 critical risks")
-    """
-    main_section = extract_section(text, main_header)
-    main_lower = main_section.lower()
-    keyword_lower = keyword.lower()
-
-    if keyword_lower not in main_lower:
-        return ""
-
-    # Extract starting at keyword
-    part = main_lower.split(keyword_lower, 1)[1]
-
-    # Limit by next sentence or next bullet
-    stops = ["- ", "•", "\n\n", "immediate actions", "overall"]
-    for stop in stops:
-        if stop in part:
-            part = part.split(stop, 1)[0]
-            break
-
-    return part.strip().lstrip("-•").strip()
-
-def extract_score(text, label):
-    match = re.search(rf"{label}\s*[:\-]\s*(\d)", text, re.IGNORECASE)
-    return int(match.group(1)) if match else 0
-
-
-# =====================================================
-# GENERATE ANALYSIS
-# =====================================================
 @login_required
 def generate_analysis(request, project_id):
     project = get_object_or_404(Project, id=project_id, user=request.user)
 
-    # Prepare structured data for the prompt
     structured_data_str = ""
     if project.structured_data:
         for section, data in project.structured_data.items():
@@ -103,121 +30,75 @@ def generate_analysis(request, project_id):
             structured_data_str += "\n"
 
     prompt = f"""
-You are a Senior Secure Software Architect AI. Generate a fully structured and highly technical secure system analysis for the following project.
+    Analyze the following project and return a structured JSON response.
 
-Use the structured details as the primary source of truth. The basic project info is for context.
+    ---
+    BASIC PROJECT INFO:
+    Name: {project.name}
+    Description: {project.description}
+    Platform: {project.platform}
+    Tech Stack: {project.tech_stack}
+    Scale: {project.scale}
+    Budget: ${project.budget:,.0f}
+    Risk Level: {project.risk_level}
+    ---
+    STRUCTURED PROJECT DETAILS:
+    {structured_data_str}
+    ---
+    """
 
----
-BASIC PROJECT INFO:
-Name: {project.name}
-Description: {project.description}
-Platform: {project.platform}
-Tech Stack: {project.tech_stack}
-Scale: {project.scale}
-Budget: ${project.budget:,.0f}
-Risk Level: {project.risk_level}
----
-STRUCTURED PROJECT DETAILS:
-{structured_data_str}
----
+    raw_response = generate_ai_analysis(prompt)
 
-OUTPUT REQUIREMENTS:
-Use the following EXACT SECTION HEADERS in markdown:
+    try:
+        ai_data = json.loads(raw_response)
+    except json.JSONDecodeError:
+        messages.error(request, "AI returned an invalid response. Please try again.")
+        # Optionally log the malformed response
+        print(f"Malformed AI Response: {raw_response}")
+        return redirect("view_project", project_id=project.id)
 
-EXECUTIVE SUMMARY
-SYSTEM ARCHITECTURE
-THREAT MODEL
-SECURE SDLC RECOMMENDATIONS
-COST ESTIMATION
-SECURITY TESTING PLAN
+    required_fields = [
+        "executive_summary", "architecture", "threat_model", "secure_sdlc",
+        "cost_estimation", "testing_plan", "likelihood_score", "impact_score",
+        "risk_adjustment", "key_risks", "recommendations"
+    ]
 
-EXECUTIVE SUMMARY MUST INCLUDE:
-- Overall security posture (1–2 sentences)
-- Top 3 Critical Risks (bullet points)
-- Immediate Security Actions Required (bullet points)
+    missing_fields = [field for field in required_fields if field not in ai_data]
+    if missing_fields:
+        messages.error(request, f"AI response was missing required fields: {', '.join(missing_fields)}")
+        return redirect("view_project", project_id=project.id)
 
-SYSTEM ARCHITECTURE MUST INCLUDE:
-- Logical architecture based on the structured data provided.
-- Data flow overview.
-- Trust boundaries.
-- Authentication & authorization model.
-
-THREAT MODEL MUST INCLUDE:
-- STRIDE breakdown.
-- Relevant OWASP Top 10 risks.
-- Attack surface summary.
-
-SECURE SDLC RECOMMENDATIONS MUST INCLUDE:
-- Phase-wise practices.
-- Mandatory security gates.
-- Required tools (SAST, DAST, SCA).
-
-COST ESTIMATION MUST INCLUDE:
-- Security cost impact (low/medium/high).
-- Resource estimation for implementation.
-
-SECURITY TESTING PLAN MUST INCLUDE:
-- Pentesting scope.
-- Automated testing tools.
-- Continuous security monitoring suggestions.
-
-Provide two numerical scores at the very end:
-LIKELIHOOD SCORE (1–5)
-IMPACT SCORE (1–5)
-"""
-
-    generated_text = generate_ai_analysis(prompt)
-
-    likelihood = extract_score(generated_text, "LIKELIHOOD SCORE")
-    impact = extract_score(generated_text, "IMPACT SCORE")
-
-    # Extract top-level sections
-    executive_summary = extract_section(generated_text, "EXECUTIVE SUMMARY")
-    architecture = extract_section(generated_text, "SYSTEM ARCHITECTURE")
-    threat_model = extract_section(generated_text, "THREAT MODEL")
-    sdls_recommendations = extract_section(generated_text, "SECURE SDLC RECOMMENDATIONS")
-    cost_estimation = extract_section(generated_text, "COST ESTIMATION")
-    testing_plan = extract_section(generated_text, "SECURITY TESTING PLAN")
-
-    # Extract subsections from EXECUTIVE SUMMARY
-    top_risks = extract_subsection(generated_text, "EXECUTIVE SUMMARY", "Top 3 critical risks")
-    immediate_actions = extract_subsection(generated_text, "EXECUTIVE SUMMARY", "Immediate actions recommended")
-
-    
     # Save analysis
     analysis = ProjectAnalysis.objects.create(
         project=project,
         user=request.user,
-
-        executive_summary=executive_summary,
-        top_risks=top_risks,
-        immediate_actions=immediate_actions,
-
-        architecture=architecture,
-        threat_model=threat_model,
-        cost_estimation=cost_estimation,
-        sdls_recommendations=sdls_recommendations,
-        testing_plan=testing_plan,
-
-        likelihood=likelihood,
-        impact=impact,
+        executive_summary=ai_data["executive_summary"],
+        architecture=ai_data["architecture"],
+        threat_model=ai_data["threat_model"],
+        sdls_recommendations=ai_data["secure_sdlc"],
+        cost_estimation=ai_data["cost_estimation"],
+        testing_plan=ai_data["testing_plan"],
+        likelihood=ai_data["likelihood_score"],
+        impact=ai_data["impact_score"],
+        # Note: The model has top_risks and immediate_actions fields. We'll map the new JSON fields to them.
+        # This is a temporary measure until the model is updated.
+        top_risks="\n".join(f"- {risk}" for risk in ai_data.get("key_risks", [])),
+        immediate_actions="\n".join(f"- {rec}" for rec in ai_data.get("recommendations", [])),
     )
 
     # Apply hybrid security scoring
-    score, category = calculate_final_security_score(project)
+    score, category = calculate_final_security_score(
+        project,
+        ai_risk_adjustment=ai_data.get("risk_adjustment", 0)
+    )
     analysis.security_score = score
     analysis.risk_category = category
     analysis.save()
 
     messages.success(request, f"Security analysis generated — Risk rating: {category} ({score})")
-
     return redirect("view_analysis", analysis_id=analysis.id)
 
 
-
-# =====================================================
-# VIEW ANALYSIS
-# =====================================================
 @login_required
 def view_analysis(request, analysis_id):
     analysis = get_object_or_404(ProjectAnalysis, id=analysis_id, user=request.user)
@@ -227,10 +108,6 @@ def view_analysis(request, analysis_id):
     })
 
 
-
-# =====================================================
-# ANALYSIS HISTORY
-# =====================================================
 @login_required
 def history_analysis(request, project_id):
     project = get_object_or_404(Project, id=project_id, user=request.user)
@@ -241,7 +118,7 @@ def history_analysis(request, project_id):
     trend_data = {
         "highest": max(scores) if scores else 0,
         "lowest": min(scores) if scores else 0,
-        "average": sum(scores)/len(scores) if scores else 0,
+        "average": sum(scores) / len(scores) if scores else 0,
         "improving": scores[-1] < scores[0] if len(scores) > 1 else False,
     }
 
@@ -252,10 +129,6 @@ def history_analysis(request, project_id):
     })
 
 
-
-# =====================================================
-# EXPORT PDF
-# =====================================================
 @login_required
 def download_analysis_pdf(request, analysis_id):
     analysis = get_object_or_404(ProjectAnalysis, id=analysis_id, user=request.user)

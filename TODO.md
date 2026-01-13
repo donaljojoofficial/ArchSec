@@ -1,134 +1,66 @@
-# ArchSec Project TODO
+# ArchSec Project Roadmap
 
-This file tracks the development progress based on the phases outlined in the `README.md`.
-
----
-
-### Database Schema Hotfix (2026-01-12)
-- **Status:** Partially Complete
-- **Tasks:**
-    - [x] Inspect `core/models/project.py` for `structured_data` field.
-    - [x] Confirm `Project` model has `JSONField` for `structured_data`.
-    - [x] Manually create migration `0010_auto_20260112_1200.py` for the missing column.
-    - [ ] Apply the new migration to the database.
-    - [ ] Verify the dashboard and ORM queries work as expected.
-- **Notes:**
-    - The `run_shell_command` tool is disabled in the current environment, so the `migrate` command could not be run. The migration file has been created, but the database schema has not been updated. The user will need to run `python manage.py migrate` to apply the changes.
+This document outlines the development status and future roadmap for the ArchSec platform.
 
 ---
 
-### Phase 1: Environment & Base Setup (Week 1) ✅
-- **Status:** Mostly Complete
-- **Tasks:**
-    - [x] Create GitHub repo
-    - [x] Configure GitHub Codespaces
-    - [x] Initialize Django project
-    - [x] User authentication setup
-    - [x] Base UI + dashboard shell
-    - [x] Connect AI API keys via environment variables
+## ✅ Completed Milestones (Phases 1-6)
+
+- [x] Core Django project setup with a modular service-oriented architecture.
+- [x] User authentication system for project and analysis ownership.
+- [x] Advanced `Project` model using a flexible `JSONField` for structured architecture data.
+- [x] `ProjectAnalysis` model for storing versioned, AI-generated security reports.
+- [x] AI integration with the Google Gemini API for core analysis generation.
+- [x] Hybrid security scoring engine combining rule-based checks with AI-driven risk adjustments.
+- [x] AI-driven generation of Executive Summaries, Threat Models, and System Architecture.
+- [x] Automated recommendations for Secure SDLC and security testing plans.
+- [x] Risk category classification into Low, Medium, or High.
+- [x] Analysis history tracking with risk trend visualization using Chart.js.
+- [x] PDF and ZIP export capabilities for security reports and historical data.
+- [x] Sophisticated, architecture-aware AI prompting engine.
 
 ---
 
-### Phase 2: Project Creation + AI Design Engine (Week 2–3) ✅
-- **Status:** Largely Complete
-- **Tasks:**
-    - [x] Create new project
-    - [x] Input project info: tech stack, platform, budget, risk level
-    - [x] AI generates:
-        - [x] System design
-        - [x] Architecture
-        - [x] Tech suggestions
-        - [x] Initial security risks
-        - [x] Rough cost estimation
+## 🚧 Identified Architectural Weaknesses
+
+- **Fragile AI Response Parsing:** The current system relies on brittle markdown string parsing, which is susceptible to failures if the AI's output format deviates.
+- **Synchronous AI Analysis:** Long-running AI analyses are executed as blocking HTTP requests, posing a risk of request timeouts and a poor user experience.
+- **Data Model Anomaly:** A duplicate `executive_summary` field has been identified in the `ProjectAnalysis` model and requires a database schema cleanup.
 
 ---
 
-### Phase 3: Security Intelligence Module (Week 4–5) ✅
-- **Status:** Largely Complete
-- **Tasks:**
-    - [x] Add full AI-driven modules:
-        - [x] Threat modeling (STRIDE/DREAD)
-        - [x] Attack vector identification
-        - [x] Security measures & countermeasures
-        - [x] Secure SDLC guidelines
-        - [ ] Suggest compliance frameworks (OWASP ASVS, ISO 27001, NIST 800-53) - *Note: Basic OWASP Top 10 is mentioned, but not the others.*
+## 🚀 Upcoming Development Roadmap
 
----
+### PHASE 7 — Platform Hardening & Reliability
+- [ ] Migrate AI output from markdown to a structured JSON mode.
+- [ ] Replace all markdown parsing logic with robust JSON deserialization.
+- [ ] Refactor the `ai_client` service to support and enforce a JSON output schema.
+- [ ] Implement an AI response validation layer to ensure data integrity.
+- [ ] Implement asynchronous AI processing for analysis jobs using Celery and Redis.
+- [ ] Add background job status tracking and reporting.
+- [ ] Implement frontend polling or WebSockets for real-time UI updates on analysis completion.
+- [ ] Create a database migration to remove the duplicate `executive_summary` field.
+- [ ] Add system health check endpoints for monitoring.
+- [ ] Implement structured logging (e.g., JSON format) across the application.
 
-### Phase 4: Testing & Audit Planning Module (Week 6) ✅
-- **Status:** Largely Complete
-- **Tasks:**
-    - [x] Implement:
-        - [x] AI-generated penetration test plan
-        - [x] Recommended security tools (Nmap, Burp, ZAP)
-        - [ ] Secure coding checklist - *Note: Not explicitly generated.*
-        - [ ] Test case generation - *Note: Not explicitly generated.*
-        - [x] Severity scoring (CVSS-like) - *Note: A custom security score is implemented.*
+### PHASE 8 — Compliance & Architecture Decision Engine
+- [ ] Create a `ComplianceStandard` model (e.g., PCI DSS, ISO 27001, SOC2, HIPAA).
+- [ ] Create a `ComplianceControl` model to store individual compliance requirements.
+- [ ] Add functionality to map projects to one or more compliance frameworks.
+- [ ] Enhance the AI engine to generate compliance evidence and identify gaps against selected controls.
+- [ ] Build a compliance dashboard to visualize status and evidence.
+- [ ] Implement an Architecture Decision Record (ADR) engine.
+- [ ] Add versioning and history tracking for all ADRs.
+- [ ] Generate AI-powered draft ADR documents from project architecture and decisions.
+- [ ] Add export functionality for ADRs to Markdown and PDF.
 
----
-
-### Phase 5: Reporting & Export Module (Week 7–8)
-- **Status:** Partially Complete
-- **Tasks:**
-    - [x] Export project reports as:
-        - [x] PDF
-        - [x] Markdown
-        - [ ] JSON - *Note: Not implemented.*
-    - [ ] Architecture diagrams using Mermaid
-    - [x] Dashboard overview for all projects
-
----
-
-### Phase 6: UI Improvement & Final Integration (Week 9)
-- **Status:** Partially Complete
-- **Tasks:**
-    - [ ] Modern UI polishing - *Note: Uses Bootstrap, not TailwindCSS as planned. UI needs refinement.*
-    - [ ] Nav sidebar + clean components
-    - [ ] Better readability for long AI outputs
-    - [x] Project history & logs
-    - [ ] Error handling & response caching
-
----
-
-### Phase 7: Testing & Deployment (Week 10)
-- **Status:** Not Started
-- **Tasks:**
-    - [ ] Unit testing + integration testing
-    - [ ] Performance checks
-    - [ ] Deploy on:
-        - [ ] Render
-        - [ ] Railway
-        - [ ] Or Django + PostgreSQL hosting
-
----
-
-### Project Idea Submission Module Upgrade
-- **Status:** Not Started
-- **Tasks:**
-    - [x] **1. Update Project model:**
-        - [x] Use JSONField to store structured sections:
-            - `requirements`, `users`, `architecture`, `technology`, `security`,
-            - `performance`, `database`, `testing`, `deployment`, `monitoring`,
-            - `compliance`, `privacy`, `scalability`, `infrastructure`
-        - [x] Keep backward compatibility
-    - [x] **2. Update project creation form:**
-        - [x] For each section, provide common selectable options
-        - [x] Provide an optional input field
-        - [x] Group inputs logically
-    - [x] **3. Update project creation template:**
-        - [x] Use sectioned UI (accordion or fieldsets)
-        - [x] Keep it readable and not overwhelming
-    - [x] **4. Update project save logic:**
-        - [x] Merge dropdown + manual inputs correctly into JSON fields
-    - [x] **5. Update AI analysis prompt:**
-        - [x] Pass structured data with clear section headers
-        - [x] Do not flatten JSON into plain text
-    - [x] **6. Update security scoring logic:**
-        - [x] Penalize missing security/monitoring/compliance data
-        - [x] Reward mature architecture choices
-    - [x] **7. Update dashboard:**
-        - [x] Show completeness indicators
-        - [x] Warn for missing critical sections
-    - [x] **8. Update TODO.md:**
-        - [x] Add all above tasks
-        - [x] Mark completed tasks clearly
+### PHASE 9 — Proactive Intelligence & Maturity Scoring
+- [ ] Implement a Security Maturity Model based on an industry standard (e.g., BSIMM or SAMM).
+- [ ] Add multi-domain maturity scoring across areas like Governance, Design, and Operations.
+- [ ] Create a radar chart visualization for security maturity scores.
+- [ ] Implement AI-powered remediation suggestions, including actionable code samples.
+- [ ] Add detection for common anti-patterns and vulnerability patterns in project architecture.
+- [ ] Build a dedicated security knowledge base (e.g., using a vector database).
+- [ ] Integrate Retrieval-Augmented Generation (RAG) for more accurate and verifiable AI reasoning.
+- [ ] Implement reasoning traceability to show how the AI reached its conclusions.
+- [ ] Add explainable AI (XAI) features to the analysis output.
