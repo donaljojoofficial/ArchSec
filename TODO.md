@@ -4,6 +4,14 @@ This document outlines the development status and future roadmap for the ArchSec
 
 ---
 
+## Bugs
+- [x] Fix NoReverseMatch: view_project URL resolution error
+- [x] Fix incorrect redirect after analysis generation (should redirect to view_analysis)
+- [x] Fix incorrect redirect behavior during AI failure path
+- [x] Generate Analysis always redirects to dashboard even on success
+
+---
+
 ## ✅ Completed Milestones (Phases 1-6)
 
 - [x] Core Django project setup with a modular service-oriented architecture.

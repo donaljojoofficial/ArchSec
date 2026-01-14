@@ -6,6 +6,7 @@ from .project import Project
 class ProjectAnalysis(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="analyses")
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    raw_ai_response = models.JSONField(null=True, blank=True)
 
     architecture = models.TextField(blank=True)
     threat_model = models.TextField(blank=True)

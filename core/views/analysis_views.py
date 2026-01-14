@@ -48,40 +48,45 @@ def generate_analysis(request, project_id):
     """
 
     raw_response = generate_ai_analysis(prompt)
+    ai_data = None
+    validation_errors = []
 
     try:
         ai_data = json.loads(raw_response)
+        # Enforce AI JSON Validation
+        required_keys = [
+            "executive_summary", "architecture", "threat_model", "sdlc",
+            "cost_estimation", "testing_plan", "ai_risk_adjustment"
+        ]
+        missing_keys = [key for key in required_keys if key not in ai_data]
+        if missing_keys:
+            validation_errors.append(f"AI response missing required keys: {', '.join(missing_keys)}")
     except json.JSONDecodeError:
-        messages.error(request, "AI returned an invalid response. Please try again.")
-        # Optionally log the malformed response
-        print(f"Malformed AI Response: {raw_response}")
-        return redirect("view_project", project_id=project.id)
+        validation_errors.append("AI returned an invalid, non-JSON response.")
 
-    required_fields = [
-        "executive_summary", "architecture", "threat_model", "secure_sdlc",
-        "cost_estimation", "testing_plan", "likelihood_score", "impact_score",
-        "risk_adjustment", "key_risks", "recommendations"
-    ]
+    # Check if validation failed
+    if validation_errors:
+        messages.error(request, f"❌ AI analysis failed: {validation_errors[0]}. Please try again.")
+        # Optionally log the full error for debugging
+        print(f"Failed AI Response: {raw_response}")
+        return redirect("dashboard")
 
-    missing_fields = [field for field in required_fields if field not in ai_data]
-    if missing_fields:
-        messages.error(request, f"AI response was missing required fields: {', '.join(missing_fields)}")
-        return redirect("view_project", project_id=project.id)
+    # --- Success Path ---
+    messages.success(request, "✅ Analysis generated successfully")
 
-    # Save analysis
+    # Save analysis, now with raw AI response
     analysis = ProjectAnalysis.objects.create(
         project=project,
         user=request.user,
-        executive_summary=ai_data["executive_summary"],
-        architecture=ai_data["architecture"],
-        threat_model=ai_data["threat_model"],
-        sdls_recommendations=ai_data["secure_sdlc"],
-        cost_estimation=ai_data["cost_estimation"],
-        testing_plan=ai_data["testing_plan"],
-        likelihood=ai_data["likelihood_score"],
-        impact=ai_data["impact_score"],
-        # Note: The model has top_risks and immediate_actions fields. We'll map the new JSON fields to them.
-        # This is a temporary measure until the model is updated.
+        raw_ai_response=ai_data,  # Persist raw AI output
+        executive_summary=ai_data.get("executive_summary", ""),
+        architecture=ai_data.get("architecture", ""),
+        threat_model=ai_data.get("threat_model", ""),
+        sdls_recommendations=ai_data.get("sdlc", ""),  # Map from 'sdlc' key
+        cost_estimation=ai_data.get("cost_estimation", ""),
+        testing_plan=ai_data.get("testing_plan", ""),
+        likelihood=ai_data.get("likelihood_score", 0),
+        impact=ai_data.get("impact_score", 0),
         top_risks="\n".join(f"- {risk}" for risk in ai_data.get("key_risks", [])),
         immediate_actions="\n".join(f"- {rec}" for rec in ai_data.get("recommendations", [])),
     )
@@ -89,13 +94,12 @@ def generate_analysis(request, project_id):
     # Apply hybrid security scoring
     score, category = calculate_final_security_score(
         project,
-        ai_risk_adjustment=ai_data.get("risk_adjustment", 0)
+        ai_risk_adjustment=ai_data.get("ai_risk_adjustment", 0)
     )
     analysis.security_score = score
     analysis.risk_category = category
     analysis.save()
 
-    messages.success(request, f"Security analysis generated — Risk rating: {category} ({score})")
     return redirect("view_analysis", analysis_id=analysis.id)
 
 
