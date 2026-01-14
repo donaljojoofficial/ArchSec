@@ -1,4 +1,5 @@
 import os
+import json
 import google.generativeai as genai
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
@@ -33,18 +34,28 @@ def _get_available_model():
             if model in available:
                 _cached_model = model
                 return model
-        return "ERROR: No suitable models available."
+        return None
     except Exception as e:
-        return f"ERROR: Could not list Gemini models: {e}"
+        # Log the exception for debugging, but don't expose it directly.
+        print(f"ERROR: Could not list Gemini models: {e}")
+        return None
 
 def generate_ai_analysis(prompt):
     """Generates security analysis using a Gemini model, ensuring JSON output."""
     if not GEMINI_API_KEY:
-        return '{"error": "No Gemini API key configured."}'
+        return {
+            "status": "error",
+            "error_type": "misconfigured",
+            "message": "No Gemini API key configured.",
+        }
 
     model_name = _get_available_model()
-    if model_name.startswith("ERROR:"):
-        return f'{{"error": "{model_name}"}}'
+    if not model_name:
+        return {
+            "status": "error",
+            "error_type": "model_unavailable",
+            "message": "No suitable models available.",
+        }
 
     json_instruction = """
     IMPORTANT: Your entire response MUST be a single, valid JSON object.
@@ -77,6 +88,11 @@ def generate_ai_analysis(prompt):
         response = model.generate_content(
             full_prompt, generation_config=generation_config
         )
-        return response.text
+        # The response.text is already a JSON string, so we parse it to a Python dict
+        return json.loads(response.text)
     except Exception as e:
-        return f'{{"error": "AI Error: {str(e)}"}}'
+        return {
+            "status": "error",
+            "error_type": "ai_error",
+            "message": f"AI Error: {str(e)}",
+        }

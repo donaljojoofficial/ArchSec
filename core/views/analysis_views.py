@@ -47,29 +47,24 @@ def generate_analysis(request, project_id):
     ---
     """
 
-    raw_response = generate_ai_analysis(prompt)
-    ai_data = None
-    validation_errors = []
+    ai_response = generate_ai_analysis(prompt)
 
-    try:
-        ai_data = json.loads(raw_response)
-        # Enforce AI JSON Validation
-        required_keys = [
-            "executive_summary", "architecture", "threat_model", "sdlc",
-            "cost_estimation", "testing_plan", "ai_risk_adjustment"
-        ]
-        missing_keys = [key for key in required_keys if key not in ai_data]
-        if missing_keys:
-            validation_errors.append(f"AI response missing required keys: {', '.join(missing_keys)}")
-    except json.JSONDecodeError:
-        validation_errors.append("AI returned an invalid, non-JSON response.")
+    # Detect if the AI client returned a structured error
+    if ai_response.get("status") == "error":
+        messages.error(
+            request, f"❌ AI analysis failed: {ai_response.get('message')}"
+        )
 
-    # Check if validation failed
-    if validation_errors:
-        messages.error(request, f"❌ AI analysis failed: {validation_errors[0]}. Please try again.")
-        # Optionally log the full error for debugging
-        print(f"Failed AI Response: {raw_response}")
-        return redirect("dashboard")
+        # Create a failed analysis record to persist the error
+        analysis = ProjectAnalysis.objects.create(
+            project=project,
+            user=request.user,
+            raw_ai_response=ai_response,  # Persist the structured error
+            security_score=0,  # Explicitly set failure state
+            risk_category="Error",
+        )
+        # Redirect to the analysis page, which will now render the error
+        return redirect("view_analysis", analysis_id=analysis.id)
 
     # --- Success Path ---
     messages.success(request, "✅ Analysis generated successfully")
@@ -78,23 +73,23 @@ def generate_analysis(request, project_id):
     analysis = ProjectAnalysis.objects.create(
         project=project,
         user=request.user,
-        raw_ai_response=ai_data,  # Persist raw AI output
-        executive_summary=ai_data.get("executive_summary", ""),
-        architecture=ai_data.get("architecture", ""),
-        threat_model=ai_data.get("threat_model", ""),
-        sdls_recommendations=ai_data.get("sdlc", ""),  # Map from 'sdlc' key
-        cost_estimation=ai_data.get("cost_estimation", ""),
-        testing_plan=ai_data.get("testing_plan", ""),
-        likelihood=ai_data.get("likelihood_score", 0),
-        impact=ai_data.get("impact_score", 0),
-        top_risks="\n".join(f"- {risk}" for risk in ai_data.get("key_risks", [])),
-        immediate_actions="\n".join(f"- {rec}" for rec in ai_data.get("recommendations", [])),
+        raw_ai_response=ai_response,  # Persist raw AI output
+        executive_summary=ai_response.get("executive_summary", ""),
+        architecture=ai_response.get("architecture", ""),
+        threat_model=ai_response.get("threat_model", ""),
+        sdls_recommendations=ai_response.get("sdlc", ""),  # Map from 'sdlc' key
+        cost_estimation=ai_response.get("cost_estimation", ""),
+        testing_plan=ai_response.get("testing_plan", ""),
+        likelihood=ai_response.get("likelihood_score", 0),
+        impact=ai_response.get("impact_score", 0),
+        top_risks="\n".join(f"- {risk}" for risk in ai_response.get("key_risks", [])),
+        immediate_actions="\n".join(f"- {rec}" for rec in ai_response.get("recommendations", [])),
     )
 
     # Apply hybrid security scoring
     score, category = calculate_final_security_score(
         project,
-        ai_risk_adjustment=ai_data.get("ai_risk_adjustment", 0)
+        ai_risk_adjustment=ai_response.get("ai_risk_adjustment", 0)
     )
     analysis.security_score = score
     analysis.risk_category = category
