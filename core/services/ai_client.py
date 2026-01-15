@@ -1,81 +1,46 @@
 import os
 import json
+import logging
 import google.generativeai as genai
+from django.conf import settings
 
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-
-if GEMINI_API_KEY:
-    genai.configure(api_key=GEMINI_API_KEY)
-
-_cached_model = None
-
-def _get_available_model():
-    """Fetches and caches the best available Gemini model."""
-    global _cached_model
-    if _cached_model:
-        return _cached_model
-
-    if not GEMINI_API_KEY:
-        return None
-
-    try:
-        models = genai.list_models()
-        preferred_order = [
-            "gemini-1.5-flash-latest",
-            "gemini-1.5-pro-latest",
-            "gemini-pro",
-        ]
-        available = [
-            m.name.replace("models/", "")
-            for m in models
-            if "generateContent" in m.supported_generation_methods
-        ]
-        for model in preferred_order:
-            if model in available:
-                _cached_model = model
-                return model
-        return None
-    except Exception as e:
-        # Log the exception for debugging, but don't expose it directly.
-        print(f"ERROR: Could not list Gemini models: {e}")
-        return None
+logger = logging.getLogger(__name__)
 
 def generate_ai_analysis(prompt):
-    """Generates security analysis using a Gemini model, ensuring JSON output."""
-    if not GEMINI_API_KEY:
-        return {
+    """
+    Generates security analysis using the Gemini 1.5 Pro model.
+
+    Args:
+        prompt (str): The input prompt for the AI model.
+
+    Returns:
+        tuple: A tuple containing:
+            - bool: True if the API call was successful, False otherwise.
+            - dict: If successful, the JSON response from the AI.
+                    If unsuccessful, a dictionary with error details.
+    """
+    api_key = getattr(settings, "GEMINI_API_KEY", None)
+    if not api_key:
+        logger.error("GEMINI_API_KEY not configured.")
+        return False, {
             "status": "error",
-            "error_type": "misconfigured",
-            "message": "No Gemini API key configured.",
+            "error_type": "config",
+            "message": "GEMINI_API_KEY not configured.",
         }
 
-    model_name = _get_available_model()
-    if not model_name:
-        return {
-            "status": "error",
-            "error_type": "model_unavailable",
-            "message": "No suitable models available.",
-        }
+    logger.info("GEMINI_API_KEY is configured.")
+    genai.configure(api_key=api_key)
 
+    model_name = "models/gemini-1.5-pro"
+    logger.info(f"Sending request to Gemini API using model: {model_name}")
+    logger.debug(f"Prompt size: {len(prompt)} characters")
+
+    # This instruction should be part of the prompt engineering in the calling view,
+    # but is kept here for now to minimize refactoring scope.
     json_instruction = """
     IMPORTANT: Your entire response MUST be a single, valid JSON object.
     Do not include any text, notes, or explanations before or after the JSON.
     Do not use markdown formatting (e.g., ```json).
-
-    The JSON object must conform to the following schema:
-    {
-      "executive_summary": "string",
-      "architecture": "string",
-      "threat_model": "string",
-      "secure_sdlc": "string",
-      "cost_estimation": "string",
-      "testing_plan": "string",
-      "likelihood_score": "integer (1-5)",
-      "impact_score": "integer (1-5)",
-      "risk_adjustment": "integer (-30 to +30)",
-      "key_risks": ["string"],
-      "recommendations": ["string"]
-    }
     """
 
     full_prompt = f"{prompt}\n\n{json_instruction}"
@@ -88,11 +53,16 @@ def generate_ai_analysis(prompt):
         response = model.generate_content(
             full_prompt, generation_config=generation_config
         )
-        # The response.text is already a JSON string, so we parse it to a Python dict
-        return json.loads(response.text)
+        
+        logger.info("Successfully received response from Gemini API.")
+        # The response.text is a JSON string, which we load into a Python dict.
+        ai_response_dict = json.loads(response.text)
+        return True, ai_response_dict
+
     except Exception as e:
-        return {
+        logger.error(f"Gemini API call failed: {e}", exc_info=True)
+        return False, {
             "status": "error",
-            "error_type": "ai_error",
-            "message": f"AI Error: {str(e)}",
+            "error_type": "api_error",
+            "message": str(e),
         }

@@ -47,12 +47,14 @@ def generate_analysis(request, project_id):
     ---
     """
 
-    ai_response = generate_ai_analysis(prompt)
+    success, ai_response = generate_ai_analysis(prompt)
 
-    # Detect if the AI client returned a structured error
-    if ai_response.get("status") == "error":
+    # TASK 5: Always save the raw AI response, regardless of success or failure.
+    # The 'ai_response' variable now holds either the success JSON or the error dict.
+    
+    if not success:
         messages.error(
-            request, f"❌ AI analysis failed: {ai_response.get('message')}"
+            request, f"❌ AI analysis failed: {ai_response.get('message', 'Unknown error')}"
         )
 
         # Create a failed analysis record to persist the error
@@ -60,10 +62,9 @@ def generate_analysis(request, project_id):
             project=project,
             user=request.user,
             raw_ai_response=ai_response,  # Persist the structured error
-            security_score=0,  # Explicitly set failure state
+            security_score=0,
             risk_category="Error",
         )
-        # Redirect to the analysis page, which will now render the error
         return redirect("view_analysis", analysis_id=analysis.id)
 
     # --- Success Path ---
@@ -77,7 +78,7 @@ def generate_analysis(request, project_id):
         executive_summary=ai_response.get("executive_summary", ""),
         architecture=ai_response.get("architecture", ""),
         threat_model=ai_response.get("threat_model", ""),
-        sdls_recommendations=ai_response.get("sdlc", ""),  # Map from 'sdlc' key
+        sdls_recommendations=ai_response.get("secure_sdlc", ""), # Mapped from 'secure_sdlc'
         cost_estimation=ai_response.get("cost_estimation", ""),
         testing_plan=ai_response.get("testing_plan", ""),
         likelihood=ai_response.get("likelihood_score", 0),
