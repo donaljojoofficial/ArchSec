@@ -6,9 +6,12 @@ from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
+# Define the single, allowed Gemini model for this application.
+ALLOWED_MODELS = ["models/gemini-2.5-flash"]
+
 def generate_ai_analysis(prompt):
     """
-    Generates security analysis using the Gemini 1.5 Pro model.
+    Generates security analysis using the mandated Gemini 2.5 Flash model.
 
     Args:
         prompt (str): The input prompt for the AI model.
@@ -28,11 +31,16 @@ def generate_ai_analysis(prompt):
             "message": "GEMINI_API_KEY not configured.",
         }
 
-    logger.info("GEMINI_API_KEY is configured.")
     genai.configure(api_key=api_key)
 
-    model_name = "models/gemini-1.5-pro"
-    logger.info(f"Sending request to Gemini API using model: {model_name}")
+    # Enforce the use of the specified Gemini model.
+    model_name = "models/gemini-2.5-flash"
+    
+    if model_name not in ALLOWED_MODELS:
+        # This is a hard failure because the application is misconfigured.
+        raise RuntimeError(f"Invalid Gemini model: '{model_name}'. Allowed models are: {ALLOWED_MODELS}")
+
+    logger.info(f"Using Gemini model: {model_name}")
     logger.debug(f"Prompt size: {len(prompt)} characters")
 
     # This instruction should be part of the prompt engineering in the calling view,
@@ -46,6 +54,7 @@ def generate_ai_analysis(prompt):
     full_prompt = f"{prompt}\n\n{json_instruction}"
 
     try:
+        logger.info("Sending request to Gemini API...")
         model = genai.GenerativeModel(model_name)
         generation_config = genai.types.GenerationConfig(
             response_mime_type="application/json"
@@ -54,13 +63,13 @@ def generate_ai_analysis(prompt):
             full_prompt, generation_config=generation_config
         )
         
-        logger.info("Successfully received response from Gemini API.")
+        logger.info("Gemini response received successfully.")
         # The response.text is a JSON string, which we load into a Python dict.
         ai_response_dict = json.loads(response.text)
         return True, ai_response_dict
 
     except Exception as e:
-        logger.error(f"Gemini API call failed: {e}", exc_info=True)
+        logger.exception("Gemini API failure") # exc_info=True is implicit with logger.exception
         return False, {
             "status": "error",
             "error_type": "api_error",
