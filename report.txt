@@ -28,7 +28,13 @@ The project has made significant progress and has a solid foundation with many c
 - **Status:** Partially Complete
 - **Details:** The application can export analysis reports in PDF, Markdown, and plain text formats. It can also export the entire analysis history of a project as a ZIP archive.
 
-## 3. Discrepancies and Incomplete Work
+## 3. Bug Fixes
+
+### Critical Bug Fix: AI Analysis Generation
+- **Issue:** A `ValueError` was raised during AI analysis generation because the `generate_ai_analysis` function was returning a single string instead of the expected two values (a success boolean and a response dictionary). This caused an unpacking error in the view.
+- **Fix:** The `generate_ai_analysis` function in `core/services/ai_client.py` was modified to return a tuple `(success, response)`. Now, in case of an error, it returns `(False, {"message": "error details"})`, and on success, it returns `(True, parsed_json_response)`. This change makes the error handling more robust and prevents the application from crashing if the AI service fails.
+
+## 4. Discrepancies and Incomplete Work
 
 - **UI/UX (Phase 6):** The README mentions TailwindCSS, but the project currently uses Bootstrap. The overall UI is functional but could be polished for a better user experience.
 - **Diagram Generation (Phase 5):** The README specifies architecture diagrams using Mermaid/PlantUML as part of the reporting module, but this feature is not yet implemented.
@@ -36,7 +42,7 @@ The project has made significant progress and has a solid foundation with many c
 - **Advanced Features:** Optional features like real vulnerability scanning integration and multi-role user systems are not implemented.
 - **Deployment:** There are no configurations for deployment (e.g., Dockerfile, production-ready database settings).
 
-## 4. Next Steps and Prioritization
+## 5. Next Steps and Prioritization
 
 Here is a prioritized list of the next steps to move the project forward.
 
@@ -71,7 +77,7 @@ Here is a prioritized list of the next steps to move the project forward.
     *   **Action:** Consider implementing features like multi-role user access or integration with external security tools.
     *   **Priority:** Low. These are "nice-to-have" features that can be added after the core application is stable and deployed.
 
-## 5. Suggested Improvements
+## 6. Suggested Improvements
 
 Here are some suggested improvements to enhance the ArchSec platform, categorized by area.
 

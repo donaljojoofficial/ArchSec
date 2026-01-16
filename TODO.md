@@ -12,6 +12,7 @@ This document outlines the development status and future roadmap for the ArchSec
 - [x] Gemini API is never being called (AI client returns fallback error)
 - [x] Django cannot find json_filters template tag library
 - [x] Gemini model selection is not enforced to gemini-2.5-flash
+- [x] Fix ValueError in AI analysis due to incorrect return signature
 
 ---
 
