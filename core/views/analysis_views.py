@@ -28,7 +28,7 @@ def generate_analysis(request, project_id):
     )
 
     # Start the asynchronous analysis task
-    task = generate_analysis_task.delay(project.id, request.user.id)
+    task = generate_analysis_task.delay(analysis.id)
 
     # Store the task ID in the analysis object to track its status
     analysis.task_id = task.id

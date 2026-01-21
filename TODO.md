@@ -7,7 +7,7 @@ This document outlines the development status and future roadmap for the ArchSec
 ## Bugs
 - [x] Fix NoReverseMatch: view_project URL resolution error
 - [x] Fix incorrect redirect after analysis generation (should redirect to view_analysis)
-- [x] Fix incorrect redirect behavior during AI failure path
+- [x] Fix incorrect redirect behavior during aI failure path
 - [x] Generate Analysis redirects to dashboard on AI model availability failure
 - [x] Gemini API is never being called (AI client returns fallback error)
 - [x] Django cannot find json_filters template tag library
@@ -19,6 +19,8 @@ This document outlines the development status and future roadmap for the ArchSec
 - [x] Fix 'AI returned a non-JSON response' by enforcing JSON output mode.
 - [ ] Fix `no such column: core_projectanalysis.task_id` by running migrations.
 - [x] Fix empty analysis page by providing a JSON schema in the AI prompt.
+- [x] Fix asynchronous analysis job not displaying results
+
 
 ---
 

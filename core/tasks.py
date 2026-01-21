@@ -4,12 +4,13 @@ from .models import Project, ProjectAnalysis
 from .services.security_scoring import calculate_final_security_score
 
 @shared_task
-def generate_analysis_task(project_id, user_id):
+def generate_analysis_task(analysis_id):
     """
     Celery task to generate AI analysis for a project.
     """
     try:
-        project = Project.objects.get(id=project_id)
+        analysis = ProjectAnalysis.objects.get(id=analysis_id)
+        project = analysis.project
         
         structured_data_str = ""
         if project.structured_data:
@@ -58,14 +59,8 @@ def generate_analysis_task(project_id, user_id):
 
         success, ai_response = generate_ai_analysis(prompt)
 
-        analysis = ProjectAnalysis.objects.create(
-            project=project,
-            user_id=user_id,
-            raw_ai_response=ai_response,
-            security_score=0,
-            risk_category="Pending" if success else "Error",
-        )
-
+        analysis.raw_ai_response = ai_response
+        
         if success:
             analysis.executive_summary=ai_response.get("executive_summary", "")
             analysis.architecture=ai_response.get("architecture", "")
@@ -84,13 +79,17 @@ def generate_analysis_task(project_id, user_id):
             )
             analysis.security_score = score
             analysis.risk_category = category
-        
+        else:
+            analysis.risk_category = "Error"
+
         analysis.save()
 
         return analysis.id
-    except Project.DoesNotExist:
+    except ProjectAnalysis.DoesNotExist:
         # Handle project not found
         return None
     except Exception as e:
         # Handle other exceptions
+        analysis.risk_category = "Error"
+        analysis.save()
         return str(e)
