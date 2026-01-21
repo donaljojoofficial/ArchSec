@@ -46,7 +46,7 @@ This document outlines the development status and future roadmap for the ArchSec
 
 ## 🚧 Identified Architectural Weaknesses
 
-- **Fragile AI Response Parsing:** The current system relies on brittle markdown string parsing, which is susceptible to failures if the AI's output format deviates.
+- **[RESOLVED] Fragile AI Response Parsing:** The current system relies on brittle markdown string parsing, which is susceptible to failures if the AI's output format deviates.
 - **Synchronous AI Analysis:** Long-running AI analyses are executed as blocking HTTP requests, posing a risk of request timeouts and a poor user experience.
 - **Data Model Anomaly:** A duplicate `executive_summary` field has been identified in the `ProjectAnalysis` model and requires a database schema cleanup.
 
