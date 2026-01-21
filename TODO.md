@@ -21,6 +21,12 @@ This document outlines the development status and future roadmap for the ArchSec
 
 ---
 
+## Features
+- [x] Improve risk heatmap visualization with labels and better colors.
+- [x] Enhance AI prompt to generate more detailed analysis.
+
+---
+
 ## ✅ Completed Milestones (Phases 1-6)
 
 - [x] Core Django project setup with a modular service-oriented architecture.

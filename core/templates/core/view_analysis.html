@@ -23,35 +23,67 @@
     <p class="text-muted">Generated on {{ analysis.created_at }}</p>
 
     <h3>Risk Heatmap</h3>
-    <canvas id="riskHeatmap" width="300" height="300"></canvas>
+    <canvas id="riskHeatmap" width="350" height="350"></canvas>
     <script>
-      const likelihood = {{ analysis.likelihood }};
-      const impact = {{ analysis.impact }};
+        const likelihood = {{ analysis.likelihood }};
+        const impact = {{ analysis.impact }};
+        const canvas = document.getElementById("riskHeatmap");
+        const ctx = canvas.getContext("2d");
+        const gridSize = 60;
+        const matrixSize = 5;
+        const axisOffset = 50;
 
-      // Create a square matrix (3x3, or 5x5 if you want)
-      const ctx = document.getElementById("riskHeatmap").getContext("2d");
+        // Clear canvas
+        ctx.fillStyle = "white";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      ctx.fillStyle = "white";
-      ctx.fillRect(0,0,300,300);
+        const colors = [
+            ["#2ECC71", "#2ECC71", "#F1C40F", "#E67E22", "#E74C3C"],
+            ["#2ECC71", "#F1C40F", "#F1C40F", "#E67E22", "#E74C3C"],
+            ["#F1C40F", "#F1C40F", "#E67E22", "#E74C3C", "#E74C3C"],
+            ["#F1C40F", "#E67E22", "#E67E22", "#E74C3C", "#C0392B"],
+            ["#E67E22", "#E74C3C", "#C0392B", "#C0392B", "#C0392B"]
+        ];
 
-      // paint the matrix
-     for (let x=0; x<5; x++){
-       for (let y=0; y<5; y++){
-         let color = "green";
-
-         if (x > 2 || y > 2) color = "yellow";
-         if (x > 3 || y > 3) color = "orange";
-         if (x > 3 && y > 3) color = "red";
-
-         ctx.fillStyle = color;
-         ctx.fillRect(x*60, (4-y)*60, 60, 60);  // invert Y-axis
-         }
+        // Draw the matrix cells
+        for (let x = 0; x < matrixSize; x++) {
+            for (let y = 0; y < matrixSize; y++) {
+                ctx.fillStyle = colors[y][x];
+                ctx.fillRect(axisOffset + x * gridSize, canvas.height - axisOffset - (y + 1) * gridSize, gridSize, gridSize);
+                ctx.strokeStyle = "#BDC3C7";
+                ctx.strokeRect(axisOffset + x * gridSize, canvas.height - axisOffset - (y + 1) * gridSize, gridSize, gridSize);
+            }
         }
 
-      // highlight the project score
-      ctx.strokeStyle = "black";
-      ctx.lineWidth = 4;
-      ctx.strokeRect((impact-1)*60, (5-likelihood)*60, 60, 60);
+        // Draw axis labels and numbers
+        ctx.fillStyle = "black";
+        ctx.font = "14px Arial";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+
+        // Y-axis (Likelihood)
+        ctx.save();
+        ctx.translate(axisOffset / 2 - 10, canvas.height / 2);
+        ctx.rotate(-Math.PI / 2);
+        ctx.fillText("Likelihood", 0, 0);
+        ctx.restore();
+
+        // X-axis (Impact)
+        ctx.fillText("Impact", axisOffset + (matrixSize * gridSize) / 2, canvas.height - axisOffset / 2 + 10);
+
+        for (let i = 0; i < matrixSize; i++) {
+            // Y-axis numbers
+            ctx.fillText(i + 1, axisOffset - 20, canvas.height - axisOffset - (i + 0.5) * gridSize);
+            // X-axis numbers
+            ctx.fillText(i + 1, axisOffset + (i + 0.5) * gridSize, canvas.height - axisOffset + 20);
+        }
+
+        // Highlight the project score
+        if (impact > 0 && likelihood > 0) {
+            ctx.strokeStyle = "blue";
+            ctx.lineWidth = 4;
+            ctx.strokeRect(axisOffset + (impact - 1) * gridSize, canvas.height - axisOffset - likelihood * gridSize, gridSize, gridSize);
+        }
     </script>
 
     <!-- EXECUTIVE SUMMARY -->

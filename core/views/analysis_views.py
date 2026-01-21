@@ -30,18 +30,21 @@ def generate_analysis(request, project_id):
             structured_data_str += "\n"
 
     prompt = f"""
-    Analyze the following project and return a structured JSON response with the following keys:
-    - "executive_summary": (string)
-    - "architecture": (string)
-    - "threat_model": (string)
-    - "secure_sdlc": (string)
-    - "cost_estimation": (string)
-    - "testing_plan": (string)
-    - "key_risks": (array of strings)
-    - "recommendations": (array of strings)
-    - "likelihood_score": (integer, 1-5)
-    - "impact_score": (integer, 1-5)
-    - "ai_risk_adjustment": (integer)
+    Analyze the following project in detail and return a comprehensive, structured JSON response. 
+    For each text section, provide at least three detailed paragraphs.
+    
+    The JSON response must have the following keys:
+    - "executive_summary": (string) A detailed summary of the project's security posture.
+    - "architecture": (string) A detailed description of the proposed secure architecture.
+    - "threat_model": (string) A comprehensive threat model based on STRIDE, listing potential threats.
+    - "secure_sdlc": (string) Detailed recommendations for a secure software development lifecycle.
+    - "cost_estimation": (string) A detailed breakdown of estimated costs for security measures.
+    - "testing_plan": (string) A comprehensive plan for security testing, including tools and methodologies.
+    - "key_risks": (array of strings) A list of the top 5-10 key risks.
+    - "recommendations": (array of strings) A list of actionable recommendations to mitigate risks.
+    - "likelihood_score": (integer, 1-5) An integer representing the likelihood of a breach.
+    - "impact_score": (integer, 1-5) An integer representing the impact of a breach.
+    - "ai_risk_adjustment": (integer, -10 to 10) An integer to adjust the risk score based on nuances not captured by other fields.
 
     ---
     BASIC PROJECT INFO:
