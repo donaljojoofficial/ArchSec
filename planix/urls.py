@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.urls import path, include
 from core.views.dashboard_views import dashboard
 from core.views.project_views import create_project
-from core.views.analysis_views import generate_analysis, view_analysis, history_analysis, download_analysis_pdf
+from core.views.analysis_views import generate_analysis, view_analysis, history_analysis, download_analysis_pdf, analysis_status
 from core.views.export_views import export_analysis_md, export_analysis_txt
 from core.views.export_views import export_analysis_history_zip
 
@@ -16,6 +16,7 @@ urlpatterns = [
     path("analysis/<int:analysis_id>/", view_analysis, name="view_analysis"),
     path("project/<int:project_id>/analysis/history/", history_analysis, name="analysis_history"),
     path("analysis/<int:analysis_id>/pdf/", download_analysis_pdf, name="download_analysis_pdf"),
+    path("analysis/<int:analysis_id>/status/", analysis_status, name="analysis_status"),
     # Export actions
     path("analysis/<int:analysis_id>/export/md/", export_analysis_md, name="export_analysis_md"),
     path("analysis/<int:analysis_id>/export/txt/", export_analysis_txt, name="export_analysis_txt"),

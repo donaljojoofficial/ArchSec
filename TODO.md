@@ -46,8 +46,8 @@ This document outlines the development status and future roadmap for the ArchSec
 
 ## 🚧 Identified Architectural Weaknesses
 
-- **[RESOLVED] Fragile AI Response Parsing:** The current system relies on brittle markdown string parsing, which is susceptible to failures if the AI's output format deviates.
-- **Synchronous AI Analysis:** Long-running AI analyses are executed as blocking HTTP requests, posing a risk of request timeouts and a poor user experience.
+- **[COMPLETED] Fragile AI Response Parsing:** The current system relies on brittle markdown string parsing, which is susceptible to failures if the AI's output format deviates.
+- **[COMPLETED] Synchronous AI Analysis:** Long-running AI analyses are executed as blocking HTTP requests, posing a risk of request timeouts and a poor user experience.
 - **Data Model Anomaly:** A duplicate `executive_summary` field has been identified in the `ProjectAnalysis` model and requires a database schema cleanup.
 
 ---
@@ -59,9 +59,9 @@ This document outlines the development status and future roadmap for the ArchSec
 - [x] Replace all markdown parsing logic with robust JSON deserialization.
 - [x] Refactor the `ai_client` service to support and enforce a JSON output schema.
 - [ ] Implement an AI response validation layer to ensure data integrity.
-- [ ] Implement asynchronous AI processing for analysis jobs using Celery and Redis.
-- [ ] Add background job status tracking and reporting.
-- [ ] Implement frontend polling or WebSockets for real-time UI updates on analysis completion.
+- [x] Implement asynchronous AI processing for analysis jobs using Celery and Redis.
+- [x] Add background job status tracking and reporting.
+- [x] Implement frontend polling or WebSockets for real-time UI updates on analysis completion.
 - [ ] Create a database migration to remove the duplicate `executive_summary` field.
 - [ ] Add system health check endpoints for monitoring.
 - [ ] Implement structured logging (e.g., JSON format) across the application.

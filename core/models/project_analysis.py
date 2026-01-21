@@ -7,6 +7,7 @@ class ProjectAnalysis(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="analyses")
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     raw_ai_response = models.JSONField(null=True, blank=True)
+    task_id = models.CharField(max_length=255, blank=True, null=True)
 
     architecture = models.TextField(blank=True)
     threat_model = models.TextField(blank=True)
@@ -15,7 +16,6 @@ class ProjectAnalysis(models.Model):
     testing_plan = models.TextField(blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
-    executive_summary = models.TextField(blank=True)
 
     security_score = models.IntegerField(default=0)
     risk_category = models.CharField(max_length=20, default="Unknown")
@@ -26,11 +26,3 @@ class ProjectAnalysis(models.Model):
     immediate_actions = models.TextField(blank=True, null=True)
     likelihood = models.IntegerField(default=0)   # 1–5
     impact = models.IntegerField(default=0)       # 1–5
-
-
-
-
-    def __str__(self):
-        return f"Analysis for {self.project.name} ({self.created_at})"
-
-

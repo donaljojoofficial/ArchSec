@@ -2,7 +2,7 @@
 {% load json_filters %}
 
 {% block content %}
-<div class="container mt-4">
+<div class="container mt-4" id="analysis-content">
 
     {% if analysis.risk_category == "Error" %}
     <div class="alert alert-danger">
@@ -165,10 +165,50 @@
     <a href="{% url 'export_analysis_txt' analysis.id %}" class="btn btn-dark mt-2">
         Download as Text
     </a>
+    <a href="{% url 'dashboard' %}" class="btn btn-secondary mt-2">
+        Back to Dashboard
+    </a>
     {% endif %}
 
+    
+</div>
+
+<div id="analysis-pending" class="container mt-4 text-center" style="display: none;">
+    <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="mt-2">Your security analysis is being generated. Please wait, this page will refresh automatically when complete.</p>
     <a href="{% url 'dashboard' %}" class="btn btn-secondary mt-2">
         Back to Dashboard
     </a>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const analysisContent = document.getElementById("analysis-content");
+        const pendingContainer = document.getElementById("analysis-pending");
+        const analysisStatus = "{{ analysis.risk_category }}";
+        const analysisId = "{{ analysis.id }}";
+
+        if (analysisStatus === "Pending") {
+            analysisContent.style.display = "none";
+            pendingContainer.style.display = "block";
+
+            const interval = setInterval(function () {
+                fetch(`/analysis/${analysisId}/status/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === "SUCCESS" || data.status === "FAILURE") {
+                            clearInterval(interval);
+                            window.location.reload();
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error fetching analysis status:", error);
+                        clearInterval(interval);
+                    });
+            }, 3000); // Poll every 3 seconds
+        }
+    });
+</script>
 {% endblock %}
