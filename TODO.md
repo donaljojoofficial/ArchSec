@@ -17,6 +17,7 @@ This document outlines the development status and future roadmap for the ArchSec
 - [x] Gemini API is returning 'Too Many Requests' error.
 - [x] Fix 429 quota error by preferring gemini-flash model.
 - [x] Fix 'AI returned a non-JSON response' by enforcing JSON output mode.
+- [ ] Fix `no such column: core_projectanalysis.task_id` by running migrations.
 - [x] Fix empty analysis page by providing a JSON schema in the AI prompt.
 
 ---
