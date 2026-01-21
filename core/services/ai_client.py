@@ -32,8 +32,8 @@ def _get_available_model():
     try:
         models = genai.list_models()
         
-        # Sort models to prefer 'gemini-pro' and 'gemini-flash'
-        sorted_models = sorted(models, key=lambda m: ("gemini-pro" not in m.name, "gemini-flash" not in m.name))
+        # Sort models to prefer 'gemini-flash' and 'gemini-pro'
+        sorted_models = sorted(models, key=lambda m: ("gemini-flash" not in m.name, "gemini-pro" not in m.name))
         
         for model in sorted_models:
             if "generateContent" in model.supported_generation_methods:
@@ -69,22 +69,18 @@ def generate_ai_analysis(prompt):
 
     try:
         model = genai.GenerativeModel(model_name)
-        response = model.generate_content(prompt)
+        
+        # Enforce JSON output from the model
+        generation_config = genai.GenerationConfig(response_mime_type="application/json")
+        response = model.generate_content(prompt, generation_config=generation_config)
 
-        # Pre-process the response to handle markdown and extract JSON
-        raw_text = response.text.strip()
-        if raw_text.startswith("```json"):
-            raw_text = raw_text[7:]
-        if raw_text.endswith("```"):
-            raw_text = raw_text[:-3]
-
-        # Attempt to parse the cleaned text as JSON
-        return True, json.loads(raw_text)
+        # The response should be a valid JSON string now.
+        return True, json.loads(response.text)
 
     except json.JSONDecodeError:
-        # If JSON parsing fails, return the raw text with an error message
+        # This is less likely to happen, but good to keep as a fallback.
         return False, {
-            "message": "AI returned a non-JSON response.",
+            "message": "AI returned a non-JSON response, even when JSON was requested.",
             "raw_response": response.text,
         }
     except Exception as e:

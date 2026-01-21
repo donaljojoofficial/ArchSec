@@ -30,7 +30,18 @@ def generate_analysis(request, project_id):
             structured_data_str += "\n"
 
     prompt = f"""
-    Analyze the following project and return a structured JSON response.
+    Analyze the following project and return a structured JSON response with the following keys:
+    - "executive_summary": (string)
+    - "architecture": (string)
+    - "threat_model": (string)
+    - "secure_sdlc": (string)
+    - "cost_estimation": (string)
+    - "testing_plan": (string)
+    - "key_risks": (array of strings)
+    - "recommendations": (array of strings)
+    - "likelihood_score": (integer, 1-5)
+    - "impact_score": (integer, 1-5)
+    - "ai_risk_adjustment": (integer)
 
     ---
     BASIC PROJECT INFO:

@@ -15,6 +15,9 @@ This document outlines the development status and future roadmap for the ArchSec
 - [x] Fix ValueError in AI analysis due to incorrect return signature
 - [x] Suppress Pylance warning for missing `google-generativeai` package.
 - [x] Gemini API is returning 'Too Many Requests' error.
+- [x] Fix 429 quota error by preferring gemini-flash model.
+- [x] Fix 'AI returned a non-JSON response' by enforcing JSON output mode.
+- [x] Fix empty analysis page by providing a JSON schema in the AI prompt.
 
 ---
 
@@ -46,9 +49,9 @@ This document outlines the development status and future roadmap for the ArchSec
 ## 🚀 Upcoming Development Roadmap
 
 ### PHASE 7 — Platform Hardening & Reliability
-- [ ] Migrate AI output from markdown to a structured JSON mode.
-- [ ] Replace all markdown parsing logic with robust JSON deserialization.
-- [ ] Refactor the `ai_client` service to support and enforce a JSON output schema.
+- [x] Migrate AI output from markdown to a structured JSON mode.
+- [x] Replace all markdown parsing logic with robust JSON deserialization.
+- [x] Refactor the `ai_client` service to support and enforce a JSON output schema.
 - [ ] Implement an AI response validation layer to ensure data integrity.
 - [ ] Implement asynchronous AI processing for analysis jobs using Celery and Redis.
 - [ ] Add background job status tracking and reporting.
