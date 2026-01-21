@@ -13,6 +13,8 @@ This document outlines the development status and future roadmap for the ArchSec
 - [x] Django cannot find json_filters template tag library
 - [x] Gemini model selection is not enforced to gemini-2.5-flash
 - [x] Fix ValueError in AI analysis due to incorrect return signature
+- [x] Suppress Pylance warning for missing `google-generativeai` package.
+- [x] Gemini API is returning 'Too Many Requests' error.
 
 ---
 
