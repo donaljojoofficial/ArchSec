@@ -34,8 +34,8 @@ def generate_analysis(request, project_id):
     analysis.task_id = task.id
     analysis.save()
 
-    messages.success(request, "✅ Analysis has been queued and is now processing.")
-    return redirect("view_analysis", analysis_id=analysis.id)
+    messages.success(request, "✅ Analysis has been queued. You will be notified when it is complete.")
+    return redirect("dashboard")
 
 
 @login_required

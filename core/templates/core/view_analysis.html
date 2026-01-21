@@ -177,7 +177,7 @@
     <div class="spinner-border text-primary" role="status">
         <span class="visually-hidden">Loading...</span>
     </div>
-    <p class="mt-2">Your security analysis is being generated. Please wait, this page will refresh automatically when complete.</p>
+    <p class="mt-2">Your security analysis is being generated. This may take some time. Feel free to explore the system, and we will notify you here once the analysis is complete.</p>
     <a href="{% url 'dashboard' %}" class="btn btn-secondary mt-2">
         Back to Dashboard
     </a>
@@ -188,26 +188,15 @@
         const analysisContent = document.getElementById("analysis-content");
         const pendingContainer = document.getElementById("analysis-pending");
         const analysisStatus = "{{ analysis.risk_category }}";
-        const analysisId = "{{ analysis.id }}";
 
         if (analysisStatus === "Pending") {
             analysisContent.style.display = "none";
             pendingContainer.style.display = "block";
 
-            const interval = setInterval(function () {
-                fetch(`/analysis/${analysisId}/status/`)
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.status === "SUCCESS" || data.status === "FAILURE") {
-                            clearInterval(interval);
-                            window.location.reload();
-                        }
-                    })
-                    .catch(error => {
-                        console.error("Error fetching analysis status:", error);
-                        clearInterval(interval);
-                    });
-            }, 3000); // Poll every 3 seconds
+            // Refresh the page every 30 seconds to check for completion
+            setTimeout(function () {
+                location.reload();
+            }, 30000);
         }
     });
 </script>

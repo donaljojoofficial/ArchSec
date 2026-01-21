@@ -1,6 +1,9 @@
 from celery import shared_task
+from django.urls import reverse
+
 from .services.ai_client import generate_ai_analysis
 from .models import Project, ProjectAnalysis
+from .models.notification import Notification
 from .services.security_scoring import calculate_final_security_score
 
 @shared_task
@@ -79,10 +82,18 @@ def generate_analysis_task(analysis_id):
             )
             analysis.security_score = score
             analysis.risk_category = category
+            message = f"✅ Your security analysis for project '{project.name}' is complete."
         else:
             analysis.risk_category = "Error"
+            message = f"❌ There was an error generating the analysis for project '{project.name}'."
 
         analysis.save()
+        
+        Notification.objects.create(
+            user=project.user,
+            message=message,
+            link=reverse("view_analysis", args=[analysis.id]),
+        )
 
         return analysis.id
     except ProjectAnalysis.DoesNotExist:
@@ -90,6 +101,13 @@ def generate_analysis_task(analysis_id):
         return None
     except Exception as e:
         # Handle other exceptions
-        analysis.risk_category = "Error"
-        analysis.save()
+        if 'analysis' in locals():
+            analysis.risk_category = "Error"
+            analysis.save()
+            message = f"❌ An unexpected error occurred during the analysis for project '{analysis.project.name}'."
+            Notification.objects.create(
+                user=analysis.project.user,
+                message=message,
+                link=reverse("view_analysis", args=[analysis.id]),
+            )
         return str(e)

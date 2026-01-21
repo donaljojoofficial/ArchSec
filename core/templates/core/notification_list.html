@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Notifications</h2>
+    <a href="{% url 'clear_all_notifications' %}" class="btn btn-danger mb-3">Clear All Notifications</a>
+    <div class="list-group">
+        {% for notification in notifications %}
+            <a href="{% url 'mark_notification_as_read' notification.id %}" class="list-group-item list-group-item-action {% if not notification.is_read %}list-group-item-primary{% endif %}">
+                <div class="d-flex w-100 justify-content-between">
+                    <p class="mb-1">{{ notification.message }}</p>
+                    <small>{{ notification.created_at|timesince }} ago</small>
+                </div>
+            </a>
+        {% empty %}
+            <div class="list-group-item">
+                You have no notifications.
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
