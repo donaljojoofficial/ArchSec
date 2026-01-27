@@ -17,7 +17,7 @@ This document outlines the development status and future roadmap for the ArchSec
 - [x] Gemini API is returning 'Too Many Requests' error.
 - [x] Fix 429 quota error by preferring gemini-flash model.
 - [x] Fix 'AI returned a non-JSON response' by enforcing JSON output mode.
-- [ ] Fix `no such column: core_projectanalysis.task_id` by running migrations.
+- [x] Fix `no such column: core_projectanalysis.task_id` by running migrations.
 - [x] Fix empty analysis page by providing a JSON schema in the AI prompt.
 - [x] Fix asynchronous analysis job not displaying results
 
@@ -51,8 +51,7 @@ This document outlines the development status and future roadmap for the ArchSec
 
 - **[COMPLETED] Fragile AI Response Parsing:** The current system relies on brittle markdown string parsing, which is susceptible to failures if the AI's output format deviates.
 - **[COMPLETED] Synchronous AI Analysis:** Long-running AI analyses are executed as blocking HTTP requests, posing a risk of request timeouts and a poor user experience.
-- **Data Model Anomaly:** A duplicate `executive_summary` field has been identified in the `ProjectAnalysis` model and requires a database schema cleanup.
-
+- **[COMPLETED] Data Model Anomaly:** A duplicate `executive_summary` field has been identified in the `ProjectAnalysis` model and requires a database schema cleanup.
 ---
 
 ## 🚀 Upcoming Development Roadmap
