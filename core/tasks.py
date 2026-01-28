@@ -44,6 +44,17 @@ def generate_analysis_task(analysis_id):
         - "likelihood_score": (integer, 1-5) An integer representing the likelihood of a breach.
         - "impact_score": (integer, 1-5) An integer representing the impact of a breach.
         - "ai_risk_adjustment": (integer, -10 to 10) An integer to adjust the risk score based on nuances not captured by other fields.
+        - "uml_diagram": (string) Mermaid code for a UML diagram.
+        - "dfd_diagram": (string) Mermaid code for a DFD diagram.
+        - "erd_diagram": (string) Mermaid code for an ERD diagram.
+        - "threat_diagram": (string) Mermaid code for a Threat Model diagram.
+
+        For each of the diagram keys, you must return only valid Mermaid code.
+        Do not include any explanations, markdown, or backticks.
+        The value must be pure Mermaid syntax. For example:
+        graph TD
+        A[User] --> B[Web Server]
+        B --> C[Database]
 
         ---
         BASIC PROJECT INFO:
@@ -75,6 +86,10 @@ def generate_analysis_task(analysis_id):
             analysis.impact=ai_response.get("impact_score", 0)
             analysis.top_risks="\n".join(f"- {risk}" for risk in ai_response.get("key_risks", []))
             analysis.immediate_actions="\n".join(f"- {rec}" for rec in ai_response.get("recommendations", []))
+            analysis.uml_diagram = ai_response.get("uml_diagram", "")
+            analysis.dfd_diagram = ai_response.get("dfd_diagram", "")
+            analysis.erd_diagram = ai_response.get("erd_diagram", "")
+            analysis.threat_diagram = ai_response.get("threat_diagram", "")
 
             score, category = calculate_final_security_score(
                 project,

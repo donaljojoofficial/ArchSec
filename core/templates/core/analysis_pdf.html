@@ -9,7 +9,12 @@
         .section { margin-bottom: 25px; }
         .label { font-weight: bold; font-size: 18px; margin-bottom: 8px; }
         pre { white-space: pre-wrap; font-size: 14px; }
+        .mermaid {
+            text-align: center;
+        }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>mermaid.initialize({ startOnLoad: true });</script>
 </head>
 
 <body>
@@ -26,6 +31,34 @@
     <div class="section">
         <div class="label">Threat Model</div>
         <pre>{{ analysis.threat_model }}</pre>
+    </div>
+
+    <div class="section">
+        <div class="label">UML Diagram</div>
+        <div class="mermaid">
+            {{ analysis.uml_diagram|safe }}
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="label">DFD Diagram</div>
+        <div class="mermaid">
+            {{ analysis.dfd_diagram|safe }}
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="label">ERD Diagram</div>
+        <div class="mermaid">
+            {{ analysis.erd_diagram|safe }}
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="label">Threat Model Diagram</div>
+        <div class="mermaid">
+            {{ analysis.threat_diagram|safe }}
+        </div>
     </div>
 
     <div class="section">

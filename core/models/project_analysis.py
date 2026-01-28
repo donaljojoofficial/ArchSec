@@ -26,3 +26,8 @@ class ProjectAnalysis(models.Model):
     immediate_actions = models.TextField(blank=True, null=True)
     likelihood = models.IntegerField(default=0)   # 1–5
     impact = models.IntegerField(default=0)       # 1–5
+
+    uml_diagram = models.TextField(blank=True, null=True)
+    dfd_diagram = models.TextField(blank=True, null=True)
+    erd_diagram = models.TextField(blank=True, null=True)
+    threat_diagram = models.TextField(blank=True, null=True)

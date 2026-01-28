@@ -89,3 +89,11 @@ This document outlines the development status and future roadmap for the ArchSec
 - [ ] Integrate Retrieval-Augmented Generation (RAG) for more accurate and verifiable AI reasoning.
 - [ ] Implement reasoning traceability to show how the AI reached its conclusions.
 - [ ] Add explainable AI (XAI) features to the analysis output.
+
+### Phase 7B — Diagram Generation
+- [x] Update ProjectAnalysis model to include diagram fields.
+- [x] Update AI prompt to request Mermaid diagrams.
+- [x] Save diagrams in generate_analysis.
+- [x] Render diagrams in view_analysis.html.
+- [x] Ensure diagrams are included in PDF export.
+- [x] Update TODO.md with the new tasks.

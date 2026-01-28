@@ -1,6 +1,9 @@
 {% extends 'base.html' %}
 {% load json_filters %}
 
+<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script>mermaid.initialize({ startOnLoad: true });</script>
+
 {% block content %}
 <div class="container mt-4" id="analysis-content">
 
@@ -109,6 +112,46 @@
         <div class="card-header"><strong>Threat Model</strong></div>
         <div class="card-body">
             <pre style="white-space: pre-wrap;">{{ analysis.threat_model }}</pre>
+        </div>
+    </div>
+
+    <!-- UML Diagram -->
+    <div class="card mb-3">
+        <div class="card-header"><strong>UML Diagram</strong></div>
+        <div class="card-body">
+            <div class="mermaid">
+                {{ analysis.uml_diagram|safe }}
+            </div>
+        </div>
+    </div>
+
+    <!-- DFD Diagram -->
+    <div class="card mb-3">
+        <div class="card-header"><strong>DFD Diagram</strong></div>
+        <div class="card-body">
+            <div class="mermaid">
+                {{ analysis.dfd_diagram|safe }}
+            </div>
+        </div>
+    </div>
+
+    <!-- ERD Diagram -->
+    <div class="card mb-3">
+        <div class="card-header"><strong>ERD Diagram</strong></div>
+        <div class="card-body">
+            <div class="mermaid">
+                {{ analysis.erd_diagram|safe }}
+            </div>
+        </div>
+    </div>
+
+    <!-- Threat Model Diagram -->
+    <div class="card mb-3">
+        <div class="card-header"><strong>Threat Model Diagram</strong></div>
+        <div class="card-body">
+            <div class="mermaid">
+                {{ analysis.threat_diagram|safe }}
+            </div>
         </div>
     </div>
 
