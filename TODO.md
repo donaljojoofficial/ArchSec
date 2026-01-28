@@ -20,6 +20,8 @@ This document outlines the development status and future roadmap for the ArchSec
 - [x] Fix `no such column: core_projectanalysis.task_id` by running migrations.
 - [x] Fix empty analysis page by providing a JSON schema in the AI prompt.
 - [x] Fix asynchronous analysis job not displaying results
+- [x] Mermaid diagrams not rendering in the analysis view.
+- [ ] Mermaid diagrams are not rendering in the exported PDF.
 
 
 ---
