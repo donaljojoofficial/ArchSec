@@ -3,8 +3,7 @@
 from django.contrib import admin
 from django.urls import path, include
 from django.contrib.auth import views as auth_views
-from core.views import register_view
-from core.views.dashboard_views import dashboard
+from core.views import register_view, dashboard
 from core.views.project_views import create_project
 from core.views.analysis_views import generate_analysis, view_analysis, history_analysis, download_analysis_pdf, analysis_status
 from core.views.export_views import export_analysis_md, export_analysis_txt
@@ -37,5 +36,6 @@ urlpatterns = [
 
 
     # Dashboard last (so it doesn't override other routes)
-    path("", dashboard, name="dashboard"),
+    path("dashboard/", dashboard, name="dashboard"),
+    path("", dashboard, name="home"),
 ]
