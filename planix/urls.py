@@ -1,5 +1,9 @@
+# urls.py
+
 from django.contrib import admin
 from django.urls import path, include
+from django.contrib.auth import views as auth_views
+from core.views import register_view
 from core.views.dashboard_views import dashboard
 from core.views.project_views import create_project
 from core.views.analysis_views import generate_analysis, view_analysis, history_analysis, download_analysis_pdf, analysis_status
@@ -10,6 +14,8 @@ from core.views.notification_views import notification_list, mark_notification_a
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("accounts/", include("django.contrib.auth.urls")),
+    path('login/', auth_views.LoginView.as_view(), name='login'),
+    path('register/', register_view, name='register'),
 
     # Project actions
     path("project/create/", create_project, name="create_project"),
@@ -33,6 +39,3 @@ urlpatterns = [
     # Dashboard last (so it doesn't override other routes)
     path("", dashboard, name="dashboard"),
 ]
-
-
-
