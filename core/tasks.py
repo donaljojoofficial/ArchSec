@@ -19,9 +19,10 @@ def generate_analysis_task(analysis_id):
         if project.structured_data:
             for section, data in project.structured_data.items():
                 structured_data_str += f"## {section.upper().replace('_', ' ')}\n"
-                if data.get('options'):
+                options = data.get('options')
+                if options and isinstance(options, (list, tuple)):
                     structured_data_str += "Selected Options:\n"
-                    for option in data['options']:
+                    for option in options:
                         structured_data_str += f"- {option}\n"
                 if data.get('manual_input'):
                     structured_data_str += "Manual Input:\n"
@@ -84,8 +85,16 @@ def generate_analysis_task(analysis_id):
             analysis.testing_plan=ai_response.get("testing_plan", "")
             analysis.likelihood=ai_response.get("likelihood_score", 0)
             analysis.impact=ai_response.get("impact_score", 0)
-            analysis.top_risks="\n".join(f"- {risk}" for risk in ai_response.get("key_risks", []))
-            analysis.immediate_actions="\n".join(f"- {rec}" for rec in ai_response.get("recommendations", []))
+            
+            key_risks = ai_response.get("key_risks", [])
+            if not isinstance(key_risks, list):
+                key_risks = []
+            analysis.top_risks="\n".join(f"- {risk}" for risk in key_risks)
+            
+            recommendations = ai_response.get("recommendations", [])
+            if not isinstance(recommendations, list):
+                recommendations = []
+            analysis.immediate_actions="\n".join(f"- {rec}" for rec in recommendations)
             analysis.uml_diagram = ai_response.get("uml_diagram", "")
             analysis.dfd_diagram = ai_response.get("dfd_diagram", "")
             analysis.erd_diagram = ai_response.get("erd_diagram", "")
@@ -118,6 +127,7 @@ def generate_analysis_task(analysis_id):
         # Handle other exceptions
         if 'analysis' in locals():
             analysis.risk_category = "Error"
+            analysis.raw_ai_response = {"message": str(e)}
             analysis.save()
             message = f"❌ An unexpected error occurred during the analysis for project '{analysis.project.name}'."
             Notification.objects.create(

@@ -21,7 +21,7 @@
     {% if analysis.risk_category == "Error" %}
     <div class="bg-error/10 border border-error p-4 text-error">
         <h4 class="font-bold text-lg">❌ AI Analysis Failed</h4>
-        <p class="mt-2"><strong>Reason:</strong> {{ analysis.raw_ai_response.message }}</p>
+        <p class="mt-2"><strong>Reason:</strong> {{ analysis.raw_ai_response.message|default:analysis.raw_ai_response|default:"Unknown error" }}</p>
         <div class="border-t border-error/30 my-3"></div>
         <p>
             <a class="underline hover:text-white" data-bs-toggle="collapse" href="#rawError" role="button">
