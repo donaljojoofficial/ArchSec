@@ -71,6 +71,8 @@ Backend
 
 Python
 
+Celery + Redis (Asynchronous Task Queue)
+
 Django Framework
 
 
@@ -219,6 +221,14 @@ Compare projects
 User authentication
 
 
+---
+
+8. Diagram Generation
+
+Mermaid.js integration for architecture diagrams
+
+UML, DFD, ERD, and Threat Model visualizations
+
 
 ---
 
@@ -315,7 +325,7 @@ Documentation
 
 Phase 5 — Optional Add-ons (If time allows)
 
-Diagram generation (Mermaid/PlantUML)
+✔ Diagram generation (Mermaid.js)
 
 DevSecOps pipeline simulation
 
@@ -578,7 +588,7 @@ Markdown
 JSON
 
 
-Architecture diagrams using Mermaid
+✔ Architecture diagrams using Mermaid
 
 Dashboard overview for all projects
 
@@ -590,7 +600,7 @@ Output: Fully exportable structured reports
 
 Phase 6 — UI Improvement & Final Integration (Week 9)
 
-Modern UI polishing
+✔ Modern UI polishing (Terminal/Cyberpunk Theme)
 
 Nav sidebar + clean components
 
@@ -636,6 +646,8 @@ Python 3.12
 Django 5
 
 Django REST Framework
+
+Celery + Redis
 
 PostgreSQL / SQLite
 
@@ -697,6 +709,8 @@ Pytest for testing
 
 ✔ 9. Dashboard & Analytics
 
+✔ 10. Diagram Generation
+
 
 ---
 
@@ -716,12 +730,3 @@ Total	10–11 weeks
 
 
 ---
-
-
-
-
-
-
-
-
-

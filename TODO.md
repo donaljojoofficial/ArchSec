@@ -46,6 +46,7 @@ This document outlines the development status and future roadmap for the ArchSec
 - [x] Analysis history tracking with risk trend visualization using Chart.js.
 - [x] PDF and ZIP export capabilities for security reports and historical data.
 - [x] Sophisticated, architecture-aware AI prompting engine.
+- [x] Implement Terminal/Cyberpunk UI theme using TailwindCSS.
 
 ---
 
