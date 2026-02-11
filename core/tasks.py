@@ -97,7 +97,14 @@ def generate_analysis_task(analysis_id):
             analysis.immediate_actions="\n".join(f"- {rec}" for rec in recommendations)
             
             # Helper to clean mermaid code (remove markdown code blocks if present)
-            clean_mermaid = lambda x: x.replace("```mermaid", "").replace("```", "").strip() if isinstance(x, str) else ""
+            def clean_mermaid(text):
+                if not isinstance(text, str):
+                    return ""
+                # Remove markdown blocks and handle escaped newlines
+                text = text.replace("```mermaid", "").replace("```", "")
+                text = text.replace("\\n", "\n") # Fix escaped newlines
+                return text.strip()
+
             analysis.uml_diagram = clean_mermaid(ai_response.get("uml_diagram", ""))
             analysis.dfd_diagram = clean_mermaid(ai_response.get("dfd_diagram", ""))
             analysis.erd_diagram = clean_mermaid(ai_response.get("erd_diagram", ""))

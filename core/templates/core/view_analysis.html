@@ -13,7 +13,10 @@
     // Clean up any markdown code blocks that might have been included in existing data
     const nodes = document.querySelectorAll('.mermaid');
     nodes.forEach(el => {
-        el.textContent = el.textContent.replace(/```mermaid/g, '').replace(/```/g, '').trim();
+        let content = el.textContent;
+        content = content.replace(/```mermaid/g, '').replace(/```/g, '');
+        content = content.replace(/\\n/g, '\n'); // Fix literal escaped newlines
+        el.textContent = content.trim();
     });
 
     await mermaid.run({

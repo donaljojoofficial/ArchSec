@@ -22,11 +22,7 @@ This document outlines the development status and future roadmap for the ArchSec
 - [x] Fix asynchronous analysis job not displaying results
 - [x] Mermaid diagrams not rendering in the analysis view.
 - [x] Fix Mermaid diagrams displaying raw code by stripping markdown formatting.
-- [x] Fix Mermaid diagrams not processing (raw code visible) by improving client-side initialization.
-- [ ] Mermaid diagrams are not rendering in the exported PDF.
-
-
----
+- [x] Fix Mermaid diagrams not processing (raw code visible) by 
 
 ## Features
 - [x] Improve risk heatmap visualization with labels and better colors.
