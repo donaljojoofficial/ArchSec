@@ -1,4 +1,5 @@
 import json
+import logging
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -6,6 +7,9 @@ from django.http import HttpResponse, JsonResponse
 from celery.result import AsyncResult
 from django.template.loader import render_to_string
 from weasyprint import HTML
+from celery import current_app
+from django.contrib.admin.views.decorators import staff_member_required
+from kombu.exceptions import OperationalError
 
 from core.models.project import Project
 from core.models.project_analysis import ProjectAnalysis
@@ -13,6 +17,7 @@ from core.services.ai_client import generate_ai_analysis
 from core.services.security_scoring import calculate_final_security_score
 from core.tasks import generate_analysis_task
 
+logger = logging.getLogger(__name__)
 
 
 @login_required
@@ -27,14 +32,21 @@ def generate_analysis(request, project_id):
         security_score=0,
     )
 
-    # Start the asynchronous analysis task
-    task = generate_analysis_task.delay(analysis.id)
+    try:
+        # Start the asynchronous analysis task
+        task = generate_analysis_task.delay(analysis.id)
 
-    # Store the task ID in the analysis object to track its status
-    analysis.task_id = task.id
-    analysis.save()
+        # Store the task ID in the analysis object to track its status
+        analysis.task_id = task.id
+        analysis.save()
 
-    messages.success(request, "✅ Analysis has been queued. You will be notified when it is complete.")
+        messages.success(request, "✅ Analysis has been queued. You will be notified when it is complete.")
+    except OperationalError as e:
+        logger.warning(f"Redis/Celery connection failed: {e}")
+        analysis.risk_category = "Error"
+        analysis.save()
+        messages.error(request, "❌ Analysis service is currently unavailable. Please try again later.")
+
     return redirect("dashboard")
 
 
@@ -91,4 +103,38 @@ def download_analysis_pdf(request, analysis_id):
 
     return response
 
+@staff_member_required
+def celery_dashboard(request):
+    inspector = current_app.control.inspect()
+    
+    active = {}
+    scheduled = {}
+    reserved = {}
+    connection_error = None
 
+    try:
+        # Attempt to fetch stats. If Redis is down, this should raise an OperationalError.
+        active = inspector.active() or {}
+        scheduled = inspector.scheduled() or {}
+        reserved = inspector.reserved() or {}
+    except Exception as e:
+        connection_error = str(e)
+        logger.error(f"Celery dashboard connection error: {e}")
+    
+    # Calculate totals
+    total_active = sum(len(tasks) for tasks in active.values()) if active else 0
+    total_scheduled = sum(len(tasks) for tasks in scheduled.values()) if scheduled else 0
+    total_reserved = sum(len(tasks) for tasks in reserved.values()) if reserved else 0
+    
+    pending_analyses = ProjectAnalysis.objects.filter(risk_category="Pending").order_by('-created_at')
+
+    return render(request, "core/celery_dashboard.html", {
+        "active": active,
+        "scheduled": scheduled,
+        "reserved": reserved,
+        "total_active": total_active,
+        "total_scheduled": total_scheduled,
+        "total_reserved": total_reserved,
+        "pending_analyses": pending_analyses,
+        "connection_error": connection_error,
+    })
