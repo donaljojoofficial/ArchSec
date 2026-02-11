@@ -1,4 +1,5 @@
 from celery import shared_task
+from celery.exceptions import MaxRetriesExceededError
 from django.urls import reverse
 
 from .services.ai_client import generate_ai_analysis
@@ -6,8 +7,8 @@ from .models import Project, ProjectAnalysis
 from .models.notification import Notification
 from .services.security_scoring import calculate_final_security_score
 
-@shared_task
-def generate_analysis_task(analysis_id):
+@shared_task(bind=True, max_retries=5, rate_limit='4/m')
+def generate_analysis_task(self, analysis_id):
     """
     Celery task to generate AI analysis for a project.
     """
@@ -73,6 +74,15 @@ def generate_analysis_task(analysis_id):
         """
 
         success, ai_response = generate_ai_analysis(prompt)
+        
+        # Handle Rate Limiting & Retries
+        if not success:
+            error_msg = str(ai_response).lower()
+            if any(x in error_msg for x in ['429', 'too many requests', 'quota', 'resource exhausted']):
+                try:
+                    raise self.retry(countdown=30 * (2 ** self.request.retries))
+                except MaxRetriesExceededError:
+                    pass  # Fall through to standard error handling
 
         analysis.raw_ai_response = ai_response
         
@@ -134,6 +144,9 @@ def generate_analysis_task(analysis_id):
         # Handle project not found
         return None
     except Exception as e:
+        # Allow Celery retries to bubble up
+        if isinstance(e, self.Retry):
+            raise e
         # Handle other exceptions
         if 'analysis' in locals():
             analysis.risk_category = "Error"
