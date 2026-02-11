@@ -2,15 +2,22 @@
 {% load json_filters %}
 
 {% block extra_head %}
-<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        mermaid.initialize({ 
-            startOnLoad: false,
-            theme: 'dark',
-            securityLevel: 'loose'
-        });
-        mermaid.run();
+<script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ 
+        startOnLoad: false,
+        theme: 'dark',
+        securityLevel: 'loose'
+    });
+    
+    // Clean up any markdown code blocks that might have been included in existing data
+    const nodes = document.querySelectorAll('.mermaid');
+    nodes.forEach(el => {
+        el.textContent = el.textContent.replace(/```mermaid/g, '').replace(/```/g, '').trim();
+    });
+
+    await mermaid.run({
+        nodes: nodes
     });
 </script>
 {% endblock %}

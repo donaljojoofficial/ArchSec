@@ -95,10 +95,13 @@ def generate_analysis_task(analysis_id):
             if not isinstance(recommendations, list):
                 recommendations = []
             analysis.immediate_actions="\n".join(f"- {rec}" for rec in recommendations)
-            analysis.uml_diagram = ai_response.get("uml_diagram", "")
-            analysis.dfd_diagram = ai_response.get("dfd_diagram", "")
-            analysis.erd_diagram = ai_response.get("erd_diagram", "")
-            analysis.threat_diagram = ai_response.get("threat_diagram", "")
+            
+            # Helper to clean mermaid code (remove markdown code blocks if present)
+            clean_mermaid = lambda x: x.replace("```mermaid", "").replace("```", "").strip() if isinstance(x, str) else ""
+            analysis.uml_diagram = clean_mermaid(ai_response.get("uml_diagram", ""))
+            analysis.dfd_diagram = clean_mermaid(ai_response.get("dfd_diagram", ""))
+            analysis.erd_diagram = clean_mermaid(ai_response.get("erd_diagram", ""))
+            analysis.threat_diagram = clean_mermaid(ai_response.get("threat_diagram", ""))
 
             score, category = calculate_final_security_score(
                 project,
