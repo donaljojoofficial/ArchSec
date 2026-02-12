@@ -3,7 +3,7 @@
 from django.contrib import admin
 from django.urls import path, include
 from django.contrib.auth import views as auth_views
-from core.views import register_view, dashboard
+from core.views import register_view, dashboard, celery_dashboard
 from core.views.project_views import create_project
 from core.views.analysis_views import generate_analysis, view_analysis, history_analysis, download_analysis_pdf, analysis_status
 from core.views.export_views import export_analysis_md, export_analysis_txt
@@ -34,6 +34,7 @@ urlpatterns = [
     path("analysis/<int:analysis_id>/export/txt/", export_analysis_txt, name="export_analysis_txt"),
     path("project/<int:project_id>/analysis/history/export/",export_analysis_history_zip,name="export_analysis_history_zip"),
 
+    path("celery-dashboard/", celery_dashboard, name="celery_dashboard"),
 
     # Dashboard last (so it doesn't override other routes)
     path("dashboard/", dashboard, name="dashboard"),
