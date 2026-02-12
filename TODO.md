@@ -68,7 +68,7 @@ This document outlines the development status and future roadmap for the ArchSec
 - [x] Create a Celery task monitor dashboard to inspect queues and tasks.
 - [x] Implement frontend polling or WebSockets for real-time UI updates on analysis completion.
 - [x] Create a database migration to remove the duplicate `executive_summary` field.
-- [ ] Add system health check endpoints for monitoring.
+- [x] Add system health check endpoints for monitoring.
 - [x] Implement structured logging (e.g., JSON format) across the application.
 
 ### PHASE 8 — Compliance & Architecture Decision Engine
