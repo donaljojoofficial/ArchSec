@@ -23,6 +23,7 @@ This document outlines the development status and future roadmap for the ArchSec
 - [x] Mermaid diagrams not rendering in the analysis view.
 - [x] Fix Mermaid diagrams displaying raw code by stripping markdown formatting.
 - [x] Fix Mermaid diagrams not processing (raw code visible) by 
+- [x] Fix `NoReverseMatch` for `celery_dashboard` URL.
 
 ## Features
 - [x] Improve risk heatmap visualization with labels and better colors.
@@ -64,8 +65,9 @@ This document outlines the development status and future roadmap for the ArchSec
 - [ ] Implement an AI response validation layer to ensure data integrity.
 - [x] Implement asynchronous AI processing for analysis jobs using Celery and Redis.
 - [x] Add background job status tracking and reporting.
+- [x] Create a Celery task monitor dashboard to inspect queues and tasks.
 - [x] Implement frontend polling or WebSockets for real-time UI updates on analysis completion.
-- [ ] Create a database migration to remove the duplicate `executive_summary` field.
+- [x] Create a database migration to remove the duplicate `executive_summary` field.
 - [ ] Add system health check endpoints for monitoring.
 - [ ] Implement structured logging (e.g., JSON format) across the application.
 
