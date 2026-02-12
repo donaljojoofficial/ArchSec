@@ -10,6 +10,11 @@ from core.views.export_views import export_analysis_md, export_analysis_txt
 from core.views.export_views import export_analysis_history_zip
 from core.views.notification_views import notification_list, mark_notification_as_read, clear_all_notifications
 
+from core.logging_config import configure_logging
+
+# Initialize structured logging
+configure_logging()
+
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("accounts/", include("django.contrib.auth.urls")),

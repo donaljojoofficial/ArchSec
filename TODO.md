@@ -69,7 +69,7 @@ This document outlines the development status and future roadmap for the ArchSec
 - [x] Implement frontend polling or WebSockets for real-time UI updates on analysis completion.
 - [x] Create a database migration to remove the duplicate `executive_summary` field.
 - [ ] Add system health check endpoints for monitoring.
-- [ ] Implement structured logging (e.g., JSON format) across the application.
+- [x] Implement structured logging (e.g., JSON format) across the application.
 
 ### PHASE 8 — Compliance & Architecture Decision Engine
 - [ ] Create a `ComplianceStandard` model (e.g., PCI DSS, ISO 27001, SOC2, HIPAA).
