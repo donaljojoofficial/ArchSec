@@ -22,8 +22,9 @@ This document outlines the development status and future roadmap for the ArchSec
 - [x] Fix asynchronous analysis job not displaying results
 - [x] Mermaid diagrams not rendering in the analysis view.
 - [x] Fix Mermaid diagrams displaying raw code by stripping markdown formatting.
-- [x] Fix Mermaid diagrams not processing (raw code visible) by 
 - [x] Fix `NoReverseMatch` for `celery_dashboard` URL.
+- [x] Fix `AttributeError: 'list' object has no attribute 'get'` when AI returns a list.
+- [x] Fix `AttributeError: 'generate_analysis_task' object has no attribute 'Retry'` in Celery task.
 
 ## Features
 - [x] Improve risk heatmap visualization with labels and better colors.

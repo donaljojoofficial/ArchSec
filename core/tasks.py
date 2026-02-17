@@ -1,5 +1,5 @@
 from celery import shared_task
-from celery.exceptions import MaxRetriesExceededError
+from celery.exceptions import MaxRetriesExceededError, Retry
 from django.urls import reverse
 
 from .services.ai_client import generate_ai_analysis
@@ -87,6 +87,15 @@ def generate_analysis_task(self, analysis_id):
         analysis.raw_ai_response = ai_response
         
         if success:
+            if isinstance(ai_response, list):
+                if len(ai_response) > 0 and isinstance(ai_response[0], dict):
+                    ai_response = ai_response[0]
+                else:
+                    success = False
+            elif not isinstance(ai_response, dict):
+                success = False
+
+        if success:
             analysis.executive_summary=ai_response.get("executive_summary", "")
             analysis.architecture=ai_response.get("architecture", "")
             analysis.threat_model=ai_response.get("threat_model", "")
@@ -145,7 +154,7 @@ def generate_analysis_task(self, analysis_id):
         return None
     except Exception as e:
         # Allow Celery retries to bubble up
-        if isinstance(e, self.Retry):
+        if isinstance(e, Retry):
             raise e
         # Handle other exceptions
         if 'analysis' in locals():
