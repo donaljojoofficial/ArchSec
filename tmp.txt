@@ -1,0 +1,8 @@
+>> UML Diagram
+classDiagram class User { +String username +String password +login() +logout() } class Target { +String url +String ip_address +check_status() } class ScanJob { +Integer id +DateTime started_at +String status +run_autonomous_exploit() } class VulnerabilityReport { +String type +String severity +String description +anonymize_data() } User "1" -- "*" ScanJob : initiates ScanJob "1" -- "1" Target : probes ScanJob "1" -- "*" VulnerabilityReport : generates
+>> DFD Diagram
+graph LR User((User)) -- Authenticated Request --> WebServer[Django Web Server] WebServer -- Task Parameters --> TaskQueue[Async Task Queue] TaskQueue -- Job Data --> AIWorker[AI Hacking Engine] AIWorker -- Probes/Exploits --> TargetPlatform[Target Web App] TargetPlatform -- Responses --> AIWorker AIWorker -- Findings --> DB[(SQL Database)] DB -- Results --> WebServer WebServer -- View Report --> User
+>> ERD Diagram
+erDiagram USER ||--o{ SCAN_JOB : creates USER { int id string username string password_hash string role } SCAN_JOB ||--|| TARGET : scans SCAN_JOB { int id datetime start_time string status } TARGET ||--o{ FINDING : contains TARGET { int id string hostname string ip_address } FINDING { int id string vuln_type string severity text evidence }
+>> Threat Model Diagram
+graph TD Attacker[External/Internal Attacker] -->|Brute Force/Phishing| Auth[Authentication System] Attacker -->|Input Injection| WebUI[Django Web Interface] WebUI -->|Tampered Task| Workers[Async AI Workers] Workers -->|Malicious Payload| TargetSystem[Target Infrastructure] Workers -->|Data Theft| Database[(SQL Database)] Database -->|Info Leak| Attacker Admin[Admin] -->|Manual Deploy| WebUI Admin -->|Configuration| Workers

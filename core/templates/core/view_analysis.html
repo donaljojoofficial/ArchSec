@@ -2,27 +2,6 @@
 {% load json_filters %}
 
 {% block extra_head %}
-<script type="module">
-    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
-    mermaid.initialize({ 
-        startOnLoad: false,
-        theme: 'dark',
-        securityLevel: 'loose'
-    });
-    
-    // Clean up any markdown code blocks that might have been included in existing data
-    const nodes = document.querySelectorAll('.mermaid');
-    nodes.forEach(el => {
-        let content = el.textContent;
-        content = content.replace(/```mermaid/g, '').replace(/```/g, '');
-        content = content.replace(/\\n/g, '\n'); // Fix literal escaped newlines
-        el.textContent = content.trim();
-    });
-
-    await mermaid.run({
-        nodes: nodes
-    });
-</script>
 {% endblock %}
 
 {% block content %}
@@ -52,6 +31,12 @@
         <div class="text-right">
             <span class="text-xs px-2 py-1 bg-gray-800 text-gray-300 border border-gray-700">STATUS: COMPLETE</span>
         </div>
+    </div>
+
+    <div class="flex justify-end pt-2">
+        <a href="{% url 'view_diagrams' analysis.id %}" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 text-sm font-bold transition-colors rounded">
+            View Architecture Diagrams &rarr;
+        </a>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -163,54 +148,6 @@
         </div>
         <div class="p-4">
             <pre class="whitespace-pre-wrap font-mono text-sm text-gray-300">{{ analysis.threat_model }}</pre>
-        </div>
-    </div>
-
-    <!-- UML Diagram -->
-    <div class="bg-panel border border-gray-800">
-        <div class="bg-gray-800/50 px-4 py-2 border-b border-gray-800">
-            <strong class="text-gray-300">>> UML Diagram</strong>
-        </div>
-        <div class="p-4 overflow-x-auto">
-            <div class="mermaid">
-                {{ analysis.uml_diagram|safe }}
-            </div>
-        </div>
-    </div>
-
-    <!-- DFD Diagram -->
-    <div class="bg-panel border border-gray-800">
-        <div class="bg-gray-800/50 px-4 py-2 border-b border-gray-800">
-            <strong class="text-gray-300">>> DFD Diagram</strong>
-        </div>
-        <div class="p-4 overflow-x-auto">
-            <div class="mermaid">
-                {{ analysis.dfd_diagram|safe }}
-            </div>
-        </div>
-    </div>
-
-    <!-- ERD Diagram -->
-    <div class="bg-panel border border-gray-800">
-        <div class="bg-gray-800/50 px-4 py-2 border-b border-gray-800">
-            <strong class="text-gray-300">>> ERD Diagram</strong>
-        </div>
-        <div class="p-4 overflow-x-auto">
-            <div class="mermaid">
-                {{ analysis.erd_diagram|safe }}
-            </div>
-        </div>
-    </div>
-
-    <!-- Threat Model Diagram -->
-    <div class="bg-panel border border-gray-800">
-        <div class="bg-gray-800/50 px-4 py-2 border-b border-gray-800">
-            <strong class="text-warning">>> Threat Model Diagram</strong>
-        </div>
-        <div class="p-4 overflow-x-auto">
-            <div class="mermaid">
-                {{ analysis.threat_diagram|safe }}
-            </div>
         </div>
     </div>
 

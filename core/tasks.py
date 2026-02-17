@@ -53,10 +53,9 @@ def generate_analysis_task(self, analysis_id):
 
         For each of the diagram keys, you must return only valid Mermaid code.
         Do not include any explanations, markdown, or backticks.
-        The value must be pure Mermaid syntax. For example:
-        graph TD
-        A[User] --> B[Web Server]
-        B --> C[Database]
+        The value must be pure Mermaid syntax. 
+        IMPORTANT: Ensure you use newlines (\n) to separate lines in the diagram code. Do NOT output the diagram as a single line.
+        Example JSON value: "graph TD\nA-->B\nB-->C"
 
         ---
         BASIC PROJECT INFO:
@@ -119,10 +118,13 @@ def generate_analysis_task(self, analysis_id):
             def clean_mermaid(text):
                 if not isinstance(text, str):
                     return ""
-                # Remove markdown blocks and handle escaped newlines
+                # Handle escaped newlines and markdown blocks
+                text = text.replace("\\n", "\n")
                 text = text.replace("```mermaid", "").replace("```", "")
-                text = text.replace("\\n", "\n") # Fix escaped newlines
-                return text.strip()
+                text = text.strip()
+                if text.lower().startswith("mermaid"):
+                    text = text[7:].strip()
+                return text
 
             analysis.uml_diagram = clean_mermaid(ai_response.get("uml_diagram", ""))
             analysis.dfd_diagram = clean_mermaid(ai_response.get("dfd_diagram", ""))

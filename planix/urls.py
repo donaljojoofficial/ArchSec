@@ -3,7 +3,7 @@
 from django.contrib import admin
 from django.urls import path, include
 from django.contrib.auth import views as auth_views
-from core.views import register_view, dashboard, celery_dashboard, health_check
+from core.views import register_view, dashboard, celery_dashboard, health_check, view_diagrams
 from core.views.project_views import create_project
 from core.views.analysis_views import generate_analysis, view_analysis, history_analysis, download_analysis_pdf, analysis_status
 from core.views.export_views import export_analysis_md, export_analysis_txt
@@ -25,6 +25,7 @@ urlpatterns = [
     path("project/create/", create_project, name="create_project"),
     path("project/<int:project_id>/analysis/", generate_analysis, name="generate_analysis"),
     path("analysis/<int:analysis_id>/", view_analysis, name="view_analysis"),
+    path("analysis/<int:analysis_id>/diagrams/", view_diagrams, name="view_diagrams"),
     path("project/<int:project_id>/analysis/history/", history_analysis, name="analysis_history"),
     path("analysis/<int:analysis_id>/pdf/", download_analysis_pdf, name="download_analysis_pdf"),
     path("analysis/<int:analysis_id>/status/", analysis_status, name="analysis_status"),
