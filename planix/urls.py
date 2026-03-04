@@ -3,7 +3,7 @@
 from django.contrib import admin
 from django.urls import path, include
 from django.contrib.auth import views as auth_views
-from core.views import register_view, dashboard, celery_dashboard, health_check, view_diagrams
+from core.views import register_view, logout_view, profile_view, edit_profile_view, change_password_view, dashboard, celery_dashboard, health_check, view_diagrams
 from core.views.project_views import create_project
 from core.views.analysis_views import generate_analysis, view_analysis, history_analysis, download_analysis_pdf, analysis_status
 from core.views.export_views import export_analysis_md, export_analysis_txt
@@ -17,9 +17,14 @@ configure_logging()
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("accounts/", include("django.contrib.auth.urls")),
-    path('login/', auth_views.LoginView.as_view(), name='login'),
+    
+    # Authentication URLs
+    path('login/', auth_views.LoginView.as_view(template_name='registration/login.html'), name='login'),
     path('register/', register_view, name='register'),
+    path('logout/', logout_view, name='logout'),
+    path('profile/', profile_view, name='profile'),
+    path('profile/edit/', edit_profile_view, name='edit_profile'),
+    path('profile/change-password/', change_password_view, name='change_password'),
 
     # Project actions
     path("project/create/", create_project, name="create_project"),

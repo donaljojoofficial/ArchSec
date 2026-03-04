@@ -1,5 +1,180 @@
 from django import forms
+from django.contrib.auth.models import User
+from django.contrib.auth.forms import UserCreationForm, UserChangeForm
+from django.core.exceptions import ValidationError
 from .models import Project
+
+
+# ========================
+# Authentication Forms
+# ========================
+
+class CustomUserCreationForm(UserCreationForm):
+    """
+    Extended user creation form with email and additional validation.
+    """
+    email = forms.EmailField(
+        required=True,
+        help_text='Required. Enter a valid email address.',
+        widget=forms.EmailInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'your.email@example.com'
+        })
+    )
+    first_name = forms.CharField(
+        max_length=30,
+        required=False,
+        help_text='Optional.',
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'First Name'
+        })
+    )
+    last_name = forms.CharField(
+        max_length=30,
+        required=False,
+        help_text='Optional.',
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Last Name'
+        })
+    )
+
+    class Meta:
+        model = User
+        fields = ('username', 'email', 'first_name', 'last_name', 'password1', 'password2')
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Add styling to form fields
+        for field_name in self.fields:
+            self.fields[field_name].widget.attrs['class'] = 'form-control'
+        self.fields['password1'].widget.attrs['placeholder'] = 'Enter a strong password'
+        self.fields['password2'].widget.attrs['placeholder'] = 'Confirm password'
+        self.fields['username'].widget.attrs['placeholder'] = 'Choose a username'
+
+    def clean_email(self):
+        """Check if email already exists."""
+        email = self.cleaned_data.get('email')
+        if User.objects.filter(email=email).exists():
+            raise ValidationError('This email address is already in use.')
+        return email
+
+    def clean_username(self):
+        """Check if username already exists."""
+        username = self.cleaned_data.get('username')
+        if User.objects.filter(username=username).exists():
+            raise ValidationError('This username is already taken.')
+        return username
+
+    def clean(self):
+        """Additional validation."""
+        cleaned_data = super().clean()
+        password1 = cleaned_data.get('password1')
+        password2 = cleaned_data.get('password2')
+
+        if password1 and password2 and password1 != password2:
+            raise ValidationError('Passwords do not match.')
+
+        # Check password strength
+        if password1:
+            if len(password1) < 8:
+                raise ValidationError('Password must be at least 8 characters long.')
+            if password1.isdigit():
+                raise ValidationError('Password cannot be entirely numeric.')
+
+        return cleaned_data
+
+
+class CustomUserChangeForm(UserChangeForm):
+    """
+    Extended user change form for updating profile.
+    """
+    email = forms.EmailField(
+        required=True,
+        widget=forms.EmailInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'your.email@example.com'
+        })
+    )
+    first_name = forms.CharField(
+        max_length=30,
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'First Name'
+        })
+    )
+    last_name = forms.CharField(
+        max_length=30,
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Last Name'
+        })
+    )
+
+    class Meta:
+        model = User
+        fields = ('username', 'email', 'first_name', 'last_name')
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field_name in self.fields:
+            self.fields[field_name].widget.attrs['class'] = 'form-control'
+        # Hide password field
+        if 'password' in self.fields:
+            del self.fields['password']
+
+
+class PasswordChangeForm(forms.Form):
+    """
+    Form for users to change their password.
+    """
+    current_password = forms.CharField(
+        label='Current Password',
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Enter your current password'
+        })
+    )
+    new_password = forms.CharField(
+        label='New Password',
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Enter a new password'
+        })
+    )
+    new_password_confirm = forms.CharField(
+        label='Confirm New Password',
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Confirm your new password'
+        })
+    )
+
+    def __init__(self, user, *args, **kwargs):
+        self.user = user
+        super().__init__(*args, **kwargs)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        new_password = cleaned_data.get('new_password')
+        new_password_confirm = cleaned_data.get('new_password_confirm')
+
+        if new_password and new_password_confirm:
+            if new_password != new_password_confirm:
+                raise ValidationError('Passwords do not match.')
+
+            if len(new_password) < 8:
+                raise ValidationError('Password must be at least 8 characters long.')
+
+        return cleaned_data
+
+
+# ========================
+# Project Forms (Existing)
+# ========================
 
 # (Existing ProjectForm kept for backward compatibility if needed)
 class OldProjectForm(forms.ModelForm):

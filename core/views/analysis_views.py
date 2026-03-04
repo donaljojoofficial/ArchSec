@@ -3,7 +3,7 @@ import logging
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, HttpResponseForbidden
 from celery.result import AsyncResult
 from django.template.loader import render_to_string
 from weasyprint import HTML
@@ -15,14 +15,17 @@ from core.models.project import Project
 from core.models.project_analysis import ProjectAnalysis
 from core.services.ai_client import generate_ai_analysis
 from core.services.security_scoring import calculate_final_security_score
+from core.services.auth_service import AuthorizationService
+from core.decorators import project_owner_required, analysis_owner_required
 from core.tasks import generate_analysis_task
 
 logger = logging.getLogger(__name__)
 
 
-@login_required
+@project_owner_required
 def generate_analysis(request, project_id):
-    project = get_object_or_404(Project, id=project_id, user=request.user)
+    # Decorator already verified user has access to this project
+    project = get_object_or_404(Project, id=project_id)
 
     # Create an initial analysis object to show "Pending" status
     analysis = ProjectAnalysis.objects.create(
@@ -47,19 +50,20 @@ def generate_analysis(request, project_id):
         analysis.save()
         messages.error(request, "❌ Analysis service is currently unavailable. Please try again later.")
 
-    return redirect("dashboard")
+    return redirect('dashboard')
 
 
-@login_required
+@analysis_owner_required
 def view_analysis(request, analysis_id):
-    analysis = get_object_or_404(ProjectAnalysis, id=analysis_id, user=request.user)
+    # Decorator already verified user has access to this analysis
+    analysis = get_object_or_404(ProjectAnalysis, id=analysis_id)
     return render(request, "core/view_analysis.html", {
         "analysis": analysis,
         "project": analysis.project
     })
 
 
-@login_required
+@project_owner_required
 def history_analysis(request, project_id):
     project = get_object_or_404(Project, id=project_id, user=request.user)
     analyses = ProjectAnalysis.objects.filter(project=project).order_by("-created_at")
@@ -80,13 +84,13 @@ def history_analysis(request, project_id):
     })
 
 
-@login_required
+@analysis_owner_required
 def analysis_status(request, analysis_id):
     analysis = get_object_or_404(ProjectAnalysis, id=analysis_id, user=request.user)
     task = AsyncResult(analysis.task_id)
     return JsonResponse({"status": task.status})
 
-@login_required
+@analysis_owner_required
 def download_analysis_pdf(request, analysis_id):
     analysis = get_object_or_404(ProjectAnalysis, id=analysis_id, user=request.user)
     project = analysis.project

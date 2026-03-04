@@ -1,12 +1,17 @@
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib import messages
 from core.models.project_analysis import ProjectAnalysis
 from core.models.project import Project
+from core.services.auth_service import AuthorizationService
+from core.decorators import analysis_owner_required, project_owner_required
 import io
 import zipfile
 from django.utils.text import slugify
+import logging
 
+logger = logging.getLogger(__name__)
 
 
 def build_export_content(analysis):
@@ -40,9 +45,11 @@ Security Testing Plan
 """.strip()
 
 
-@login_required
+@analysis_owner_required
 def export_analysis_md(request, analysis_id):
-    analysis = get_object_or_404(ProjectAnalysis, id=analysis_id, user=request.user)
+    # Decorator already verified user has access to this analysis
+    analysis = get_object_or_404(ProjectAnalysis, id=analysis_id)
+    
     content = build_export_content(analysis)
 
     response = HttpResponse(content, content_type="text/markdown")
@@ -50,22 +57,25 @@ def export_analysis_md(request, analysis_id):
     return response
 
 
-@login_required
+@analysis_owner_required
 def export_analysis_txt(request, analysis_id):
-    analysis = get_object_or_404(ProjectAnalysis, id=analysis_id, user=request.user)
+    # Decorator already verified user has access to this analysis
+    analysis = get_object_or_404(ProjectAnalysis, id=analysis_id)
+    
     content = build_export_content(analysis)
 
     response = HttpResponse(content, content_type="text/plain")
     response["Content-Disposition"] = f"attachment; filename=analysis_{analysis_id}.txt"
     return response
 
-@login_required
+@project_owner_required
 def export_analysis_history_zip(request, project_id):
     project = get_object_or_404(Project, id=project_id, user=request.user)
     analyses = project.analyses.all().order_by("created_at")
 
     if not analyses.exists():
-        return HttpResponse("No analyses available to export.")
+        messages.warning(request, "No analyses available to export.")
+        return redirect('analysis_history', project_id=project_id)
 
     zip_buffer = io.BytesIO()
 

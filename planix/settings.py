@@ -134,7 +134,43 @@ INSTALLED_APPS = [
     'core',
 ]
 
-LOGIN_REDIRECT_URL = "/"
+LOGIN_REDIRECT_URL = "dashboard"
+LOGIN_URL = "login"
+LOGOUT_REDIRECT_URL = "login"
+
+# ========================
+# Session Security Settings
+# ========================
+# Session timeout after 30 minutes of inactivity
+SESSION_COOKIE_AGE = 1800  # 30 minutes in seconds
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+SESSION_COOKIE_SECURE = not DEBUG  # Set to True in production
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = 'Strict'
+
+# ========================
+# CSRF Settings
+# ========================
+CSRF_COOKIE_SECURE = not DEBUG  # Set to True in production
+CSRF_COOKIE_HTTPONLY = True
+CSRF_COOKIE_SAMESITE = 'Strict'
+
+# ========================
+# Security Headers
+# ========================
+SECURE_HSTS_SECONDS = 31536000 if not DEBUG else 0  # 1 year in production
+SECURE_HSTS_INCLUDE_SUBDOMAINS = not DEBUG
+SECURE_HSTS_PRELOAD = not DEBUG
+SECURE_SSL_REDIRECT = not DEBUG
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_SECURITY_POLICY = {
+    'default-src': ("'self'",),
+    'script-src': ("'self'", "'unsafe-inline'", "cdn.jsdelivr.net"),
+    'style-src': ("'self'", "'unsafe-inline'", "cdn.jsdelivr.net"),
+    'img-src': ("'self'", "data:", "https:"),
+    'font-src': ("'self'", "cdn.jsdelivr.net"),
+    'connect-src': ("'self'",),
+}
 
 # Celery Configuration Options
 CELERY_BROKER_URL = 'redis://localhost:6379/0'

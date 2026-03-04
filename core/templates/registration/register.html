@@ -12,7 +12,17 @@
             <p class="text-xs text-gray-500">Create a new secure identity.</p>
         </div>
 
-        <form method="post" class="space-y-4">
+        <!-- Display form errors/messages -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{% if message.tags %}{{ message.tags }}{% else %}info{% endif %} alert-dismissible fade show mb-4" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="post" class="space-y-4" novalidate>
             {% csrf_token %}
             <style>
                 form p { margin-bottom: 1rem; }
@@ -27,10 +37,43 @@
                     outline: none;
                 }
                 form input:focus { border-color: #38bdf8; box-shadow: 0 0 0 1px #38bdf8; }
+                form input.is-invalid { border-color: #ef4444; }
                 form .helptext { display: block; font-size: 0.75rem; color: #6b7280; margin-top: 0.25rem; }
                 form ul.errorlist { color: #ef4444; font-size: 0.875rem; list-style: none; padding: 0; margin-bottom: 0.5rem; }
+                form .field-error { border-color: #ef4444 !important; }
+                .form-group { margin-bottom: 1rem; }
             </style>
-            {{ form.as_p }}
+            
+            {% for field in form %}
+                {% if field.name != 'password2' %}
+                    <div class="form-group">
+                        {{ field.label_tag }}
+                        {{ field }}
+                        {% if field.errors %}
+                            <ul class="errorlist">
+                                {% for error in field.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                        {% if field.help_text %}
+                            <small class="helptext">{{ field.help_text|safe }}</small>
+                        {% endif %}
+                    </div>
+                {% else %}
+                    <div class="form-group">
+                        {{ field.label_tag }}
+                        {{ field }}
+                        {% if field.errors %}
+                            <ul class="errorlist">
+                                {% for error in field.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            {% endfor %}
             
             <button type="submit" class="w-full bg-info/10 border border-info text-info hover:bg-info hover:text-bg font-bold py-2 px-4 transition-all duration-200 mt-4 flex items-center justify-center gap-2">
                 <span>REGISTER IDENTITY</span>
