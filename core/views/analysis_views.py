@@ -6,7 +6,6 @@ from django.contrib import messages
 from django.http import HttpResponse, JsonResponse, HttpResponseForbidden
 from celery.result import AsyncResult
 from django.template.loader import render_to_string
-from weasyprint import HTML
 from celery import current_app
 from django.contrib.admin.views.decorators import staff_member_required
 from kombu.exceptions import OperationalError
@@ -99,6 +98,15 @@ def download_analysis_pdf(request, analysis_id):
         "analysis": analysis,
         "project": project
     })
+
+    try:
+        from weasyprint import HTML
+    except (ImportError, OSError) as exc:
+        logger.exception("WeasyPrint native dependency is unavailable: %s", exc)
+        return HttpResponse(
+            "PDF export is unavailable because WeasyPrint's native libraries are not installed.",
+            status=503,
+        )
 
     pdf_file = HTML(string=html).write_pdf()
 
