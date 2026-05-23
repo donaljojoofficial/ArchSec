@@ -1,0 +1,126 @@
+{% extends "terminal_base.html" %}
+
+{% block title %}ArchSec - Modernize Legacy Systems With AI{% endblock %}
+{% block main_class %}w-full{% endblock %}
+
+{% block content %}
+<section class="relative min-h-[calc(100vh-4rem)] overflow-hidden">
+    <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=2200&q=85');"></div>
+    <div class="absolute inset-0" style="background: var(--hero-overlay);"></div>
+    <div class="relative mx-auto flex min-h-[calc(100vh-4rem)] max-w-7xl items-center px-4 py-16 sm:px-6 lg:px-8">
+        <div class="max-w-3xl pt-10 text-white">
+            <p class="text-sm font-extrabold uppercase tracking-[0.18em] text-blue-200">AI modernization advisor</p>
+            <h1 class="mt-5 text-5xl font-black tracking-tight text-white sm:text-6xl lg:text-7xl">Turn aging systems into a practical upgrade roadmap.</h1>
+            <p class="mt-6 max-w-2xl text-lg leading-8 text-blue-50">
+                ArchSec analyzes old websites, dated stacks, manual deployments, traditional testing, weak security workflows, and missing AI integrations. It returns prioritized issues with solutions, costs, requirements, migration steps, and diagrams.
+            </p>
+            <div class="mt-8 flex flex-col gap-3 sm:flex-row">
+                {% if user.is_authenticated %}
+                    <a href="{% url 'dashboard' %}" class="btn-primary-modern px-5 py-3">Open dashboard</a>
+                {% else %}
+                    <a href="{% url 'register' %}" class="btn-primary-modern px-5 py-3">Start free assessment</a>
+                {% endif %}
+                <a href="{% url 'about' %}" class="inline-flex items-center justify-center rounded-lg border border-white/35 bg-white/10 px-5 py-3 font-extrabold text-white backdrop-blur transition hover:bg-white/20">Explore platform</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
+    <div class="grid gap-6 lg:grid-cols-3">
+        <div>
+            <p class="text-sm font-bold text-blue-700">Why ArchSec</p>
+            <h2 class="mt-3 text-3xl font-black tracking-tight theme-text">Modernization advice that teams can actually execute.</h2>
+        </div>
+        <div class="app-card p-6">
+            <p class="text-sm font-extrabold text-blue-700">01</p>
+            <h3 class="mt-3 text-lg font-extrabold theme-text">Legacy system diagnosis</h3>
+            <p class="mt-3 text-sm leading-6 theme-muted">Capture the current stack, hosting, testing, deployment, monitoring, security tooling, and AI-readiness in one structured profile.</p>
+        </div>
+        <div class="app-card p-6">
+            <p class="text-sm font-extrabold text-blue-700">02</p>
+            <h3 class="mt-3 text-lg font-extrabold theme-text">Issue-by-issue roadmap</h3>
+            <p class="mt-3 text-sm leading-6 theme-muted">Each finding explains the problem, modern solution, required tools, cost range, migration steps, risk, and expected benefit.</p>
+        </div>
+    </div>
+</section>
+
+<section class="border-y" style="border-color: var(--border); background: var(--panel);">
+    <div class="mx-auto grid max-w-7xl gap-10 px-4 py-20 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:px-8">
+        <div>
+            <p class="text-sm font-bold text-blue-700">What it evaluates</p>
+            <h2 class="mt-3 text-3xl font-black tracking-tight theme-text">From old tech to AI-ready operations.</h2>
+            <p class="mt-4 text-sm leading-7 theme-muted">
+                ArchSec is built for businesses that know their system needs improvement but need a clear, priced, phased path forward.
+            </p>
+        </div>
+        <div class="grid gap-3 sm:grid-cols-2">
+            <div class="rounded-lg border p-4" style="border-color: var(--border); background: var(--panel-soft);">
+                <h3 class="font-extrabold theme-text">Old frameworks</h3>
+                <p class="mt-2 text-sm theme-muted">Runtime upgrades, dependency risks, rewrite options, and safer migration paths.</p>
+            </div>
+            <div class="rounded-lg border p-4" style="border-color: var(--border); background: var(--panel-soft);">
+                <h3 class="font-extrabold theme-text">Manual deployment</h3>
+                <p class="mt-2 text-sm theme-muted">CI/CD, rollback plans, environment parity, containers, and managed hosting.</p>
+            </div>
+            <div class="rounded-lg border p-4" style="border-color: var(--border); background: var(--panel-soft);">
+                <h3 class="font-extrabold theme-text">Traditional testing</h3>
+                <p class="mt-2 text-sm theme-muted">Automated unit, integration, security, API, and release validation strategies.</p>
+            </div>
+            <div class="rounded-lg border p-4" style="border-color: var(--border); background: var(--panel-soft);">
+                <h3 class="font-extrabold theme-text">AI opportunities</h3>
+                <p class="mt-2 text-sm theme-muted">Support assistants, document search, workflow automation, analytics, and governance.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
+    <div class="grid gap-8 lg:grid-cols-[1fr_1.1fr]">
+        <div>
+            <p class="text-sm font-bold text-blue-700">Assessment output</p>
+            <h2 class="mt-3 text-3xl font-black tracking-tight theme-text">Not one huge report. A decision-ready plan.</h2>
+            <p class="mt-4 text-sm leading-7 theme-muted">
+                Every issue is separated into a solution package so teams can approve, budget, and sequence improvements without guessing.
+            </p>
+        </div>
+        <div class="app-card overflow-hidden">
+            <div class="border-b p-5" style="border-color: var(--border);">
+                <p class="text-sm font-extrabold theme-text">Example finding</p>
+            </div>
+            <div class="grid gap-0 divide-y" style="border-color: var(--border);">
+                <div class="p-5">
+                    <p class="text-xs font-bold uppercase text-blue-700">Issue</p>
+                    <p class="mt-2 font-bold theme-text">Deployments are manual and undocumented.</p>
+                </div>
+                <div class="p-5">
+                    <p class="text-xs font-bold uppercase text-blue-700">Solution</p>
+                    <p class="mt-2 theme-muted">Introduce GitHub Actions, staging, automated tests, release approvals, and rollback scripts.</p>
+                </div>
+                <div class="grid gap-0 divide-y sm:grid-cols-3 sm:divide-x sm:divide-y-0" style="border-color: var(--border);">
+                    <div class="p-5"><p class="text-xs font-bold uppercase text-blue-700">Cost</p><p class="mt-2 font-bold theme-text">$300-$900/mo</p></div>
+                    <div class="p-5"><p class="text-xs font-bold uppercase text-blue-700">Effort</p><p class="mt-2 font-bold theme-text">2-4 weeks</p></div>
+                    <div class="p-5"><p class="text-xs font-bold uppercase text-blue-700">Priority</p><p class="mt-2 font-bold theme-text">High</p></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="mx-auto max-w-7xl px-4 pb-20 sm:px-6 lg:px-8">
+    <div class="relative overflow-hidden rounded-lg bg-blue-700 p-8 text-white sm:p-10">
+        <div class="max-w-3xl">
+            <h2 class="text-3xl font-black tracking-tight text-white">Ready to see what your legacy system should become?</h2>
+            <p class="mt-3 text-sm leading-6 text-blue-50">Create a system profile, run an AI modernization assessment, and turn uncertain upgrades into a clear roadmap.</p>
+            <div class="mt-6 flex flex-col gap-3 sm:flex-row">
+                {% if user.is_authenticated %}
+                    <a href="{% url 'create_project' %}" class="inline-flex items-center justify-center rounded-lg bg-white px-5 py-3 font-extrabold text-blue-700">New assessment</a>
+                {% else %}
+                    <a href="{% url 'register' %}" class="inline-flex items-center justify-center rounded-lg bg-white px-5 py-3 font-extrabold text-blue-700">Create account</a>
+                {% endif %}
+                <a href="{% url 'help' %}" class="inline-flex items-center justify-center rounded-lg border border-white/35 px-5 py-3 font-extrabold text-white">Read help</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

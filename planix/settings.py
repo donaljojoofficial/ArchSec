@@ -136,7 +136,7 @@ INSTALLED_APPS = [
 
 LOGIN_REDIRECT_URL = "dashboard"
 LOGIN_URL = "login"
-LOGOUT_REDIRECT_URL = "login"
+LOGOUT_REDIRECT_URL = "home"
 
 # ========================
 # Session Security Settings

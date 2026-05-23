@@ -1,13 +1,13 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}ArchSec Modernization Advisor{% endblock %}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -34,34 +34,83 @@
             }
         }
     </script>
+    <script>
+        (function () {
+            const savedTheme = localStorage.getItem("archsec-theme");
+            const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+            document.documentElement.dataset.theme = savedTheme || (prefersDark ? "dark" : "light");
+        })();
+    </script>
     <style>
+        :root {
+            --bg: #f7f8fb;
+            --panel: #ffffff;
+            --panel-soft: #f9fafb;
+            --text: #172033;
+            --muted: #6b7280;
+            --muted-strong: #374151;
+            --border: #e5e7eb;
+            --accent: #2563eb;
+            --accent-hover: #1d4ed8;
+            --accent-soft: #eff6ff;
+            --hero-overlay: rgba(5, 14, 35, 0.54);
+            --shadow: 0 12px 30px rgba(15, 23, 42, 0.05);
+        }
+
+        html[data-theme="dark"] {
+            --bg: #0d111a;
+            --panel: #151b27;
+            --panel-soft: #111827;
+            --text: #eef2ff;
+            --muted: #a0a9ba;
+            --muted-strong: #d5dbea;
+            --border: #273244;
+            --accent: #60a5fa;
+            --accent-hover: #93c5fd;
+            --accent-soft: rgba(96, 165, 250, 0.14);
+            --hero-overlay: rgba(5, 14, 35, 0.68);
+            --shadow: 0 18px 45px rgba(0, 0, 0, 0.28);
+            color-scheme: dark;
+        }
+
         * { box-sizing: border-box; }
-        body { font-family: Inter, system-ui, sans-serif; }
-        .text-gray-300 { color: #374151 !important; }
-        .text-gray-400 { color: #4b5563 !important; }
-        .text-gray-500 { color: #6b7280 !important; }
-        .text-gray-600 { color: #9ca3af !important; }
-        .bg-panel { background-color: #ffffff !important; }
-        .bg-bg { background-color: #f7f8fb !important; }
-        .border-gray-800, .border-gray-700, .border-gray-600 { border-color: #e5e7eb !important; }
-        .bg-gray-800, .bg-gray-800\/50, .bg-gray-900, .bg-gray-900\/50 { background-color: #f9fafb !important; }
-        .rounded-modern { border-radius: 8px; }
+        html { background: var(--bg); }
+        body {
+            min-height: 100vh;
+            background: var(--bg);
+            color: var(--text);
+            font-family: Inter, system-ui, sans-serif;
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+
+        .theme-surface { background: color-mix(in srgb, var(--panel) 90%, transparent); border-color: var(--border); }
+        .theme-text { color: var(--text) !important; }
+        .theme-muted { color: var(--muted) !important; }
+        .theme-muted-strong { color: var(--muted-strong) !important; }
+
+        .text-gray-950, .text-gray-900, .text-gray-800, .text-gray-700, .text-gray-300 { color: var(--text) !important; }
+        .text-gray-600, .text-gray-500, .text-gray-400 { color: var(--muted) !important; }
+        .bg-panel, .bg-white { background-color: var(--panel) !important; }
+        .bg-bg, .bg-gray-50, .bg-gray-100, .bg-gray-800, .bg-gray-800\/50, .bg-gray-900, .bg-gray-900\/50 { background-color: var(--panel-soft) !important; }
+        .border-gray-100, .border-gray-200, .border-gray-300, .border-gray-600, .border-gray-700, .border-gray-800 { border-color: var(--border) !important; }
+
         input, select, textarea {
             border-radius: 8px !important;
-            border: 1px solid #d1d5db !important;
-            background: #ffffff !important;
-            color: #111827 !important;
+            border: 1px solid var(--border) !important;
+            background: var(--panel) !important;
+            color: var(--text) !important;
         }
         input:focus, select:focus, textarea:focus {
             outline: none !important;
-            border-color: #2563eb !important;
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12) !important;
+            border-color: var(--accent) !important;
+            box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent) !important;
         }
+
         .app-card {
-            background: #ffffff;
-            border: 1px solid #e5e7eb;
+            background: var(--panel);
+            border: 1px solid var(--border);
             border-radius: 8px;
-            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.05);
+            box-shadow: var(--shadow);
         }
         .btn-primary-modern {
             display: inline-flex;
@@ -69,54 +118,69 @@
             justify-content: center;
             gap: 0.5rem;
             border-radius: 8px;
-            background: #2563eb;
+            background: var(--accent);
             color: #ffffff;
-            font-weight: 700;
+            font-weight: 800;
             padding: 0.7rem 1rem;
             transition: background 0.2s ease, transform 0.2s ease;
         }
-        .btn-primary-modern:hover { background: #1d4ed8; transform: translateY(-1px); }
+        .btn-primary-modern:hover { background: var(--accent-hover); transform: translateY(-1px); }
         .btn-secondary-modern {
             display: inline-flex;
             align-items: center;
             justify-content: center;
             border-radius: 8px;
-            border: 1px solid #d1d5db;
-            color: #374151;
-            font-weight: 600;
+            border: 1px solid var(--border);
+            color: var(--muted-strong);
+            font-weight: 700;
             padding: 0.7rem 1rem;
-            background: #ffffff;
+            background: var(--panel);
         }
-        .btn-secondary-modern:hover { border-color: #9ca3af; background: #f9fafb; }
+        .btn-secondary-modern:hover { background: var(--panel-soft); color: var(--text); }
+        .theme-toggle {
+            border: 1px solid var(--border);
+            background: var(--panel);
+            color: var(--muted-strong);
+            border-radius: 999px;
+            min-width: 4.8rem;
+            padding: 0.45rem 0.7rem;
+            font-weight: 800;
+            font-size: 0.78rem;
+        }
     </style>
     {% block extra_head %}{% endblock %}
 </head>
-<body class="bg-bg text-text min-h-screen">
-    <header class="sticky top-0 z-50 border-b border-gray-200 bg-white/90 backdrop-blur">
+<body>
+    <header class="sticky top-0 z-50 border-b theme-surface backdrop-blur">
         <div class="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-            <a href="{% url 'dashboard' %}" class="flex items-center gap-3">
+            <a href="{% url 'home' %}" class="flex items-center gap-3">
                 <span class="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-600 text-sm font-extrabold text-white">A</span>
                 <span>
-                    <span class="block text-sm font-bold text-gray-950">ArchSec</span>
-                    <span class="block text-xs text-gray-500">Modernization Advisor</span>
+                    <span class="block text-sm font-bold theme-text">ArchSec</span>
+                    <span class="block text-xs theme-muted">Modernization Advisor</span>
                 </span>
             </a>
             <nav class="flex items-center gap-2 text-sm">
+                <a href="{% url 'about' %}" class="rounded-lg px-3 py-2 font-semibold theme-muted hover:bg-gray-100">About</a>
+                <a href="{% url 'help' %}" class="rounded-lg px-3 py-2 font-semibold theme-muted hover:bg-gray-100">Help</a>
                 {% if user.is_authenticated %}
-                    <a href="{% url 'dashboard' %}" class="hidden rounded-lg px-3 py-2 font-semibold text-gray-600 hover:bg-gray-100 hover:text-gray-950 sm:inline-flex">Dashboard</a>
-                    <a href="{% url 'create_project' %}" class="hidden rounded-lg px-3 py-2 font-semibold text-gray-600 hover:bg-gray-100 hover:text-gray-950 sm:inline-flex">New assessment</a>
+                    <a href="{% url 'dashboard' %}" class="hidden rounded-lg px-3 py-2 font-semibold theme-muted hover:bg-gray-100 sm:inline-flex">Dashboard</a>
+                    <a href="{% url 'create_project' %}" class="hidden rounded-lg px-3 py-2 font-semibold theme-muted hover:bg-gray-100 sm:inline-flex">New assessment</a>
                     {% if user.is_staff or user.is_superuser %}
-                        <a href="{% url 'admin:index' %}" class="hidden rounded-lg px-3 py-2 font-semibold text-gray-600 hover:bg-gray-100 hover:text-gray-950 sm:inline-flex">Admin</a>
+                        <a href="{% url 'admin:index' %}" class="hidden rounded-lg px-3 py-2 font-semibold theme-muted hover:bg-gray-100 sm:inline-flex">Admin</a>
                     {% endif %}
-                    <a href="{% url 'profile' %}" class="rounded-lg px-3 py-2 font-semibold text-gray-600 hover:bg-gray-100 hover:text-gray-950">{{ user.username }}</a>
+                    <a href="{% url 'profile' %}" class="hidden rounded-lg px-3 py-2 font-semibold theme-muted hover:bg-gray-100 md:inline-flex">{{ user.username }}</a>
                     <form method="post" action="{% url 'logout' %}">
                         {% csrf_token %}
                         <button type="submit" class="btn-secondary-modern px-3 py-2">Logout</button>
                     </form>
                 {% else %}
-                    <a href="{% url 'login' %}" class="btn-secondary-modern px-3 py-2">Login</a>
+                    <a href="{% url 'login' %}" class="btn-secondary-modern hidden px-3 py-2 sm:inline-flex">Login</a>
                     <a href="{% url 'register' %}" class="btn-primary-modern px-3 py-2">Register</a>
                 {% endif %}
+                <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Toggle color theme">
+                    <span data-theme-label>Light</span>
+                </button>
             </nav>
         </div>
     </header>
@@ -124,15 +188,39 @@
     {% if messages %}
     <div class="mx-auto max-w-7xl px-4 pt-4 sm:px-6 lg:px-8">
         {% for message in messages %}
-            <div class="mb-3 rounded-lg border border-blue-100 bg-blue-50 px-4 py-3 text-sm font-medium text-blue-900">
+            <div class="mb-3 rounded-lg border px-4 py-3 text-sm font-medium" style="border-color: var(--border); background: var(--accent-soft); color: var(--text);">
                 {{ message }}
             </div>
         {% endfor %}
     </div>
     {% endif %}
 
-    <main class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <main class="{% block main_class %}mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8{% endblock %}">
         {% block content %}{% endblock %}
     </main>
+
+    <script>
+        (function () {
+            const root = document.documentElement;
+            const button = document.getElementById("theme-toggle");
+            const label = document.querySelector("[data-theme-label]");
+
+            function setTheme(theme) {
+                root.dataset.theme = theme;
+                localStorage.setItem("archsec-theme", theme);
+                if (label) {
+                    label.textContent = theme === "dark" ? "Dark" : "Light";
+                }
+            }
+
+            setTheme(root.dataset.theme || "light");
+
+            if (button) {
+                button.addEventListener("click", function () {
+                    setTheme(root.dataset.theme === "dark" ? "light" : "dark");
+                });
+            }
+        })();
+    </script>
 </body>
 </html>

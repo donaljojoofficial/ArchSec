@@ -4,3 +4,4 @@ from .auth_views import register_view, logout_view, profile_view, edit_profile_v
 from .health_views import health_check
 from .celery_views import celery_dashboard
 from .diagram_views import view_diagrams
+from .public_views import landing_page, about_page, help_page

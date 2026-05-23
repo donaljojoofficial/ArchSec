@@ -38,6 +38,8 @@ This roadmap reflects the new product direction: ArchSec is now an AI Modernizat
 
 - [x] Replace the terminal/cyberpunk visual style with a minimal modern interface.
 - [x] Update shared layout, navigation, buttons, forms, cards, and status states.
+- [x] Add persistent light/dark theme toggle.
+- [x] Add public landing, about, and help pages without login requirement.
 - [x] Redesign dashboard around systems, assessments, modernization priority, and recent findings.
 - [x] Redesign project creation as a legacy system profile intake.
 - [x] Redesign report pages around issue-by-issue recommendations.

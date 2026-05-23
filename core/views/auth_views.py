@@ -69,8 +69,7 @@ def logout_view(request):
         messages.info(request, 'You were already logged out.')
         logger.debug(f"Logout requested by unauthenticated user")
     
-    # Redirect to login page
-    return redirect('login')
+    return redirect('home')
 
 
 @login_required(login_url='login')
