@@ -101,6 +101,22 @@
                     {% endfor %}
                 </div>
             </div>
+            <div class="app-card p-5">
+                <div class="flex items-start justify-between gap-3">
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-950">Customer support</h3>
+                        <p class="mt-2 text-sm leading-6 text-gray-500">
+                            Need help shaping an assessment or interpreting recommendations?
+                        </p>
+                    </div>
+                    <span class="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-bold text-blue-700">Support</span>
+                </div>
+                <div class="mt-4 grid gap-2">
+                    <a href="{% url 'help' %}" class="btn-secondary-modern w-full">Open help center</a>
+                    <a href="mailto:support@archsec.local?subject=ArchSec%20Support%20Request" class="btn-secondary-modern w-full">Email support</a>
+                </div>
+                <p class="mt-3 text-xs text-gray-500">Share your system name, assessment ID, and the recommendation you want reviewed.</p>
+            </div>
             {% if user.is_staff or user.is_superuser %}
                 <div class="app-card p-5">
                     <h3 class="text-sm font-bold text-gray-950">Admin operations</h3>

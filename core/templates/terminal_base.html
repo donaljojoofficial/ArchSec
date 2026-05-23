@@ -161,8 +161,6 @@
                 </span>
             </a>
             <nav class="flex items-center gap-2 text-sm">
-                <a href="{% url 'about' %}" class="rounded-lg px-3 py-2 font-semibold theme-muted hover:bg-gray-100">About</a>
-                <a href="{% url 'help' %}" class="rounded-lg px-3 py-2 font-semibold theme-muted hover:bg-gray-100">Help</a>
                 {% if user.is_authenticated %}
                     <a href="{% url 'dashboard' %}" class="hidden rounded-lg px-3 py-2 font-semibold theme-muted hover:bg-gray-100 sm:inline-flex">Dashboard</a>
                     <a href="{% url 'create_project' %}" class="hidden rounded-lg px-3 py-2 font-semibold theme-muted hover:bg-gray-100 sm:inline-flex">New assessment</a>
@@ -175,6 +173,8 @@
                         <button type="submit" class="btn-secondary-modern px-3 py-2">Logout</button>
                     </form>
                 {% else %}
+                    <a href="{% url 'about' %}" class="rounded-lg px-3 py-2 font-semibold theme-muted hover:bg-gray-100">About</a>
+                    <a href="{% url 'help' %}" class="rounded-lg px-3 py-2 font-semibold theme-muted hover:bg-gray-100">Help</a>
                     <a href="{% url 'login' %}" class="btn-secondary-modern hidden px-3 py-2 sm:inline-flex">Login</a>
                     <a href="{% url 'register' %}" class="btn-primary-modern px-3 py-2">Register</a>
                 {% endif %}
