@@ -16,31 +16,31 @@ logger = logging.getLogger(__name__)
 
 def build_export_content(analysis):
     return f"""
-Security Analysis Report
-========================
+Modernization Assessment Report
+===============================
 
-Project: {analysis.project.name}
+System: {analysis.project.name}
 Date: {analysis.created_at}
-Security Score: {analysis.security_score} ({analysis.risk_category})
+Modernization Priority Score: {analysis.security_score} ({analysis.risk_category})
 
-System Architecture
--------------------
+Architecture Modernization
+--------------------------
 {analysis.architecture}
 
-Threat Model
-------------
+Security And Technical Debt Risks
+---------------------------------
 {analysis.threat_model}
 
-Secure SDLC Recommendations
----------------------------
+Development And Deployment Modernization
+----------------------------------------
 {analysis.sdls_recommendations}
 
-Cost Estimation
----------------
+Cost, Effort, And Requirements
+------------------------------
 {analysis.cost_estimation}
 
-Security Testing Plan
----------------------
+Testing And Security Validation Plan
+------------------------------------
 {analysis.testing_plan}
 """.strip()
 
@@ -70,7 +70,7 @@ def export_analysis_txt(request, analysis_id):
 
 @project_owner_required
 def export_analysis_history_zip(request, project_id):
-    project = get_object_or_404(Project, id=project_id, user=request.user)
+    project = get_object_or_404(Project, id=project_id)
     analyses = project.analyses.all().order_by("created_at")
 
     if not analyses.exists():

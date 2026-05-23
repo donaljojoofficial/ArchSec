@@ -1,111 +1,76 @@
 {% extends "terminal_base.html" %}
 
 {% block content %}
-<div class="max-w-6xl mx-auto space-y-6">
-    <div class="flex justify-between items-end border-b border-gray-800 pb-4">
-        <div>
-            <h2 class="text-2xl font-bold text-white">
-                <span class="text-accent">>></span> Celery Task Monitor
-            </h2>
-            <p class="text-xs text-gray-500 font-mono mt-1">System process inspection and queue management.</p>
+<div class="space-y-6">
+    <section class="app-card p-6 sm:p-8">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+                <p class="text-sm font-semibold text-blue-700">Operations</p>
+                <h1 class="mt-2 text-3xl font-extrabold text-gray-950">Background task monitor</h1>
+                <p class="mt-2 text-sm text-gray-500">Inspect queued modernization assessments and Celery worker state.</p>
+            </div>
+            <a href="." class="btn-primary-modern">Refresh</a>
         </div>
-        <a href="." class="bg-accent/10 border border-accent text-accent hover:bg-accent hover:text-bg px-4 py-2 text-sm font-bold transition-colors">
-            [ REFRESH_DATA ]
-        </a>
-    </div>
-    
+    </section>
+
     {% if connection_error %}
-    <div class="bg-error/10 border border-error p-4 text-error">
-        <h4 class="font-bold text-lg">❌ System Error - Connection Refused</h4>
-        <p class="mt-2">Could not connect to the Redis broker. Background tasks cannot be processed.</p>
-        <div class="border-t border-error/30 my-3"></div>
-        <p class="font-mono text-xs">{{ connection_error }}</p>
+    <div class="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-900">
+        <strong>Redis broker unavailable.</strong>
+        <p class="mt-1">{{ connection_error }}</p>
     </div>
     {% endif %}
-    
-    <!-- Pending Analyses in DB -->
-    <div class="bg-panel border border-gray-800">
-        <div class="bg-gray-800/50 px-4 py-2 border-b border-gray-800">
-            <strong class="text-warning">>> Pending Analyses (Database)</strong>
+
+    <section class="app-card overflow-hidden">
+        <div class="border-b border-gray-200 px-5 py-4">
+            <h2 class="text-base font-bold text-gray-950">Pending assessments</h2>
         </div>
-        <div class="p-0">
-            {% if pending_analyses %}
-                <table class="w-full text-left text-sm text-gray-300">
-                    <thead class="bg-gray-900 text-gray-500 font-mono text-xs uppercase">
-                        <tr>
-                            <th class="px-4 py-3">Project</th>
-                            <th class="px-4 py-3">Created At</th>
-                            <th class="px-4 py-3">Task ID</th>
-                        </tr>
+        {% if pending_analyses %}
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm">
+                    <thead class="bg-gray-50 text-xs uppercase text-gray-500">
+                        <tr><th class="px-5 py-3">System</th><th class="px-5 py-3">Created</th><th class="px-5 py-3">Task ID</th></tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-800 font-mono">
+                    <tbody class="divide-y divide-gray-100">
                         {% for analysis in pending_analyses %}
-                        <tr class="hover:bg-gray-800/50 transition-colors">
-                            <td class="px-4 py-3">{{ analysis.project.name }}</td>
-                            <td class="px-4 py-3">{{ analysis.created_at|date:"Y-m-d H:i:s" }}</td>
-                            <td class="px-4 py-3 text-gray-500">{{ analysis.task_id }}</td>
-                        </tr>
+                        <tr><td class="px-5 py-3 font-semibold text-gray-900">{{ analysis.project.name }}</td><td class="px-5 py-3 text-gray-600">{{ analysis.created_at|date:"Y-m-d H:i:s" }}</td><td class="px-5 py-3 text-gray-500">{{ analysis.task_id }}</td></tr>
                         {% endfor %}
                     </tbody>
                 </table>
-            {% else %}
-                <div class="p-6 text-center text-gray-500 font-mono text-sm">No pending analyses in database.</div>
-            {% endif %}
-        </div>
-    </div>
+            </div>
+        {% else %}
+            <div class="p-8 text-center text-sm text-gray-500">No pending assessments.</div>
+        {% endif %}
+    </section>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <!-- Active Tasks -->
-        <div class="bg-panel border border-gray-800">
-            <div class="bg-gray-800/50 px-4 py-2 border-b border-gray-800 flex justify-between items-center">
-                <strong class="text-accent">>> Active Tasks (Running)</strong>
-                <span class="text-xs px-2 py-0.5 bg-gray-700 text-white rounded">{{ total_active }}</span>
-            </div>
-            <div class="p-4">
-                    {% if active %}
-                        {% for worker, tasks in active.items %}
-                            <h6 class="text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">{{ worker }}</h6>
-                            <ul class="space-y-2">
-                            {% for task in tasks %}
-                                <li class="bg-gray-900 p-3 border border-gray-700 text-sm font-mono">
-                                    <div class="text-white font-bold">{{ task.name }}</div>
-                                    <div class="text-gray-500 text-xs mt-1">ID: {{ task.id }}</div>
-                                    <div class="text-gray-400 text-xs mt-1 truncate">Args: {{ task.args }}</div>
-                                </li>
-                            {% endfor %}
-                            </ul>
+    <section class="grid gap-5 lg:grid-cols-2">
+        <div class="app-card p-5">
+            <div class="flex items-center justify-between"><h2 class="text-base font-bold text-gray-950">Active tasks</h2><span class="rounded-full bg-blue-50 px-3 py-1 text-xs font-bold text-blue-700">{{ total_active }}</span></div>
+            <div class="mt-4 space-y-3">
+                {% if active %}
+                    {% for worker, tasks in active.items %}
+                        {% for task in tasks %}
+                            <div class="rounded-lg border border-gray-100 p-3 text-sm"><p class="font-semibold text-gray-950">{{ task.name }}</p><p class="mt-1 text-xs text-gray-500">{{ task.id }}</p></div>
                         {% endfor %}
-                    {% else %}
-                        <p class="text-gray-500 text-sm font-mono">No active tasks.</p>
-                    {% endif %}
+                    {% endfor %}
+                {% else %}
+                    <p class="text-sm text-gray-500">No active tasks.</p>
+                {% endif %}
             </div>
         </div>
-
-        <!-- Scheduled/Retrying Tasks -->
-        <div class="bg-panel border border-gray-800">
-            <div class="bg-gray-800/50 px-4 py-2 border-b border-gray-800 flex justify-between items-center">
-                <strong class="text-info">>> Scheduled / Retrying Tasks</strong>
-                <span class="text-xs px-2 py-0.5 bg-gray-700 text-white rounded">{{ total_scheduled }}</span>
-            </div>
-            <div class="p-4">
-                    {% if scheduled %}
-                        {% for worker, tasks in scheduled.items %}
-                            <h6 class="text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">{{ worker }}</h6>
-                            <ul class="space-y-2">
-                            {% for task in tasks %}
-                                <li class="bg-gray-900 p-3 border border-gray-700 text-sm font-mono">
-                                    <div class="text-white font-bold">{{ task.name }}</div>
-                                    <div class="text-gray-500 text-xs mt-1">ID: {{ task.id }}</div>
-                                    <div class="text-warning text-xs mt-1">ETA: {{ task.eta }}</div>
-                                </li>
-                            {% endfor %}
-                            </ul>
+        <div class="app-card p-5">
+            <div class="flex items-center justify-between"><h2 class="text-base font-bold text-gray-950">Scheduled tasks</h2><span class="rounded-full bg-amber-50 px-3 py-1 text-xs font-bold text-amber-700">{{ total_scheduled }}</span></div>
+            <div class="mt-4 space-y-3">
+                {% if scheduled %}
+                    {% for worker, tasks in scheduled.items %}
+                        {% for task in tasks %}
+                            <div class="rounded-lg border border-gray-100 p-3 text-sm"><p class="font-semibold text-gray-950">{{ task.name }}</p><p class="mt-1 text-xs text-gray-500">{{ task.eta }}</p></div>
                         {% endfor %}
-                    {% else %}
-                        <p class="text-gray-500 text-sm font-mono">No scheduled tasks.</p>
-                    {% endif %}
+                    {% endfor %}
+                {% else %}
+                    <p class="text-sm text-gray-500">No scheduled tasks.</p>
+                {% endif %}
             </div>
         </div>
-    </div>
+    </section>
 </div>
 {% endblock %}

@@ -1,98 +1,60 @@
 {% extends 'terminal_base.html' %}
 
 {% block content %}
-<div class="max-w-5xl mx-auto space-y-6">
-    <!-- Header -->
-    <div class="flex justify-between items-end border-b border-gray-800 pb-4">
-        <div>
-            <h2 class="text-2xl font-bold text-white">
-                <span class="text-accent">>></span> Analysis History
-            </h2>
-            <p class="text-xs text-gray-500 font-mono mt-1">Project: {{ project.name }}</p>
-        </div>
-        <div class="flex gap-3">
-             <a href="{% url 'export_analysis_history_zip' project.id %}" class="bg-accent/10 border border-accent text-accent hover:bg-accent hover:text-bg px-4 py-2 text-sm font-bold transition-colors">
-                [ DOWNLOAD ZIP ]
-            </a>
-            <a href="{% url 'dashboard' %}" class="text-gray-500 hover:text-white px-4 py-2 text-sm transition-colors">
-                &lt; Back
-            </a>
-        </div>
-    </div>
-
-    <!-- Risk Summary & Chart -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <!-- Stats -->
-        <div class="bg-panel border border-gray-800 p-6">
-             <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4">Risk Trend</h3>
-             <div class="space-y-2 text-sm font-mono">
-                <div class="flex justify-between">
-                    <span class="text-gray-500">Highest Score:</span>
-                    <span class="text-error">{{ trend.highest }}</span>
-                </div>
-                <div class="flex justify-between">
-                    <span class="text-gray-500">Lowest Score:</span>
-                    <span class="text-accent">{{ trend.lowest }}</span>
-                </div>
-                <div class="flex justify-between">
-                    <span class="text-gray-500">Average:</span>
-                    <span class="text-white">{{ trend.average|floatformat:2 }}</span>
-                </div>
-                <div class="flex justify-between border-t border-gray-800 pt-2 mt-2">
-                    <span class="text-gray-500">Direction:</span>
-                    {% if trend.improving %}
-                        <span class="text-accent">Improving ↑</span>
-                    {% else %}
-                        <span class="text-error">Worsening ↓</span>
-                    {% endif %}
-                </div>
-             </div>
-        </div>
-        
-        <!-- Chart -->
-        <div class="bg-panel border border-gray-800 p-4 md:col-span-2">
-            <canvas id="riskChart" height="100"></canvas>
-        </div>
-    </div>
-
-    <!-- History List -->
-    <div class="bg-panel border border-gray-800">
-        <div class="bg-gray-800/50 px-4 py-2 border-b border-gray-800 flex justify-between items-center">
-            <strong class="text-info text-sm font-mono">// Analysis_Log</strong>
-            <span class="text-xs text-gray-500">{{ analyses|length }} entries</span>
-        </div>
-        
-        {% if analyses %}
-        <div class="divide-y divide-gray-800">
-            {% for analysis in analyses %}
-            <div class="p-4 hover:bg-gray-900/50 transition-colors flex items-center justify-between">
-                <div>
-                    <div class="flex items-center gap-3 mb-1">
-                        <span class="text-gray-400 text-xs font-mono">{{ analysis.created_at|date:"Y-m-d H:i" }}</span>
-                        {% if analysis.risk_category == "High Risk" %}
-                            <span class="text-xs px-2 py-0.5 bg-error/10 text-error border border-error/30">HIGH</span>
-                        {% elif analysis.risk_category == "Medium Risk" %}
-                            <span class="text-xs px-2 py-0.5 bg-warning/10 text-warning border border-warning/30">MED</span>
-                        {% else %}
-                            <span class="text-xs px-2 py-0.5 bg-accent/10 text-accent border border-accent/30">LOW</span>
-                        {% endif %}
-                    </div>
-                    <div class="text-sm text-gray-300">
-                        Security Score: <span class="font-bold text-white">{{ analysis.security_score }}</span>
-                    </div>
-                </div>
-                <a href="{% url 'view_analysis' analysis.id %}" class="text-xs border border-gray-700 text-gray-400 hover:text-white hover:border-gray-500 px-3 py-1 transition-colors">
-                    VIEW_REPORT
-                </a>
+<div class="space-y-6">
+    <section class="app-card p-6 sm:p-8">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+                <p class="text-sm font-semibold text-blue-700">Assessment history</p>
+                <h1 class="mt-2 text-3xl font-extrabold text-gray-950">{{ project.name }}</h1>
+                <p class="mt-2 text-sm text-gray-500">Track modernization priority changes as the system profile evolves.</p>
             </div>
-            {% endfor %}
+            <div class="flex gap-2">
+                <a href="{% url 'export_analysis_history_zip' project.id %}" class="btn-primary-modern">Download ZIP</a>
+                <a href="{% url 'dashboard' %}" class="btn-secondary-modern">Back</a>
+            </div>
         </div>
+    </section>
+
+    <section class="grid gap-4 md:grid-cols-3">
+        <div class="app-card p-5">
+            <p class="text-sm font-semibold text-gray-500">Highest priority</p>
+            <p class="mt-2 text-3xl font-extrabold text-gray-950">{{ trend.highest }}</p>
+        </div>
+        <div class="app-card p-5">
+            <p class="text-sm font-semibold text-gray-500">Lowest priority</p>
+            <p class="mt-2 text-3xl font-extrabold text-gray-950">{{ trend.lowest }}</p>
+        </div>
+        <div class="app-card p-5">
+            <p class="text-sm font-semibold text-gray-500">Average</p>
+            <p class="mt-2 text-3xl font-extrabold text-gray-950">{{ trend.average|floatformat:2 }}</p>
+        </div>
+    </section>
+
+    <section class="app-card p-5">
+        <canvas id="riskChart" height="110"></canvas>
+    </section>
+
+    <section class="app-card overflow-hidden">
+        <div class="border-b border-gray-200 px-5 py-4">
+            <h2 class="text-base font-bold text-gray-950">Previous assessments</h2>
+        </div>
+        {% if analyses %}
+            <div class="divide-y divide-gray-100">
+                {% for analysis in analyses %}
+                <div class="flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        <p class="text-sm font-bold text-gray-950">{{ analysis.created_at|date:"Y-m-d H:i" }}</p>
+                        <p class="mt-1 text-sm text-gray-500">Priority score {{ analysis.security_score }} · {{ analysis.risk_category }}</p>
+                    </div>
+                    <a href="{% url 'view_analysis' analysis.id %}" class="btn-secondary-modern px-3 py-2 text-sm">View report</a>
+                </div>
+                {% endfor %}
+            </div>
         {% else %}
-        <div class="p-8 text-center text-gray-500 font-mono text-sm">
-            No analysis records found.
-        </div>
+            <div class="p-8 text-center text-sm text-gray-500">No assessments found.</div>
         {% endif %}
-    </div>
+    </section>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -105,42 +67,24 @@
 <script>
 document.addEventListener("DOMContentLoaded", function () {
     const chartData = JSON.parse(document.getElementById('chart-data').textContent);
-    const labels = chartData.labels;
-    const scores = chartData.scores;
-
     const ctx = document.getElementById('riskChart');
-    
-    // Dark mode defaults
-    Chart.defaults.color = '#9ca3af';
-    Chart.defaults.borderColor = '#374151';
-
+    Chart.defaults.color = '#6b7280';
+    Chart.defaults.borderColor = '#e5e7eb';
     new Chart(ctx, {
         type: 'line',
         data: {
-            labels: labels,
+            labels: chartData.labels,
             datasets: [{
-                label: 'Security Risk Score',
-                data: scores,
+                label: 'Modernization priority',
+                data: chartData.scores,
                 borderWidth: 2,
-                borderColor: '#22c55e', // accent color
-                backgroundColor: 'rgba(34, 197, 94, 0.1)',
-                tension: 0.3
+                borderColor: '#2563eb',
+                backgroundColor: 'rgba(37, 99, 235, 0.08)',
+                fill: true,
+                tension: 0.35
             }]
         },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                y: { 
-                    beginAtZero: true, 
-                    max: 100,
-                    grid: { color: '#1f2937' }
-                },
-                x: {
-                    grid: { display: false }
-                }
-            }
-        }
+        options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, max: 100 }, x: { grid: { display: false } } } }
     });
 });
 </script>

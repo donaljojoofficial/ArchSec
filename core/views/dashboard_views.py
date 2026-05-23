@@ -9,9 +9,10 @@ def dashboard(request):
     total_sections = [
         'requirements', 'users', 'architecture', 'technology', 'security',
         'performance', 'database', 'testing', 'deployment', 'monitoring',
-        'compliance', 'privacy', 'scalability', 'infrastructure'
+        'compliance', 'privacy', 'scalability', 'infrastructure',
+        'legacy_constraints', 'ai_readiness'
     ]
-    critical_sections = ['security', 'monitoring', 'compliance']
+    critical_sections = ['security', 'monitoring', 'deployment', 'testing', 'legacy_constraints', 'ai_readiness']
 
     for project in projects:
         if project.structured_data:

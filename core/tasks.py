@@ -31,25 +31,27 @@ def generate_analysis_task(self, analysis_id):
                 structured_data_str += "\n"
 
         prompt = f"""
-        Analyze the following project in detail and return a comprehensive, structured JSON response. 
-        For each text section, provide at least three detailed paragraphs.
+        You are an AI modernization consultant. Analyze the following legacy or existing system and return a comprehensive, structured JSON response.
+        Focus on users who have old websites, dated technology stacks, traditional deployment, manual testing, weak security testing, limited observability, or no AI integration.
+        Do not produce a generic single report. Organize the answer around modernization issues and their solutions.
+        For each text section, provide practical details that include current issue, business impact, recommended solution, tools, requirements, cost assumptions, migration steps, risks, and expected benefits.
         
         The JSON response must have the following keys:
-        - "executive_summary": (string) A detailed summary of the project's security posture.
-        - "architecture": (string) A detailed description of the proposed secure architecture.
-        - "threat_model": (string) A comprehensive threat model based on STRIDE, listing potential threats.
-        - "secure_sdlc": (string) Detailed recommendations for a secure software development lifecycle.
-        - "cost_estimation": (string) A detailed breakdown of estimated costs for security measures.
-        - "testing_plan": (string) A comprehensive plan for security testing, including tools and methodologies.
-        - "key_risks": (array of strings) A list of the top 5-10 key risks.
-        - "recommendations": (array of strings) A list of actionable recommendations to mitigate risks.
-        - "likelihood_score": (integer, 1-5) An integer representing the likelihood of a breach.
-        - "impact_score": (integer, 1-5) An integer representing the impact of a breach.
-        - "ai_risk_adjustment": (integer, -10 to 10) An integer to adjust the risk score based on nuances not captured by other fields.
-        - "uml_diagram": (string) Mermaid code for a UML diagram.
-        - "dfd_diagram": (string) Mermaid code for a DFD diagram.
-        - "erd_diagram": (string) Mermaid code for an ERD diagram.
-        - "threat_diagram": (string) Mermaid code for a Threat Model diagram.
+        - "executive_summary": (string) A concise business-facing summary of the modernization opportunity.
+        - "architecture": (string) Issue-by-issue architecture modernization recommendations, including current weakness, target architecture, requirements, and migration steps.
+        - "threat_model": (string) Issue-by-issue security and technical debt risks, including outdated practices and mitigations.
+        - "secure_sdlc": (string) Issue-by-issue development, deployment, DevOps, and SDLC modernization recommendations.
+        - "cost_estimation": (string) Cost, effort, staffing, tooling, and monthly operating assumptions for each major recommendation.
+        - "testing_plan": (string) Modern testing and security validation plan, including automated tests, SAST, DAST, SCA, secrets scanning, and release gates.
+        - "key_risks": (array of strings) A list of the top 5-10 modernization risks or blockers.
+        - "recommendations": (array of strings) A prioritized list of immediate modernization actions.
+        - "likelihood_score": (integer, 1-5) Likelihood that modernization delay causes operational, security, or business harm.
+        - "impact_score": (integer, 1-5) Business impact if the current system remains unchanged.
+        - "ai_risk_adjustment": (integer, -10 to 10) Adjustment for technical debt, AI readiness, and migration complexity.
+        - "uml_diagram": (string) Mermaid code for a proposed future-state architecture diagram.
+        - "dfd_diagram": (string) Mermaid code for a modernized data-flow diagram.
+        - "erd_diagram": (string) Mermaid code for an updated data model or integration diagram.
+        - "threat_diagram": (string) Mermaid code for a modernization roadmap or risk-reduction flow.
 
         For each of the diagram keys, you must return only valid Mermaid code.
         Do not include any explanations, markdown, or backticks.
@@ -137,10 +139,10 @@ def generate_analysis_task(self, analysis_id):
             )
             analysis.security_score = score
             analysis.risk_category = category
-            message = f"✅ Your security analysis for project '{project.name}' is complete."
+            message = f"Your modernization assessment for '{project.name}' is complete."
         else:
             analysis.risk_category = "Error"
-            message = f"❌ There was an error generating the analysis for project '{project.name}'."
+            message = f"There was an error generating the modernization assessment for '{project.name}'."
 
         analysis.save()
         
@@ -163,7 +165,7 @@ def generate_analysis_task(self, analysis_id):
             analysis.risk_category = "Error"
             analysis.raw_ai_response = {"message": str(e)}
             analysis.save()
-            message = f"❌ An unexpected error occurred during the analysis for project '{analysis.project.name}'."
+            message = f"An unexpected error occurred during the modernization assessment for '{analysis.project.name}'."
             Notification.objects.create(
                 user=analysis.project.user,
                 message=message,

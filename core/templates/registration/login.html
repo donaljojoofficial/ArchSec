@@ -1,45 +1,26 @@
 {% extends "terminal_base.html" %}
 
 {% block content %}
-<div class="max-w-md mx-auto mt-10">
-    <div class="bg-panel border border-gray-800 p-8 shadow-2xl relative overflow-hidden group">
-        <!-- Decorative top bar -->
-        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-accent to-transparent opacity-50"></div>
-        
-        <div class="mb-6">
-            <h3 class="text-xl font-bold text-accent mb-1">> System Login</h3>
-            <p class="text-xs text-gray-500">Enter credentials to access secure console.</p>
-        </div>
+<div class="mx-auto max-w-md">
+    <div class="app-card p-8">
+        <p class="text-sm font-semibold text-blue-700">Welcome back</p>
+        <h1 class="mt-2 text-2xl font-extrabold text-gray-950">Sign in to ArchSec</h1>
+        <p class="mt-2 text-sm text-gray-600">Continue assessing legacy systems and modernization plans.</p>
 
-        <form method="post" class="space-y-4">
+        <form method="post" class="mt-6 space-y-4">
             {% csrf_token %}
             <style>
                 form p { margin-bottom: 1rem; }
-                form label { display: block; color: #9ca3af; font-size: 0.875rem; margin-bottom: 0.25rem; }
-                form input { 
-                    width: 100%; 
-                    background-color: #0b0f14; 
-                    border: 1px solid #374151; 
-                    color: #e5e7eb; 
-                    padding: 0.5rem; 
-                    font-family: 'JetBrains Mono', monospace;
-                    outline: none;
-                }
-                form input:focus { border-color: #22c55e; box-shadow: 0 0 0 1px #22c55e; }
+                form label { display: block; margin-bottom: 0.45rem; color: #374151; font-size: 0.875rem; font-weight: 700; }
+                form input { width: 100%; padding: 0.75rem 0.85rem; }
             </style>
             {{ form.as_p }}
-            
-            <button type="submit" class="w-full bg-accent/10 border border-accent text-accent hover:bg-accent hover:text-bg font-bold py-2 px-4 transition-all duration-200 mt-4 flex items-center justify-center gap-2">
-                <span>AUTHENTICATE</span>
-                <span class="animate-pulse">_</span>
-            </button>
+            <button type="submit" class="btn-primary-modern w-full">Sign in</button>
         </form>
 
-        <div class="mt-6 text-center border-t border-gray-800 pt-4">
-            <p class="text-sm text-gray-500">
-                New user? <a href="{% url 'register' %}" class="text-info hover:underline decoration-dashed underline-offset-4">[ Initialize Account ]</a>
-            </p>
-        </div>
+        <p class="mt-6 border-t border-gray-200 pt-5 text-center text-sm text-gray-600">
+            New here? <a href="{% url 'register' %}" class="font-semibold text-blue-700 hover:text-blue-800">Create an account</a>
+        </p>
     </div>
 </div>
 {% endblock %}

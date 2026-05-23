@@ -1,732 +1,244 @@
-# ArchSec — Secure Development & Planning Assistant
+# ArchSec - AI Modernization Advisor
 
----
+ArchSec is an AI-assisted modernization platform for teams running old websites, legacy applications, dated infrastructure, or traditional development and security workflows.
 
-ArchSec – AI-Powered Secure Development & Planning Platform
+Instead of producing one generic report, ArchSec analyzes the user's current system and breaks the result into clear modernization issues. Each issue includes the current problem, business/technical impact, recommended modern solution, migration requirements, estimated cost, implementation effort, risks, and supporting diagrams or flow charts where helpful.
 
-ArchSec is an AI-integrated platform designed to help developers, engineers, and security professionals plan, design, and evaluate secure software systems from the ground up.
-It streamlines secure system design, threat modeling, cost estimation, and security testing strategy — all inside a single, intelligent web application built using Python Django and deployed in GitHub Codespaces.
+## Product Vision
 
+Many organizations still depend on older stacks, manual deployment, outdated testing practices, limited security automation, and systems that were built before AI-enabled workflows became practical. ArchSec helps those teams understand what to modernize, why it matters, what it will cost, and how to migrate without losing control of the existing system.
 
----
+The platform is intended for:
 
-🚀 Project Overview
+- Small businesses with aging websites or admin panels.
+- Teams using traditional deployment, manual QA, or ad hoc security testing.
+- Organizations that want to add AI capabilities to existing systems.
+- Developers and consultants preparing modernization proposals.
+- Security engineers evaluating legacy application risk.
 
-Modern software development faces challenges like insecure architectures, unclear threat models, unpredictable cost estimation, and scattered security practices. ArchSec solves these issues by providing an AI-powered Secure Development & Planning Assistant that generates:
+## Core Outcome
 
-Secure architecture recommendations
+ArchSec converts a legacy system profile into an actionable modernization roadmap.
 
-Threat models (OWASP/STRIDE aligned)
+For every detected issue, ArchSec should provide:
 
-Security best practices
+- The current weakness or outdated practice.
+- The reason it matters.
+- A recommended modern solution.
+- Required tools, services, skills, and infrastructure.
+- Estimated cost and effort.
+- Migration steps.
+- Security, reliability, and operational impact.
+- Architecture diagrams, flow charts, or data-flow diagrams when useful.
+- Priority level and dependency order.
 
-Cost estimates for cloud & infrastructure
+## Key Capabilities
 
-Security testing strategies
+### 1. Legacy System Intake
 
-SDLC + DevSecOps guidance
+Users describe their existing system:
 
-Full downloadable reports
+- Website or application type.
+- Current backend, frontend, database, hosting, and deployment process.
+- Authentication and user management.
+- Testing process.
+- Security testing process.
+- Monitoring and logging.
+- Manual workflows.
+- AI usage or lack of AI integration.
+- Budget, team size, risk tolerance, and migration constraints.
 
+### 2. Modernization Gap Analysis
 
-ArchSec is built for developers, students, and security engineers who need fast, consistent, and reliable security planning in one place.
+The AI engine identifies outdated or risky areas such as:
 
+- Old frameworks, runtimes, libraries, or CMS versions.
+- Manual deployment or lack of CI/CD.
+- Missing automated tests.
+- Weak security testing practices.
+- No observability or incident visibility.
+- Poor scalability or reliability.
+- Lack of AI-enabled customer support, search, analytics, automation, or internal tooling.
+- Expensive or inefficient infrastructure.
 
----
+### 3. Issue-by-Issue Recommendations
 
-🎯 Project Objectives
+The platform should not return one large undifferentiated answer. It should produce structured findings where each issue has its own solution package:
 
-Automate secure system design using AI
+- Issue title.
+- Current state.
+- Impact.
+- Recommended future state.
+- Tools and technologies.
+- Cost estimate.
+- Implementation requirements.
+- Migration plan.
+- Risks and mitigations.
+- Expected benefits.
 
-Provide architecture guidelines tailored to project requirements
+### 4. Modern Architecture Proposals
 
-Generate threat models and risk assessments
+ArchSec recommends updated architectures such as:
 
-Offer DevSecOps and secure coding recommendations
+- Cloud-hosted web applications.
+- Containerized deployments.
+- Managed databases and object storage.
+- API-first systems.
+- CI/CD pipelines.
+- Automated test suites.
+- Security gates with SAST, DAST, SCA, and secret scanning.
+- Monitoring, logging, alerting, and backup strategies.
+- AI integrations using LLM APIs, embeddings, retrieval, chat assistants, summarization, or workflow automation.
 
-Estimate infrastructure and development costs
+### 5. Cost, Effort, And Requirements
 
-Suggest appropriate security testing tools and methods
+Each recommendation includes practical planning details:
 
-Create a unified project report for easy documentation
+- One-time migration cost.
+- Monthly operating cost.
+- Tooling/subscription cost.
+- Required team skills.
+- Development effort.
+- Infrastructure changes.
+- Phased rollout strategy.
 
-Run entirely inside GitHub Codespaces for convenience and portability
+### 6. Diagrams And Visual Planning
 
+ArchSec generates diagrams that explain the migration:
 
+- Current-state architecture.
+- Proposed future-state architecture.
+- Deployment pipeline flow.
+- Data-flow diagrams.
+- AI integration flow.
+- Security testing workflow.
+- Migration roadmap.
 
----
+Mermaid is the primary diagram format.
 
-🛠️ Tech Stack & Tools
+### 7. Reports And History
 
-Frontend
+Users can save modernization assessments, re-run analysis as details change, view previous assessments, and export reports for planning, budgeting, or client delivery.
 
-HTML5
+## System Architecture
 
-CSS3 / TailwindCSS
+```text
+User -> Django UI -> Project/System Intake -> AI Modernization Engine
+     -> Issue Findings -> Recommendations/Costs/Diagrams
+     -> Dashboard, History, Notifications, Reports
+```
 
-JavaScript
+The current implementation uses Django templates, Celery, Redis, SQLite for development, Google Gemini-compatible AI generation, Mermaid diagrams, and PDF/Markdown/Text exports.
 
+## Technology Stack
 
-Backend
+### Backend
 
-Python
+- Python
+- Django
+- Celery + Redis
+- SQLite for development
+- PostgreSQL planned for production
 
-Celery + Redis (Asynchronous Task Queue)
+### Frontend
 
-Django Framework
+- Django templates
+- TailwindCSS via CDN
+- Vanilla JavaScript
+- Mermaid.js for diagrams
 
+### AI
 
-AI Integration
+- Google Gemini API currently implemented.
+- Prompting should evolve toward structured modernization findings.
+- Future support can include OpenAI-compatible providers behind a provider abstraction.
 
-OpenAI API (or compatible LLM API)
+### Reporting
 
-Custom prompt-engineering for architecture, security, and testing logic
+- PDF export via WeasyPrint.
+- Markdown and text export.
+- ZIP export for analysis history.
 
+## Current Implementation Status
 
-Database
+Implemented:
 
-SQLite (default for development)
+- User authentication and ownership controls.
+- Project/system intake.
+- Structured project metadata using JSON fields.
+- Async AI analysis with Celery.
+- Security score and risk category.
+- Analysis history.
+- Notifications.
+- Mermaid diagram storage and rendering.
+- PDF, Markdown, Text, and ZIP exports.
 
-PostgreSQL (optional for production)
+Needs modernization-aligned updates:
 
+- Rename product copy from secure planning to modernization advisory.
+- Expand intake fields for legacy technology, deployment, testing, operations, and AI readiness.
+- Change AI output schema from broad report sections to issue-by-issue modernization findings.
+- Add cost/effort/requirements fields per issue.
+- Add current-state and future-state diagrams.
+- Update scoring to measure modernization priority, technical debt, AI readiness, and migration risk.
+- Add JSON export and stronger response validation.
+- Add production database configuration.
+- Add real tests for analysis generation and permissions.
 
-Development Environment
+## Development Roadmap
 
-GitHub Codespaces
+### Phase 1 - Product Repositioning
 
-VS Code Cloud IDE
+- Update documentation and UI copy.
+- Redesign the interface with a minimal modern look.
+- Rename report language from "security analysis" to "modernization assessment."
 
-Preconfigured Python/Django environment
+### Phase 2 - Legacy System Intake
 
-Easy CI/CD integration
+- Add fields for current stack age, hosting, deployment, testing, security testing, observability, data storage, integrations, and AI usage.
+- Capture business constraints such as budget, downtime tolerance, compliance needs, and team skill level.
 
+### Phase 3 - Structured Modernization Findings
 
+- Update AI prompt and response schema.
+- Store findings as structured JSON.
+- Display each issue as an independent recommendation card.
+- Include cost, effort, priority, dependencies, and migration steps per issue.
 
-Other Tools
+### Phase 4 - Architecture And Migration Planning
 
-Git & GitHub
+- Generate current-state and future-state architecture diagrams.
+- Generate CI/CD, testing, security, and AI integration flows.
+- Add phased migration roadmaps.
 
-Mermaid / PlantUML (optional for diagram generation)
+### Phase 5 - Reporting And Collaboration
 
-Report generation (PDF/HTML exporting)
+- Export PDF, Markdown, JSON, and client-ready proposal formats.
+- Add comparison between assessment versions.
+- Add team review notes and decision tracking.
 
-Docker (optional)
+### Phase 6 - Reliability And Production Readiness
 
+- Add response validation.
+- Add automated tests.
+- Add PostgreSQL production settings.
+- Add provider abstraction for multiple AI APIs.
+- Improve monitoring and operational health checks.
 
+## Installation
 
----
-
-🔐 Core Features
-
-1. AI-Based System Design Generator
-
-Generates secure architecture layout
-
-Suggests backend + frontend stack
-
-Recommends authentication methods
-
-Identifies weak design patterns
-
-
-
----
-
-2. Threat Modeling Engine
-
-STRIDE-based threat detection
-
-OWASP Top 10 alignment
-
-AI-generated attack scenarios
-
-Risk levels & mitigation strategies
-
-
-
----
-
-3. Cost Estimation Module
-
-Cloud hosting estimates (AWS/Azure/GCP)
-
-Storage + compute + bandwidth cost
-
-Development effort estimation
-
-
-
----
-
-4. Secure SDLC & DevSecOps Recommendations
-
-Best SDLC model based on project type
-
-CI/CD pipeline suggestions
-
-Security gate recommendations (SAST/DAST/SCA)
-
-Secure coding practices
-
-
-
----
-
-5. Security Testing Planner
-
-Recommends tools and methods such as:
-
-Nmap
-
-Burp Suite
-
-Nikto
-
-OpenVAS
-
-SAST/DAST frameworks
-
-API testing tools
-
-
-Customized based on project type.
-
-
----
-
-6. Report Generation
-
-Full project security report
-
-Architecture & threat model summary
-
-Cost breakdown
-
-Testing plan
-
-Export as PDF or HTML
-
-
-
----
-
-7. Dashboard + Project History
-
-Save previous assessments
-
-Re-run analysis
-
-Compare projects
-
-User authentication
-
-
----
-
-8. Diagram Generation
-
-Mermaid.js integration for architecture diagrams
-
-UML, DFD, ERD, and Threat Model visualizations
-
-
----
-
-📁 Project Modules Breakdown
-
-1. User Authentication Module
-
-
-2. Project Requirements Intake Module
-
-
-3. AI Processing Engine
-
-
-4. Secure Architecture Generator
-
-
-5. Threat Modeling Module
-
-
-6. Cost Estimation Module
-
-
-7. DevSecOps & SDLC Analysis Module
-
-
-8. Security Testing Recommendation Module
-
-
-9. Report Generator Module
-
-
-10. User Dashboard & History Module
-
-
-
-
----
-
-🧱 System Architecture (High-Level)
-
-User → Django Frontend → AI Engine → Analysis Modules → Report Generator → Dashboard/Database
-
-Modules interact through Django views and services, with the AI engine orchestrating logic and generating intelligent responses.
-
-
----
-
-🗂️ Development Plan
-
-Phase 1 — Setup (Week 1)
-
-GitHub Codespaces setup
-
-Django project initialization
-
-Database and models setup
-
-Basic UI skeleton
-
-
-Phase 2 — Core Functionality (Week 2–4)
-
-Requirement intake forms
-
-AI integration
-
-Architecture generator
-
-Threat model generator
-
-Cost estimation logic
-
-
-Phase 3 — Dashboard & Reports (Week 5–6)
-
-User authentication
-
-Project history page
-
-Report export system
-
-
-Phase 4 — UI/UX + Enhancements (Week 7–8)
-
-TailwindCSS polish
-
-Better layouts
-
-Error handling
-
-Documentation
-
-
-Phase 5 — Optional Add-ons (If time allows)
-
-✔ Diagram generation (Mermaid.js)
-
-DevSecOps pipeline simulation
-
-Real vulnerability scanning integration
-
-Multi-role system
-
-
-
----
-
-🚀 How It Works
-
-1. User submits project requirements
-
-
-2. System feeds data to AI Engine
-
-
-3. AI analyzes architecture, risks, tools, costs, SDLC
-
-
-4. AI generates a structured, detailed output
-
-
-5. Django formats and displays it in the dashboard
-
-
-6. User exports final report
-
-
-
-
----
-
-📦 Installation (GitHub Codespaces)
-
-1. Open repository in GitHub Codespaces
-
-
-2. Environment auto-installs Python & Django
-
-
-3. Run:
-
-
-
+```bash
 pip install -r requirements.txt
 python manage.py migrate
 python manage.py runserver
+```
 
-4. Access the platform via Codespaces preview URL.
+For async analysis, Redis and a Celery worker are required.
 
+```bash
+celery -A planix worker -l info
+```
 
+## License
 
-
----
-
-📜 License
-
-MIT License (recommended for open-source).
-
-
----
-
-🤝 Contributing
-
-Pull requests are welcome.
-Follow standard Git branching and PR practices.
-
-
-
----
-
-🚀 Development Plan – ArchSec
-
-ArchSec is developed in multiple structured phases to ensure reliability, modularity, and clarity.
-The plan below outlines the complete roadmap from setup to deployment.
-
-
----
-
-1. Project Overview
-
-ArchSec is an AI-powered secure software development planning assistant.
-It helps engineers and developers generate:
-
-System architecture
-
-Design blueprint
-
-Security controls
-
-Threat modeling
-
-Cost estimation
-
-Secure SDLC roadmap
-
-Security testing recommendations
-
-Compliance mapping (OWASP, ISO, NIST)
-
-
-ArchSec acts as a Secure Development Co-Pilot, built using Python Django and AI-driven analysis.
-
-
----
-
-2. System Architecture (High-Level)
-
-Frontend
-
-Django Templates
-
-TailwindCSS
-
-Vanilla JS / HTMX
-
-
-Backend
-
-Django
-
-Django REST Framework (for AI endpoints)
-
-
-AI Engine
-
-GPT-based model API
-
-Prompt templates for architecture, testing, compliance, risk analysis
-
-
-Database
-
-SQLite (development)
-
-PostgreSQL (production)
-
-
-Development Environment
-
-GitHub Codespaces
-
-VS Code Web
-
-Git & GitHub Actions (optional)
-
-
-
----
-
-3. Development Milestones & Timeline
-
-Phase 1 — Environment & Base Setup (Week 1)
-
-Create GitHub repo
-
-Configure GitHub Codespaces
-
-Initialize Django project
-
-User authentication setup
-
-Base UI + dashboard shell
-
-Connect AI API keys via environment variables
-
-
-Output: Login system + empty dashboard
-
-
----
-
-Phase 2 — Project Creation + AI Design Engine (Week 2–3)
-
-Features
-
-Create new project
-
-Input project info: tech stack, platform, budget, risk level
-
-AI generates:
-
-System design
-
-Architecture
-
-Tech suggestions
-
-Initial security risks
-
-Rough cost estimation
-
-
-
-Output: AI-generated blueprint for each project
-
-
----
-
-Phase 3 — Security Intelligence Module (Week 4–5)
-
-Add full AI-driven modules:
-
-Threat modeling (STRIDE/DREAD)
-
-Attack vector identification
-
-Security measures & countermeasures
-
-Secure SDLC guidelines
-
-Suggest compliance frameworks
-
-OWASP ASVS
-
-ISO 27001
-
-NIST 800-53
-
-
-
-Output: Detailed security analysis per project
-
-
----
-
-Phase 4 — Testing & Audit Planning Module (Week 6)
-
-Implement:
-
-AI-generated penetration test plan
-
-Recommended security tools (Nmap, Burp, ZAP)
-
-Secure coding checklist
-
-Test case generation
-
-Severity scoring (CVSS-like)
-
-
-Output: Complete test planning module
-
-
----
-
-Phase 5 — Reporting & Export Module (Week 7–8)
-
-Features added:
-
-Export project reports as:
-
-PDF
-
-Markdown
-
-JSON
-
-
-✔ Architecture diagrams using Mermaid
-
-Dashboard overview for all projects
-
-
-Output: Fully exportable structured reports
-
-
----
-
-Phase 6 — UI Improvement & Final Integration (Week 9)
-
-✔ Modern UI polishing (Terminal/Cyberpunk Theme)
-
-Nav sidebar + clean components
-
-Better readability for long AI outputs
-
-Project history & logs
-
-Error handling & response caching
-
-
-Output: Production-ready interface
-
-
----
-
-Phase 7 — Testing & Deployment (Week 10)
-
-Unit testing + integration testing
-
-Performance checks
-
-Deploy on:
-
-Render
-
-Railway
-
-Or Django + PostgreSQL hosting
-
-
-
-Output: Hosted finished project
-
-
----
-
-4. Tools & Technologies
-
-Core
-
-Python 3.12
-
-Django 5
-
-Django REST Framework
-
-Celery + Redis
-
-PostgreSQL / SQLite
-
-
-AI
-
-GPT-based API
-
-LangChain (optional)
-
-Custom prompt engineering
-
-
-Frontend
-
-TailwindCSS
-
-HTMX or vanilla JS
-
-
-Development
-
-GitHub Codespaces
-
-VS Code Web Editor
-
-GitHub Actions (optional)
-
-
-Other Tools
-
-Mermaid diagrams
-
-ReportLab / WeasyPrint for PDF
-
-Pytest for testing
-
-
-
----
-
-5. Feature Modules
-
-✔ 1. User Management
-
-✔ 2. Project Creation
-
-✔ 3. AI Architecture Generator
-
-✔ 4. Threat Modeling Engine
-
-✔ 5. Secure SDLC Planner
-
-✔ 6. Cost Estimation Engine
-
-✔ 7. Testing & Audit Planner
-
-✔ 8. Reporting + Exports
-
-✔ 9. Dashboard & Analytics
-
-✔ 10. Diagram Generation
-
-
----
-
-6. Estimated Total Development Time
-
-Phase	Time Required
-
-Setup	1 week
-AI Blueprint Engine	2–3 weeks
-Security Intelligence	2 weeks
-Test Planning	1 week
-Reporting	2 weeks
-UI Polish	1 week
-Testing + Deployment	1 week
-Total	10–11 weeks
-
-
-
----
+MIT License.

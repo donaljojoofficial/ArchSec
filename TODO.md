@@ -1,103 +1,112 @@
-# ArchSec Project Roadmap
+# ArchSec Modernization Roadmap
 
-This document outlines the development status and future roadmap for the ArchSec platform.
+This roadmap reflects the new product direction: ArchSec is now an AI Modernization Advisor for legacy websites, outdated systems, traditional deployment workflows, manual testing practices, and organizations that have not yet integrated AI into their operations.
 
----
+## Completed Foundation
 
-## Bugs
-- [x] Fix NoReverseMatch: view_project URL resolution error
-- [x] Fix incorrect redirect after analysis generation (should redirect to view_analysis)
-- [x] Fix incorrect redirect behavior during aI failure path
-- [x] Generate Analysis redirects to dashboard on AI model availability failure
-- [x] Gemini API is never being called (AI client returns fallback error)
-- [x] Django cannot find json_filters template tag library
-- [x] Gemini model selection is not enforced to gemini-2.5-flash
-- [x] Fix ValueError in AI analysis due to incorrect return signature
-- [x] Suppress Pylance warning for missing `google-generativeai` package.
-- [x] Gemini API is returning 'Too Many Requests' error.
-- [x] Fix 429 quota error by preferring gemini-flash model.
-- [x] Fix 'AI returned a non-JSON response' by enforcing JSON output mode.
-- [x] Fix `no such column: core_projectanalysis.task_id` by running migrations.
-- [x] Fix empty analysis page by providing a JSON schema in the AI prompt.
-- [x] Fix asynchronous analysis job not displaying results
-- [x] Mermaid diagrams not rendering in the analysis view.
-- [x] Fix Mermaid diagrams displaying raw code by stripping markdown formatting.
-- [x] Fix `NoReverseMatch` for `celery_dashboard` URL.
-- [x] Fix `AttributeError: 'list' object has no attribute 'get'` when AI returns a list.
-- [x] Fix `AttributeError: 'generate_analysis_task' object has no attribute 'Retry'` in Celery task.
+- [x] Django application foundation.
+- [x] User authentication and project ownership.
+- [x] Project/system intake flow.
+- [x] Structured metadata storage with JSON fields.
+- [x] Async AI analysis through Celery and Redis.
+- [x] Gemini-based AI client.
+- [x] Analysis history.
+- [x] Notifications.
+- [x] Mermaid diagram fields.
+- [x] PDF, Markdown, Text, and ZIP exports.
+- [x] Health check endpoint.
+- [x] Structured logging setup.
 
-## Features
-- [x] Improve risk heatmap visualization with labels and better colors.
-- [x] Enhance AI prompt to generate more detailed analysis.
+## Product Pivot Tasks
 
----
+- [x] Rewrite README around legacy modernization and AI-readiness advisory.
+- [x] Rewrite TODO roadmap around modernization assessments.
+- [x] Add root implementation summary for the new direction.
+- [x] Replace old "secure planning assistant" terminology throughout primary UI and prompts.
+- [x] Rename analysis labels to "modernization assessment" where appropriate.
+- [ ] Decide whether the brand remains ArchSec or becomes a broader modernization brand.
 
-## ✅ Completed Milestones (Phases 1-6)
+## Authorization And Isolation
 
-- [x] Core Django project setup with a modular service-oriented architecture.
-- [x] User authentication system for project and analysis ownership.
-- [x] Advanced `Project` model using a flexible `JSONField` for structured architecture data.
-- [x] `ProjectAnalysis` model for storing versioned, AI-generated security reports.
-- [x] AI integration with the Google Gemini API for core analysis generation.
-- [x] Hybrid security scoring engine combining rule-based checks with AI-driven risk adjustments.
-- [x] AI-driven generation of Executive Summaries, Threat Models, and System Architecture.
-- [x] Automated recommendations for Secure SDLC and security testing plans.
-- [x] Risk category classification into Low, Medium, or High.
-- [x] Analysis history tracking with risk trend visualization using Chart.js.
-- [x] PDF and ZIP export capabilities for security reports and historical data.
-- [x] Sophisticated, architecture-aware AI prompting engine.
-- [x] Implement Terminal/Cyberpunk UI theme using TailwindCSS.
+- [x] Keep regular dashboard data scoped to the logged-in user's systems.
+- [x] Protect project and assessment views with ownership checks.
+- [x] Restrict Celery/task monitor access to admin users only.
+- [x] Hide task monitor and user administration links from non-admin users.
+- [x] Add tests for project isolation, assessment isolation, and admin-only task monitor access.
 
----
+## Phase 1 - Minimal Modern UI Redesign
 
-## 🚧 Identified Architectural Weaknesses
+- [x] Replace the terminal/cyberpunk visual style with a minimal modern interface.
+- [x] Update shared layout, navigation, buttons, forms, cards, and status states.
+- [x] Redesign dashboard around systems, assessments, modernization priority, and recent findings.
+- [x] Redesign project creation as a legacy system profile intake.
+- [x] Redesign report pages around issue-by-issue recommendations.
+- [ ] Keep pages responsive on mobile and desktop.
 
-- **[COMPLETED] Fragile AI Response Parsing:** The current system relies on brittle markdown string parsing, which is susceptible to failures if the AI's output format deviates.
-- **[COMPLETED] Synchronous AI Analysis:** Long-running AI analyses are executed as blocking HTTP requests, posing a risk of request timeouts and a poor user experience.
-- **[COMPLETED] Data Model Anomaly:** A duplicate `executive_summary` field has been identified in the `ProjectAnalysis` model and requires a database schema cleanup.
----
+## Phase 2 - Legacy System Intake Model
 
-## 🚀 Upcoming Development Roadmap
+- [ ] Add intake fields for current backend, frontend, CMS/framework, database, hosting, and deployment method.
+- [ ] Add fields for runtime/framework age and version notes.
+- [ ] Add fields for current testing process, automation level, and coverage.
+- [ ] Add fields for security testing process: SAST, DAST, SCA, pentest, secrets, dependency scanning.
+- [ ] Add fields for monitoring, logging, alerting, backups, and incident response.
+- [x] Add first-pass fields for AI readiness: existing AI usage, candidate workflows, data availability, privacy constraints.
+- [ ] Add migration constraints: budget, timeline, downtime tolerance, team skill level, compliance needs.
+- [ ] Update dashboard completeness checks to use modernization-critical sections.
 
-### PHASE 7 — Platform Hardening & Reliability
-- [x] Migrate AI output from markdown to a structured JSON mode.
-- [x] Replace all markdown parsing logic with robust JSON deserialization.
-- [x] Refactor the `ai_client` service to support and enforce a JSON output schema.
-- [ ] Implement an AI response validation layer to ensure data integrity.
-- [x] Implement asynchronous AI processing for analysis jobs using Celery and Redis.
-- [x] Add background job status tracking and reporting.
-- [x] Create a Celery task monitor dashboard to inspect queues and tasks.
-- [x] Implement frontend polling or WebSockets for real-time UI updates on analysis completion.
-- [x] Create a database migration to remove the duplicate `executive_summary` field.
-- [x] Add system health check endpoints for monitoring.
-- [x] Implement structured logging (e.g., JSON format) across the application.
+## Phase 3 - Issue-Based AI Output
 
-### PHASE 8 — Compliance & Architecture Decision Engine
-- [ ] Create a `ComplianceStandard` model (e.g., PCI DSS, ISO 27001, SOC2, HIPAA).
-- [ ] Create a `ComplianceControl` model to store individual compliance requirements.
-- [ ] Add functionality to map projects to one or more compliance frameworks.
-- [ ] Enhance the AI engine to generate compliance evidence and identify gaps against selected controls.
-- [ ] Build a compliance dashboard to visualize status and evidence.
-- [ ] Implement an Architecture Decision Record (ADR) engine.
-- [ ] Add versioning and history tracking for all ADRs.
-- [ ] Generate AI-powered draft ADR documents from project architecture and decisions.
-- [ ] Add export functionality for ADRs to Markdown and PDF.
+- [ ] Replace broad report schema with structured findings.
+- [ ] Each finding should include title, category, current issue, impact, recommendation, cost estimate, effort, requirements, migration steps, dependencies, risks, expected benefits, and priority.
+- [ ] Add top-level modernization score, AI-readiness score, technical-debt score, security-risk score, and migration-risk score.
+- [ ] Store structured findings in `ProjectAnalysis.raw_ai_response`.
+- [ ] Add normalized database models later if reporting/searching across findings becomes important.
+- [ ] Add AI response validation before saving.
+- [ ] Add graceful handling for incomplete or malformed AI responses.
 
-### PHASE 9 — Proactive Intelligence & Maturity Scoring
-- [ ] Implement a Security Maturity Model based on an industry standard (e.g., BSIMM or SAMM).
-- [ ] Add multi-domain maturity scoring across areas like Governance, Design, and Operations.
-- [ ] Create a radar chart visualization for security maturity scores.
-- [ ] Implement AI-powered remediation suggestions, including actionable code samples.
-- [ ] Add detection for common anti-patterns and vulnerability patterns in project architecture.
-- [ ] Build a dedicated security knowledge base (e.g., using a vector database).
-- [ ] Integrate Retrieval-Augmented Generation (RAG) for more accurate and verifiable AI reasoning.
-- [ ] Implement reasoning traceability to show how the AI reached its conclusions.
-- [ ] Add explainable AI (XAI) features to the analysis output.
+## Phase 4 - Modernization Diagrams
 
-### Phase 7B — Diagram Generation
-- [x] Update ProjectAnalysis model to include diagram fields.
-- [x] Update AI prompt to request Mermaid diagrams.
-- [x] Save diagrams in generate_analysis.
-- [x] Render diagrams in view_analysis.html.
-- [x] Ensure diagrams are included in PDF export.
-- [x] Update TODO.md with the new tasks.
+- [ ] Generate current-state architecture diagrams.
+- [ ] Generate proposed future-state architecture diagrams.
+- [ ] Generate deployment pipeline flow charts.
+- [ ] Generate security testing workflow diagrams.
+- [ ] Generate AI integration flow charts.
+- [ ] Generate phased migration roadmap diagrams.
+- [ ] Update PDF export so diagrams render reliably.
+
+## Phase 5 - Cost And Migration Planning
+
+- [ ] Add cost ranges per recommendation.
+- [ ] Add monthly operating cost estimates.
+- [ ] Add required tools and subscription assumptions.
+- [ ] Add skill and staffing requirements.
+- [ ] Add phased rollout plans: quick wins, medium-term, long-term.
+- [ ] Add dependency ordering between recommendations.
+- [ ] Add version-to-version comparison for repeated assessments.
+
+## Phase 6 - Reports And Exports
+
+- [ ] Update PDF report to match modernization assessment structure.
+- [ ] Add JSON export for structured findings.
+- [ ] Add client-ready proposal export.
+- [ ] Add executive summary organized by business impact.
+- [ ] Add roadmap summary organized by time and cost.
+- [ ] Add appendix for raw AI response and diagrams.
+
+## Phase 7 - Reliability And Production Readiness
+
+- [ ] Add automated tests for forms, permissions, analysis views, exports, and AI parsing.
+- [ ] Add mocked AI tests for predictable report generation.
+- [ ] Add PostgreSQL production database configuration.
+- [ ] Move sensitive settings fully into environment variables.
+- [ ] Add AI provider abstraction for Gemini, OpenAI-compatible APIs, and local models.
+- [ ] Add retry/backoff controls and clearer job failure states.
+- [ ] Add monitoring for Celery task failures and AI quota errors.
+
+## Known Technical Issues
+
+- [ ] `ProjectAnalysis.sdls_recommendations` should eventually be renamed to `sdlc_recommendations`.
+- [ ] `core/tests.py` is effectively empty.
+- [ ] DRF is installed but no real API surface exists yet.
+- [ ] PDF Mermaid rendering through WeasyPrint may not execute JavaScript reliably.
+- [ ] `SECRET_KEY`, `ALLOWED_HOSTS`, and production database settings need hardening before deployment.

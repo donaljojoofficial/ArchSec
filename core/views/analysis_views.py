@@ -1,21 +1,15 @@
-import json
 import logging
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-from django.http import HttpResponse, JsonResponse, HttpResponseForbidden
+
 from celery.result import AsyncResult
+from django.contrib import messages
+from django.http import HttpResponse, JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import render_to_string
-from celery import current_app
-from django.contrib.admin.views.decorators import staff_member_required
 from kombu.exceptions import OperationalError
 
+from core.decorators import analysis_owner_required, project_owner_required
 from core.models.project import Project
 from core.models.project_analysis import ProjectAnalysis
-from core.services.ai_client import generate_ai_analysis
-from core.services.security_scoring import calculate_final_security_score
-from core.services.auth_service import AuthorizationService
-from core.decorators import project_owner_required, analysis_owner_required
 from core.tasks import generate_analysis_task
 
 logger = logging.getLogger(__name__)
@@ -23,10 +17,8 @@ logger = logging.getLogger(__name__)
 
 @project_owner_required
 def generate_analysis(request, project_id):
-    # Decorator already verified user has access to this project
     project = get_object_or_404(Project, id=project_id)
 
-    # Create an initial analysis object to show "Pending" status
     analysis = ProjectAnalysis.objects.create(
         project=project,
         user=request.user,
@@ -35,36 +27,34 @@ def generate_analysis(request, project_id):
     )
 
     try:
-        # Start the asynchronous analysis task
         task = generate_analysis_task.delay(analysis.id)
-
-        # Store the task ID in the analysis object to track its status
         analysis.task_id = task.id
         analysis.save()
-
-        messages.success(request, "✅ Analysis has been queued. You will be notified when it is complete.")
+        messages.success(
+            request,
+            "Modernization assessment has been queued. You will be notified when it is complete.",
+        )
     except OperationalError as e:
-        logger.warning(f"Redis/Celery connection failed: {e}")
+        logger.warning("Redis/Celery connection failed: %s", e)
         analysis.risk_category = "Error"
         analysis.save()
-        messages.error(request, "❌ Analysis service is currently unavailable. Please try again later.")
+        messages.error(request, "Assessment service is currently unavailable. Please try again later.")
 
-    return redirect('dashboard')
+    return redirect("dashboard")
 
 
 @analysis_owner_required
 def view_analysis(request, analysis_id):
-    # Decorator already verified user has access to this analysis
     analysis = get_object_or_404(ProjectAnalysis, id=analysis_id)
     return render(request, "core/view_analysis.html", {
         "analysis": analysis,
-        "project": analysis.project
+        "project": analysis.project,
     })
 
 
 @project_owner_required
 def history_analysis(request, project_id):
-    project = get_object_or_404(Project, id=project_id, user=request.user)
+    project = get_object_or_404(Project, id=project_id)
     analyses = ProjectAnalysis.objects.filter(project=project).order_by("-created_at")
 
     scores = [a.security_score for a in analyses if a.security_score > 0]
@@ -79,24 +69,25 @@ def history_analysis(request, project_id):
     return render(request, "core/analysis_history.html", {
         "project": project,
         "analyses": analyses,
-        "trend": trend_data
+        "trend": trend_data,
     })
 
 
 @analysis_owner_required
 def analysis_status(request, analysis_id):
-    analysis = get_object_or_404(ProjectAnalysis, id=analysis_id, user=request.user)
+    analysis = get_object_or_404(ProjectAnalysis, id=analysis_id)
     task = AsyncResult(analysis.task_id)
     return JsonResponse({"status": task.status})
 
+
 @analysis_owner_required
 def download_analysis_pdf(request, analysis_id):
-    analysis = get_object_or_404(ProjectAnalysis, id=analysis_id, user=request.user)
+    analysis = get_object_or_404(ProjectAnalysis, id=analysis_id)
     project = analysis.project
 
     html = render_to_string("core/analysis_pdf.html", {
         "analysis": analysis,
-        "project": project
+        "project": project,
     })
 
     try:
@@ -111,6 +102,6 @@ def download_analysis_pdf(request, analysis_id):
     pdf_file = HTML(string=html).write_pdf()
 
     response = HttpResponse(pdf_file, content_type="application/pdf")
-    response["Content-Disposition"] = f'attachment; filename="analysis_{analysis_id}.pdf"'
+    response["Content-Disposition"] = f'attachment; filename="assessment_{analysis_id}.pdf"'
 
     return response

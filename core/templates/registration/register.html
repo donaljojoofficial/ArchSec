@@ -1,89 +1,39 @@
-<!-- templates/registration/register.html -->
 {% extends "terminal_base.html" %}
 
 {% block content %}
-<div class="max-w-md mx-auto mt-10">
-    <div class="bg-panel border border-gray-800 p-8 shadow-2xl relative overflow-hidden">
-        <!-- Decorative top bar -->
-        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-info to-transparent opacity-50"></div>
-        
-        <div class="mb-6">
-            <h3 class="text-xl font-bold text-info mb-1">> New User Registration</h3>
-            <p class="text-xs text-gray-500">Create a new secure identity.</p>
-        </div>
+<div class="mx-auto max-w-lg">
+    <div class="app-card p-8">
+        <p class="text-sm font-semibold text-blue-700">Create workspace access</p>
+        <h1 class="mt-2 text-2xl font-extrabold text-gray-950">Register for ArchSec</h1>
+        <p class="mt-2 text-sm text-gray-600">Use an account to save system profiles, assessments, diagrams, and reports.</p>
 
-        <!-- Display form errors/messages -->
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-{% if message.tags %}{{ message.tags }}{% else %}info{% endif %} alert-dismissible fade show mb-4" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            {% endfor %}
-        {% endif %}
-
-        <form method="post" class="space-y-4" novalidate>
+        <form method="post" class="mt-6 space-y-4" novalidate>
             {% csrf_token %}
             <style>
-                form p { margin-bottom: 1rem; }
-                form label { display: block; color: #9ca3af; font-size: 0.875rem; margin-bottom: 0.25rem; }
-                form input { 
-                    width: 100%; 
-                    background-color: #0b0f14; 
-                    border: 1px solid #374151; 
-                    color: #e5e7eb; 
-                    padding: 0.5rem; 
-                    font-family: 'JetBrains Mono', monospace;
-                    outline: none;
-                }
-                form input:focus { border-color: #38bdf8; box-shadow: 0 0 0 1px #38bdf8; }
-                form input.is-invalid { border-color: #ef4444; }
-                form .helptext { display: block; font-size: 0.75rem; color: #6b7280; margin-top: 0.25rem; }
-                form ul.errorlist { color: #ef4444; font-size: 0.875rem; list-style: none; padding: 0; margin-bottom: 0.5rem; }
-                form .field-error { border-color: #ef4444 !important; }
                 .form-group { margin-bottom: 1rem; }
+                form label { display: block; margin-bottom: 0.45rem; color: #374151; font-size: 0.875rem; font-weight: 700; }
+                form input { width: 100%; padding: 0.75rem 0.85rem; }
+                .helptext { display: block; margin-top: 0.35rem; color: #6b7280; font-size: 0.75rem; }
+                .errorlist { margin-top: 0.35rem; color: #dc2626; font-size: 0.8rem; }
             </style>
-            
             {% for field in form %}
-                {% if field.name != 'password2' %}
-                    <div class="form-group">
-                        {{ field.label_tag }}
-                        {{ field }}
-                        {% if field.errors %}
-                            <ul class="errorlist">
-                                {% for error in field.errors %}
-                                    <li>{{ error }}</li>
-                                {% endfor %}
-                            </ul>
-                        {% endif %}
-                        {% if field.help_text %}
-                            <small class="helptext">{{ field.help_text|safe }}</small>
-                        {% endif %}
-                    </div>
-                {% else %}
-                    <div class="form-group">
-                        {{ field.label_tag }}
-                        {{ field }}
-                        {% if field.errors %}
-                            <ul class="errorlist">
-                                {% for error in field.errors %}
-                                    <li>{{ error }}</li>
-                                {% endfor %}
-                            </ul>
-                        {% endif %}
-                    </div>
-                {% endif %}
+                <div class="form-group">
+                    {{ field.label_tag }}
+                    {{ field }}
+                    {% if field.errors %}
+                        <ul class="errorlist">
+                            {% for error in field.errors %}<li>{{ error }}</li>{% endfor %}
+                        </ul>
+                    {% endif %}
+                    {% if field.help_text %}<small class="helptext">{{ field.help_text|safe }}</small>{% endif %}
+                </div>
             {% endfor %}
-            
-            <button type="submit" class="w-full bg-info/10 border border-info text-info hover:bg-info hover:text-bg font-bold py-2 px-4 transition-all duration-200 mt-4 flex items-center justify-center gap-2">
-                <span>REGISTER IDENTITY</span>
-                <span class="animate-pulse">_</span>
-            </button>
+            <button type="submit" class="btn-primary-modern w-full">Create account</button>
         </form>
 
-        <div class="mt-6 text-center border-t border-gray-800 pt-4">
-            <p class="text-sm text-gray-500">Already have an account? <a href="{% url 'login' %}" class="text-accent hover:underline decoration-dashed underline-offset-4">[ Login ]</a></p>
-        </div>
+        <p class="mt-6 border-t border-gray-200 pt-5 text-center text-sm text-gray-600">
+            Already registered? <a href="{% url 'login' %}" class="font-semibold text-blue-700 hover:text-blue-800">Sign in</a>
+        </p>
     </div>
 </div>
 {% endblock %}

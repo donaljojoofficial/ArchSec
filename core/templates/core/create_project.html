@@ -1,136 +1,82 @@
 {% extends 'terminal_base.html' %}
 
 {% block content %}
-<div class="max-w-3xl mx-auto">
-    <div class="bg-panel border border-gray-800 p-6 shadow-lg relative">
-        <!-- Header -->
-        <div class="mb-6 border-b border-gray-800 pb-4">
-            <h2 class="text-xl font-bold text-white">
-                <span class="text-accent">></span> Initialize New Project
-            </h2>
-            <p class="text-xs text-gray-500 mt-1">Configure parameters for security analysis scanning.</p>
-        </div>
-
-        <form method="POST" class="space-y-6">
-            {% csrf_token %}
-            
-            <!-- Custom Form Styling -->
-            <style>
-                .form-group { margin-bottom: 1.5rem; }
-                label { display: block; color: #9ca3af; font-size: 0.875rem; margin-bottom: 0.5rem; font-family: 'JetBrains Mono', monospace; }
-                input[type="text"], input[type="number"], select, textarea {
-                    width: 100%;
-                    background-color: #0b0f14;
-                    border: 1px solid #374151;
-                    color: #e5e7eb;
-                    padding: 0.75rem;
-                    font-family: 'JetBrains Mono', monospace;
-                    font-size: 0.875rem;
-                    outline: none;
-                    transition: border-color 0.2s;
-                }
-                input:focus, select:focus, textarea:focus {
-                    border-color: #22c55e;
-                    box-shadow: 0 0 0 1px #22c55e;
-                }
-            </style>
-
-            <!-- Basic Info Fieldset -->
-            <div>
-                <h3 class="text-sm font-bold text-info uppercase tracking-wider mb-4 border-l-2 border-info pl-2">
-                    // Basic Configuration
-                </h3>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="form-group md:col-span-2">
-                        {{ form.name.label_tag }}
-                        {{ form.name }}
-                    </div>
-                    
-                    <div class="form-group md:col-span-2">
-                        {{ form.description.label_tag }}
-                        {{ form.description }}
-                    </div>
-
-                    <div class="form-group">
-                        {{ form.platform.label_tag }}
-                        {{ form.platform }}
-                    </div>
-
-                    <div class="form-group">
-                        {{ form.tech_stack.label_tag }}
-                        {{ form.tech_stack }}
-                    </div>
-
-                    <div class="form-group">
-                        {{ form.scale.label_tag }}
-                        {{ form.scale }}
-                    </div>
-
-                    <div class="form-group">
-                        {{ form.budget.label_tag }}
-                        {{ form.budget }}
-                    </div>
-
-                    <div class="form-group md:col-span-2">
-                        {{ form.risk_level.label_tag }}
-                        {{ form.risk_level }}
-                    </div>
-                </div>
-            </div>
-
-            <!-- Structured Data (Alpine.js Accordion) -->
-            <div x-data="{ activeSection: null }">
-                <h3 class="text-sm font-bold text-warning uppercase tracking-wider mb-4 border-l-2 border-warning pl-2 mt-8">
-                    // Advanced Parameters
-                </h3>
-                <p class="text-xs text-gray-500 mb-4">Select applicable components to refine threat model.</p>
-
-                <div class="space-y-2">
-                    {% for field in form %}
-                        {% if '_manual' not in field.name and field.name not in 'name,description,platform,tech_stack,scale,budget,risk_level' %}
-                            <div class="border border-gray-800 bg-bg">
-                                <button type="button" 
-                                        @click="activeSection === '{{ field.name }}' ? activeSection = null : activeSection = '{{ field.name }}'"
-                                        class="w-full text-left px-4 py-3 flex justify-between items-center hover:bg-gray-900 transition-colors">
-                                    <span class="text-sm font-mono text-gray-300">{{ field.label }}</span>
-                                    <span class="text-accent" x-text="activeSection === '{{ field.name }}' ? '[-]' : '[+]'"></span>
-                                </button>
-                                
-                                <div x-show="activeSection === '{{ field.name }}'" 
-                                     x-collapse
-                                     class="px-4 py-4 border-t border-gray-800">
-                                    <div class="form-group">
-                                        {{ field }}
-                                    </div>
-                                    {% for manual_field in form %}
-                                        {% with manual_name=field.name|add:"_manual" %}
-                                            {% if manual_field.name == manual_name %}
-                                            <div class="form-group mt-3">
-                                                <label class="text-xs text-info">Manual Entry (Optional)</label>
-                                                {{ manual_field }}
-                                            </div>
-                                            {% endif %}
-                                        {% endwith %}
-                                    {% endfor %}
-                                </div>
-                            </div>
-                        {% endif %}
-                    {% endfor %}
-                </div>
-            </div>
-
-            <!-- Actions -->
-            <div class="pt-6 border-t border-gray-800 flex justify-end gap-4">
-                <a href="{% url 'dashboard' %}" class="px-6 py-3 text-sm text-gray-500 hover:text-white transition-colors">
-                    Cancel
-                </a>
-                <button type="submit" class="bg-accent/10 border border-accent text-accent hover:bg-accent hover:text-bg font-bold py-3 px-8 transition-all duration-200 flex items-center gap-2 group">
-                    <span>EXECUTE_CREATE</span>
-                    <span class="group-hover:animate-pulse">_</span>
-                </button>
-            </div>
-        </form>
+<div class="mx-auto max-w-5xl space-y-6">
+    <div class="app-card p-6 sm:p-8">
+        <p class="text-sm font-semibold text-blue-700">Legacy system profile</p>
+        <h1 class="mt-2 text-3xl font-extrabold tracking-tight text-gray-950">Tell ArchSec what exists today.</h1>
+        <p class="mt-3 max-w-3xl text-sm leading-6 text-gray-600">
+            Describe the current application, stack, deployment, testing, security process, and modernization constraints. The assessment will translate this into issue-by-issue upgrade recommendations.
+        </p>
     </div>
+
+    <form method="POST" class="app-card p-6 sm:p-8">
+        {% csrf_token %}
+        <style>
+            .form-group { margin-bottom: 1.25rem; }
+            label { display: block; margin-bottom: 0.45rem; color: #374151; font-size: 0.875rem; font-weight: 700; }
+            input[type="text"], input[type="number"], select, textarea {
+                width: 100%;
+                padding: 0.75rem 0.85rem;
+                font-size: 0.95rem;
+            }
+            textarea { min-height: 120px; }
+            ul { display: grid; gap: 0.45rem; }
+            li label { display: flex; align-items: center; gap: 0.55rem; font-weight: 500; color: #4b5563; }
+            input[type="checkbox"] { height: 1rem; width: 1rem; accent-color: #2563eb; }
+        </style>
+
+        <section>
+            <h2 class="text-lg font-bold text-gray-950">System basics</h2>
+            <p class="mt-1 text-sm text-gray-500">Use current values, even if they are outdated. The goal is to capture reality first.</p>
+            <div class="mt-5 grid gap-4 md:grid-cols-2">
+                <div class="form-group md:col-span-2">{{ form.name.label_tag }}{{ form.name }}</div>
+                <div class="form-group md:col-span-2">{{ form.description.label_tag }}{{ form.description }}</div>
+                <div class="form-group">{{ form.platform.label_tag }}{{ form.platform }}</div>
+                <div class="form-group">{{ form.tech_stack.label_tag }}{{ form.tech_stack }}</div>
+                <div class="form-group">{{ form.scale.label_tag }}{{ form.scale }}</div>
+                <div class="form-group">{{ form.budget.label_tag }}{{ form.budget }}</div>
+                <div class="form-group md:col-span-2">{{ form.risk_level.label_tag }}{{ form.risk_level }}</div>
+            </div>
+        </section>
+
+        <section class="mt-8 border-t border-gray-200 pt-8" x-data="{ activeSection: 'technology' }">
+            <h2 class="text-lg font-bold text-gray-950">Modernization details</h2>
+            <p class="mt-1 text-sm text-gray-500">Select what describes the current system. Add notes when the checkboxes are too generic.</p>
+
+            <div class="mt-5 grid gap-3">
+                {% for field in form %}
+                    {% if '_manual' not in field.name and field.name not in 'name,description,platform,tech_stack,scale,budget,risk_level' %}
+                    <div class="rounded-lg border border-gray-200 bg-white">
+                        <button type="button"
+                                @click="activeSection === '{{ field.name }}' ? activeSection = null : activeSection = '{{ field.name }}'"
+                                class="flex w-full items-center justify-between px-4 py-3 text-left">
+                            <span class="font-semibold text-gray-800">{{ field.label }}</span>
+                            <span class="text-sm font-bold text-blue-700" x-text="activeSection === '{{ field.name }}' ? 'Close' : 'Add details'"></span>
+                        </button>
+                        <div x-show="activeSection === '{{ field.name }}'" x-collapse class="border-t border-gray-100 px-4 py-4">
+                            <div class="form-group">{{ field }}</div>
+                            {% for manual_field in form %}
+                                {% with manual_name=field.name|add:"_manual" %}
+                                    {% if manual_field.name == manual_name %}
+                                    <div class="form-group">
+                                        <label>Notes</label>
+                                        {{ manual_field }}
+                                    </div>
+                                    {% endif %}
+                                {% endwith %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </section>
+
+        <div class="mt-8 flex flex-col-reverse gap-3 border-t border-gray-200 pt-6 sm:flex-row sm:justify-end">
+            <a href="{% url 'dashboard' %}" class="btn-secondary-modern">Cancel</a>
+            <button type="submit" class="btn-primary-modern">Save system profile</button>
+        </div>
+    </form>
 </div>
 {% endblock %}

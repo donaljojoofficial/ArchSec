@@ -2,139 +2,113 @@
 
 {% block content %}
 <div class="space-y-8">
-    <!-- Header / Stats Row -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div class="md:col-span-3">
-            <h1 class="text-3xl font-bold text-white mb-2">
-                <span class="text-accent">>></span> Dashboard
-            </h1>
-            <p class="text-gray-500 font-mono text-sm">
-                Welcome back, <span class="text-info">{{ user.username }}</span>. System ready.
-            </p>
+    <section class="grid gap-6 lg:grid-cols-[1fr_320px]">
+        <div class="app-card p-6 sm:p-8">
+            <p class="text-sm font-semibold text-blue-700">Modernization workspace</p>
+            <div class="mt-3 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                    <h1 class="text-3xl font-extrabold tracking-tight text-gray-950">Assess legacy systems and plan the upgrade.</h1>
+                    <p class="mt-3 max-w-3xl text-sm leading-6 text-gray-600">
+                        Capture the current stack, deployment, testing, security, operations, and AI-readiness details. ArchSec turns them into modernization findings with costs, requirements, migration steps, and diagrams.
+                    </p>
+                </div>
+                <a href="{% url 'create_project' %}" class="btn-primary-modern shrink-0">New assessment</a>
+            </div>
         </div>
-        <div class="md:col-span-1 flex items-center justify-end">
-            <a href="{% url 'create_project' %}" class="w-full md:w-auto text-center bg-accent/10 border border-accent text-accent hover:bg-accent hover:text-bg font-bold py-3 px-6 transition-all duration-200 flex items-center justify-center gap-2 group">
-                <span>INITIALIZE_PROJECT</span>
-                <span class="group-hover:animate-pulse">_</span>
-            </a>
+        <div class="app-card p-6">
+            <p class="text-sm font-semibold text-gray-500">Portfolio</p>
+            <div class="mt-4 grid grid-cols-2 gap-4">
+                <div>
+                    <p class="text-3xl font-extrabold text-gray-950">{{ projects|length }}</p>
+                    <p class="text-xs font-medium text-gray-500">Systems</p>
+                </div>
+                <div>
+                    <p class="text-3xl font-extrabold text-gray-950">{{ unread_notifications|length|default:"0" }}</p>
+                    <p class="text-xs font-medium text-gray-500">Updates</p>
+                </div>
+            </div>
         </div>
-    </div>
+    </section>
 
-    <!-- Main Grid -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        
-        <!-- Projects List (Left 2/3) -->
-        <div class="lg:col-span-2 space-y-4">
-            <div class="flex items-center justify-between border-b border-gray-800 pb-2">
-                <h2 class="text-lg font-bold text-gray-300">/var/projects</h2>
-                <span class="text-xs text-gray-600">{{ projects|length }} records found</span>
+    <section class="grid gap-8 lg:grid-cols-[1fr_340px]">
+        <div class="space-y-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="text-lg font-bold text-gray-950">Systems</h2>
+                    <p class="text-sm text-gray-500">Legacy profiles ready for modernization assessment.</p>
+                </div>
             </div>
 
             {% if projects %}
-            <div class="grid gap-4">
-                {% for project in projects %}
-                <div class="bg-panel border border-gray-800 p-4 hover:border-gray-600 transition-colors group relative">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <h3 class="text-lg font-bold text-white group-hover:text-accent transition-colors">
-                                {{ project.name }}
-                            </h3>
-                            <p class="text-xs text-gray-500 mt-1 font-mono">ID: {{ project.id }} | Created: {{ project.created_at|date:"Y-m-d" }}</p>
-                            {% if project.description %}
-                            <p class="text-sm text-gray-400 mt-2 line-clamp-2">{{ project.description }}</p>
-                            {% endif %}
-                        </div>
-                        <div class="flex flex-col items-end gap-2">
-                            <span class="text-xs px-2 py-1 bg-gray-800 text-gray-300 border border-gray-700">
-                                ACTIVE
-                            </span>
-                            <div class="flex gap-3 mt-2">
-                                <a href="{% url 'generate_analysis' project.id %}" class="text-xs text-accent hover:underline">[ ANALYZE ]</a>
-                                <a href="{% url 'analysis_history' project.id %}" class="text-xs text-info hover:underline">[ HISTORY ]</a>
+                <div class="grid gap-4">
+                    {% for project in projects %}
+                    <article class="app-card p-5 transition hover:border-blue-200 hover:shadow-soft">
+                        <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                            <div class="min-w-0">
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <h3 class="text-lg font-bold text-gray-950">{{ project.name }}</h3>
+                                    <span class="rounded-full bg-gray-100 px-2.5 py-1 text-xs font-semibold text-gray-600">{{ project.get_platform_display }}</span>
+                                </div>
+                                <p class="mt-2 line-clamp-2 text-sm leading-6 text-gray-600">{{ project.description }}</p>
+                                <div class="mt-4 grid gap-2 text-xs text-gray-500 sm:grid-cols-3">
+                                    <span>Stack: <strong class="text-gray-700">{{ project.tech_stack }}</strong></span>
+                                    <span>Scale: <strong class="text-gray-700">{{ project.scale }}</strong></span>
+                                    <span>Budget: <strong class="text-gray-700">${{ project.budget }}</strong></span>
+                                </div>
+                                <div class="mt-4 h-2 overflow-hidden rounded-full bg-gray-100">
+                                    <div class="h-full rounded-full bg-blue-600" style="width: {{ project.completeness_percentage|floatformat:0 }}%"></div>
+                                </div>
+                                <p class="mt-2 text-xs text-gray-500">Profile completeness: {{ project.completeness_percentage|floatformat:0 }}%</p>
+                            </div>
+                            <div class="flex shrink-0 gap-2">
+                                <a href="{% url 'generate_analysis' project.id %}" class="btn-primary-modern px-3 py-2 text-sm">Analyze</a>
+                                <a href="{% url 'analysis_history' project.id %}" class="btn-secondary-modern px-3 py-2 text-sm">History</a>
                             </div>
                         </div>
-                    </div>
+                    </article>
+                    {% endfor %}
                 </div>
-                {% endfor %}
-            </div>
             {% else %}
-            <div class="bg-panel border border-gray-800 p-12 text-center border-dashed">
-                <p class="text-gray-500 mb-4">No projects detected in the repository.</p>
-                <a href="{% url 'create_project' %}" class="text-accent hover:underline">[ Create First Project ]</a>
-            </div>
+                <div class="app-card border-dashed p-10 text-center">
+                    <h3 class="text-lg font-bold text-gray-950">No systems assessed yet</h3>
+                    <p class="mx-auto mt-2 max-w-md text-sm text-gray-600">Create a legacy system profile to receive modernization issues, solution options, costs, and architecture diagrams.</p>
+                    <a href="{% url 'create_project' %}" class="btn-primary-modern mt-5">Create first assessment</a>
+                </div>
             {% endif %}
         </div>
 
-        <!-- Sidebar (Right 1/3) -->
-        <div class="space-y-6">
-            <!-- Notifications / System Log -->
-            <div class="bg-panel border border-gray-800 p-4">
-                <h3 class="text-sm font-bold text-gray-400 border-b border-gray-800 pb-2 mb-3 uppercase tracking-wider">
-                    System Logs
-                </h3>
-                <div class="space-y-3 font-mono text-xs h-64 overflow-y-auto pr-2 custom-scrollbar">
-                    {% if unread_notifications %}
-                        {% for notification in unread_notifications %}
-                        <div class="flex gap-2 text-gray-300">
-                            <span class="text-gray-600">[{{ notification.created_at|date:"H:i" }}]</span>
-                            <span class="text-warning">WARN:</span>
-                            <span>{{ notification.message }}</span>
-                        </div>
-                        {% endfor %}
-                    {% else %}
-                        <div class="text-gray-600 italic">No active alerts. System nominal.</div>
-                    {% endif %}
-                    
-                    <!-- Static filler for vibe -->
-                    <div class="flex gap-2 text-gray-600 opacity-50">
-                        <span>[SYSTEM]</span>
-                        <span>Daemon heartbeat signal received.</span>
-                    </div>
-                </div>
-                {% if unread_notifications %}
-                <div class="mt-4 pt-2 border-t border-gray-800 text-center">
-                    <a href="{% url 'notifications' %}" class="text-xs text-gray-500 hover:text-white transition-colors">View All Logs</a>
-                </div>
-                {% endif %}
-            </div>
-
-            <!-- Quick Stats -->
-            <div class="bg-panel border border-gray-800 p-4">
-                <h3 class="text-sm font-bold text-gray-400 border-b border-gray-800 pb-2 mb-3 uppercase tracking-wider">
-                    Resource Usage
-                </h3>
-                <div class="space-y-4">
-                    <div>
-                        <div class="flex justify-between text-xs text-gray-400 mb-1">
-                            <span>Storage</span>
-                            <span>24%</span>
-                        </div>
-                        <div class="w-full bg-gray-800 h-1">
-                            <div class="bg-info h-1" style="width: 24%"></div>
-                        </div>
-                    </div>
-                    <div>
-                        <div class="flex justify-between text-xs text-gray-400 mb-1">
-                            <span>API Quota</span>
-                            <span>68%</span>
-                        </div>
-                        <div class="w-full bg-gray-800 h-1">
-                            <div class="bg-accent h-1" style="width: 68%"></div>
-                        </div>
-                    </div>
+        <aside class="space-y-4">
+            <div class="app-card p-5">
+                <h3 class="text-sm font-bold text-gray-950">Modernization focus</h3>
+                <div class="mt-4 space-y-3 text-sm text-gray-600">
+                    <div class="rounded-lg bg-blue-50 p-3 text-blue-900">AI-readiness and automation opportunities</div>
+                    <div class="rounded-lg bg-teal-50 p-3 text-teal-900">Deployment, testing, and security workflow gaps</div>
+                    <div class="rounded-lg bg-amber-50 p-3 text-amber-900">Cost and migration effort planning</div>
                 </div>
             </div>
-
-            <!-- System Tools -->
-            <div class="bg-panel border border-gray-800 p-4">
-                <h3 class="text-sm font-bold text-gray-400 border-b border-gray-800 pb-2 mb-3 uppercase tracking-wider">
-                    System Controls
-                </h3>
-                <a href="{% url 'celery_dashboard' %}" class="block w-full text-center bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white py-2 text-xs font-mono border border-gray-600 transition-colors">
-                    [ MONITOR_TASKS ]
-                </a>
+            <div class="app-card p-5">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-sm font-bold text-gray-950">Recent updates</h3>
+                    <a href="{% url 'notifications' %}" class="text-xs font-semibold text-blue-700">View all</a>
+                </div>
+                <div class="mt-4 space-y-3">
+                    {% for notification in unread_notifications %}
+                        <a href="{% url 'mark_notification_as_read' notification.id %}" class="block rounded-lg border border-gray-100 p-3 text-sm text-gray-600 hover:border-blue-200 hover:bg-blue-50">
+                            {{ notification.message }}
+                        </a>
+                    {% empty %}
+                        <p class="text-sm text-gray-500">No updates yet.</p>
+                    {% endfor %}
+                </div>
             </div>
-        </div>
-    </div>
+            {% if user.is_staff or user.is_superuser %}
+                <div class="app-card p-5">
+                    <h3 class="text-sm font-bold text-gray-950">Admin operations</h3>
+                    <a href="{% url 'celery_dashboard' %}" class="btn-secondary-modern mt-4 w-full">Task monitor</a>
+                    <a href="{% url 'admin:index' %}" class="btn-secondary-modern mt-3 w-full">User administration</a>
+                </div>
+            {% endif %}
+        </aside>
+    </section>
 </div>
 {% endblock %}

@@ -14,6 +14,6 @@ def view_diagrams(request, analysis_id):
     View diagrams for a specific analysis.
     Only the analysis owner or admin can view it.
     """
-    analysis = get_object_or_404(ProjectAnalysis, id=analysis_id, user=request.user)
+    analysis = get_object_or_404(ProjectAnalysis, id=analysis_id)
     
     return render(request, 'core/view_diagrams.html', {'analysis': analysis})

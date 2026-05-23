@@ -1,12 +1,13 @@
 import logging
 from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
 from celery import current_app
 from core.models.project_analysis import ProjectAnalysis
+from core.decorators import admin_required
 
 logger = logging.getLogger(__name__)
 
-@login_required
+
+@admin_required
 def celery_dashboard(request):
     inspector = current_app.control.inspect()
     
@@ -29,7 +30,7 @@ def celery_dashboard(request):
     total_scheduled = sum(len(tasks) for tasks in scheduled.values()) if scheduled else 0
     total_reserved = sum(len(tasks) for tasks in reserved.values()) if reserved else 0
     
-    pending_analyses = ProjectAnalysis.objects.filter(risk_category="Pending").order_by('-created_at')
+    pending_analyses = ProjectAnalysis.objects.filter(risk_category="Pending").order_by("-created_at")
 
     return render(request, "core/celery_dashboard.html", {
         "active": active,

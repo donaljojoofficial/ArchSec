@@ -296,6 +296,24 @@ INFRASTRUCTURE_CHOICES = [
     ('hybrid', 'Hybrid Cloud'),
 ]
 
+LEGACY_CHOICES = [
+    ('old_runtime', 'Old runtime or framework version'),
+    ('manual_deployments', 'Manual or FTP-based deployments'),
+    ('limited_documentation', 'Limited technical documentation'),
+    ('monolithic_codebase', 'Large monolithic codebase'),
+    ('unsupported_dependencies', 'Unsupported or unpatched dependencies'),
+    ('no_environment_parity', 'Development/staging/production are inconsistent'),
+]
+
+AI_READINESS_CHOICES = [
+    ('no_ai_usage', 'No current AI integration'),
+    ('customer_support_ai', 'Customer support assistant opportunity'),
+    ('internal_knowledge_ai', 'Internal knowledge/search assistant opportunity'),
+    ('analytics_ai', 'AI-assisted reporting or analytics opportunity'),
+    ('workflow_automation', 'Workflow automation opportunity'),
+    ('privacy_constraints', 'Sensitive data or privacy constraints'),
+]
+
 
 class StructuredDataForm(forms.Form):
     # Requirements
@@ -353,6 +371,14 @@ class StructuredDataForm(forms.Form):
     # Infrastructure
     infrastructure = forms.MultipleChoiceField(choices=INFRASTRUCTURE_CHOICES, widget=forms.CheckboxSelectMultiple, required=False)
     infrastructure_manual = forms.CharField(widget=forms.Textarea, required=False, label="Other Infrastructure")
+
+    # Legacy Modernization
+    legacy_constraints = forms.MultipleChoiceField(choices=LEGACY_CHOICES, widget=forms.CheckboxSelectMultiple, required=False, label="Legacy Constraints")
+    legacy_constraints_manual = forms.CharField(widget=forms.Textarea, required=False, label="Other Legacy Constraints")
+
+    # AI Readiness
+    ai_readiness = forms.MultipleChoiceField(choices=AI_READINESS_CHOICES, widget=forms.CheckboxSelectMultiple, required=False, label="AI Readiness")
+    ai_readiness_manual = forms.CharField(widget=forms.Textarea, required=False, label="Other AI Opportunities")
 
     def get_structured_data(self):
         """

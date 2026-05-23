@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>{{ project.name }} - Security Analysis Report</title>
+    <title>{{ project.name }} - Modernization Assessment</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 30px; }
         h1, h2 { color: #1a237e; }
@@ -18,18 +18,18 @@
 </head>
 
 <body>
-    <h1>ArchSec Secure System Analysis Report</h1>
-    <p><strong>Project:</strong> {{ project.name }}</p>
+    <h1>ArchSec Modernization Assessment</h1>
+    <p><strong>System:</strong> {{ project.name }}</p>
     <p><strong>Generated:</strong> {{ analysis.created_at }}</p>
     <hr>
 
     <div class="section">
-        <div class="label">System Architecture</div>
+        <div class="label">Architecture Modernization</div>
         <pre>{{ analysis.architecture }}</pre>
     </div>
 
     <div class="section">
-        <div class="label">Threat Model</div>
+        <div class="label">Security And Technical Debt Risks</div>
         <pre>{{ analysis.threat_model }}</pre>
     </div>
 
@@ -55,24 +55,24 @@
     </div>
 
     <div class="section">
-        <div class="label">Threat Model Diagram</div>
+        <div class="label">Modernization Roadmap Diagram</div>
         <div class="mermaid">
             {{ analysis.threat_diagram|safe }}
         </div>
     </div>
 
     <div class="section">
-        <div class="label">Secure SDLC Recommendations</div>
+        <div class="label">Development And Deployment Modernization</div>
         <pre>{{ analysis.sdls_recommendations }}</pre>
     </div>
 
     <div class="section">
-        <div class="label">Cost Estimation Guidance</div>
+        <div class="label">Cost, Effort, And Requirements</div>
         <pre>{{ analysis.cost_estimation }}</pre>
     </div>
 
     <div class="section">
-        <div class="label">Security Testing Plan</div>
+        <div class="label">Testing And Security Validation Plan</div>
         <pre>{{ analysis.testing_plan }}</pre>
     </div>
 
