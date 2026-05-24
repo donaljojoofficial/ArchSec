@@ -35,6 +35,36 @@
         <canvas id="riskChart" height="110"></canvas>
     </section>
 
+    {% if comparison %}
+    <section class="app-card p-5">
+        <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+            <div>
+                <h2 class="text-base font-bold text-gray-950">Latest comparison</h2>
+                <p class="mt-2 text-sm text-gray-600">
+                    Compared {{ comparison.latest.created_at|date:"Y-m-d H:i" }} with {{ comparison.previous.created_at|date:"Y-m-d H:i" }}.
+                </p>
+            </div>
+            <div class="rounded-lg bg-gray-50 px-4 py-3 text-sm font-bold text-gray-800">
+                Score {{ comparison.direction }}{% if comparison.score_delta != 0 %} by {{ comparison.score_delta }}{% endif %}
+            </div>
+        </div>
+        <div class="mt-5 grid gap-4 md:grid-cols-2">
+            <div>
+                <h3 class="text-sm font-bold text-gray-900">New findings</h3>
+                <ul class="mt-2 list-disc space-y-1 pl-5 text-sm text-gray-600">
+                    {% for item in comparison.new_findings %}<li>{{ item }}</li>{% empty %}<li>No new finding titles.</li>{% endfor %}
+                </ul>
+            </div>
+            <div>
+                <h3 class="text-sm font-bold text-gray-900">Resolved or renamed findings</h3>
+                <ul class="mt-2 list-disc space-y-1 pl-5 text-sm text-gray-600">
+                    {% for item in comparison.resolved_findings %}<li>{{ item }}</li>{% empty %}<li>No resolved finding titles.</li>{% endfor %}
+                </ul>
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
     <section class="app-card overflow-hidden">
         <div class="border-b border-gray-200 px-5 py-4">
             <h2 class="text-base font-bold text-gray-950">Previous assessments</h2>

@@ -146,7 +146,14 @@ class ProjectAnalysisAdmin(admin.ModelAdmin):
             'classes': ('collapse',)
         }),
         ('Diagrams', {
-            'fields': ('uml_diagram', 'dfd_diagram', 'erd_diagram', 'threat_diagram'),
+            'fields': (
+                'uml_diagram',
+                'dfd_diagram',
+                'erd_diagram',
+                'threat_diagram',
+                'security_testing_diagram',
+                'migration_roadmap_diagram',
+            ),
             'classes': ('collapse',)
         }),
         ('Metadata', {

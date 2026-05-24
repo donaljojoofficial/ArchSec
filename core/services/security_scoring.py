@@ -10,6 +10,7 @@ def determine_risk_category(score):
 def calculate_rule_score(project: Project):
     score = 0
     structured_data = project.structured_data or {}
+    scale = (project.scale or "").lower()
 
     # --- Risk level weight ---
     risk_weights = {"low": 10, "medium": 40, "high": 70}
@@ -21,21 +22,16 @@ def calculate_rule_score(project: Project):
 
     # --- Scale weighting ---
     scale_weights = {"small": 5, "medium": 10, "large": 20}
-    score += scale_weights.get(project.scale.lower(), 10)
+    score += scale_weights.get(scale, 10)
 
-    # --- Budget adequacy scoring ---
-    expected_budget = 0
-    if project.scale.lower() == "small":
-        expected_budget = 20000
-    elif project.scale.lower() == "medium":
-        expected_budget = 50000
-    elif project.scale.lower() == "large":
-        expected_budget = 120000
+    # --- Budget adequacy scoring when the user has a known budget ---
+    expected_budget = {"small": 20000, "medium": 50000, "large": 120000}.get(scale)
 
-    if project.budget < expected_budget:
-        score += 20  # underfunded increases risk
-    else:
-        score -= 10  # adequate budget reduces risk
+    if expected_budget and project.budget is not None:
+        if project.budget < expected_budget:
+            score += 20  # underfunded increases risk
+        else:
+            score -= 10  # adequate budget reduces risk
 
     # --- Structured Data Penalties & Rewards ---
     # Penalize missing critical sections

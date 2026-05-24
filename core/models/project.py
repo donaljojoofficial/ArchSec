@@ -24,8 +24,8 @@ class Project(models.Model):
     platform = models.CharField(max_length=50, choices=PLATFORM_CHOICES)
     tech_stack = models.CharField(max_length=255)
     scale = models.CharField(max_length=255)
-    budget = models.PositiveIntegerField()
-    risk_level = models.CharField(max_length=20, choices=RISK_LEVEL_CHOICES)
+    budget = models.PositiveIntegerField(null=True, blank=True)
+    risk_level = models.CharField(max_length=20, choices=RISK_LEVEL_CHOICES, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     # New structured data fields

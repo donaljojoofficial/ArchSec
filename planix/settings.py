@@ -1,4 +1,7 @@
+import os
 from pathlib import Path
+from urllib.parse import urlparse
+
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -24,16 +27,21 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-mv%+!c@w-@_d)m$4*8wl_clg($m8zvij@j08)^prf#2@gg31g)"
-
 # SECURITY WARNING: don't run with debug turned on in production!
-import os
 DEBUG = os.getenv("DEBUG", "True") == "True"
 
-#DEBUG = True
+SECRET_KEY = os.getenv("SECRET_KEY")
+if not SECRET_KEY:
+    if DEBUG:
+        SECRET_KEY = "django-insecure-dev-only-change-me"
+    else:
+        raise RuntimeError("SECRET_KEY must be set when DEBUG is False.")
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
+    if host.strip()
+]
 
 
 # Application definition
@@ -73,8 +81,24 @@ WSGI_APPLICATION = "planix.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
+def database_config_from_url(database_url):
+    parsed = urlparse(database_url)
+    if parsed.scheme not in ("postgres", "postgresql"):
+        raise RuntimeError("DATABASE_URL currently supports postgres/postgresql URLs.")
+
+    return {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": parsed.path.lstrip("/"),
+        "USER": parsed.username or "",
+        "PASSWORD": parsed.password or "",
+        "HOST": parsed.hostname or "",
+        "PORT": parsed.port or "",
+    }
+
+
+DATABASE_URL = os.getenv("DATABASE_URL")
 DATABASES = {
-    "default": {
+    "default": database_config_from_url(DATABASE_URL) if DATABASE_URL else {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": BASE_DIR / "db.sqlite3",
     }
@@ -173,8 +197,8 @@ SECURE_CONTENT_SECURITY_POLICY = {
 }
 
 # Celery Configuration Options
-CELERY_BROKER_URL = 'redis://localhost:6379/0'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "redis://localhost:6379/0")
+CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND", CELERY_BROKER_URL)
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'

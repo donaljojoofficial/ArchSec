@@ -9,20 +9,53 @@
         .section { margin-bottom: 25px; }
         .label { font-weight: bold; font-size: 18px; margin-bottom: 8px; }
         pre { white-space: pre-wrap; font-size: 14px; }
-        .mermaid {
-            text-align: center;
+        .diagram-code {
+            border: 1px solid #d9e2ec;
+            background: #f8fafc;
+            padding: 12px;
+            white-space: pre-wrap;
+            font-size: 12px;
+            line-height: 1.5;
         }
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
-    <script>mermaid.initialize({ startOnLoad: true });</script>
 </head>
 
 <body>
     <h1>ArchSec Modernization Assessment</h1>
     <p><strong>System:</strong> {{ project.name }}</p>
     <p><strong>Generated:</strong> {{ analysis.created_at }}</p>
+    <p><strong>Modernization Priority Score:</strong> {{ scorecards.modernization_score }} ({{ analysis.risk_category }})</p>
     <hr>
 
+    <div class="section">
+        <div class="label">Executive Summary</div>
+        <pre>{{ analysis.executive_summary }}</pre>
+    </div>
+
+    {% if findings %}
+    <div class="section">
+        <div class="label">Modernization Findings</div>
+        {% for finding in findings %}
+            <h2>{{ forloop.counter }}. {{ finding.title }}</h2>
+            <p><strong>Category:</strong> {{ finding.category }} | <strong>Priority:</strong> {{ finding.priority }}</p>
+            <p><strong>Current issue:</strong> {{ finding.current_issue }}</p>
+            <p><strong>Why it matters:</strong> {{ finding.why_it_matters }}</p>
+            <p><strong>Recommended solution:</strong> {{ finding.recommended_solution }}</p>
+            <p><strong>Cost:</strong> {{ finding.cost_estimate }}</p>
+            <p><strong>Effort:</strong> {{ finding.effort }}</p>
+            <p><strong>Tools:</strong> {% for item in finding.tools_services %}{{ item }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
+            <p><strong>Required skills:</strong> {% for item in finding.required_skills %}{{ item }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
+            <p><strong>Migration steps:</strong></p>
+            <ol>{% for item in finding.migration_steps %}<li>{{ item }}</li>{% endfor %}</ol>
+            <p><strong>Risks:</strong></p>
+            <ul>{% for item in finding.risks %}<li>{{ item }}</li>{% endfor %}</ul>
+            <p><strong>Mitigations:</strong></p>
+            <ul>{% for item in finding.mitigations %}<li>{{ item }}</li>{% endfor %}</ul>
+            <p><strong>Expected benefits:</strong></p>
+            <ul>{% for item in finding.expected_benefits %}<li>{{ item }}</li>{% endfor %}</ul>
+        {% endfor %}
+    </div>
+    {% else %}
     <div class="section">
         <div class="label">Architecture Modernization</div>
         <pre>{{ analysis.architecture }}</pre>
@@ -34,31 +67,33 @@
     </div>
 
     <div class="section">
-        <div class="label">UML Diagram</div>
-        <div class="mermaid">
-            {{ analysis.uml_diagram|safe }}
-        </div>
+        <div class="label">Future-State Architecture Diagram Code</div>
+        <pre class="diagram-code">{{ analysis.uml_diagram }}</pre>
     </div>
 
     <div class="section">
-        <div class="label">DFD Diagram</div>
-        <div class="mermaid">
-            {{ analysis.dfd_diagram|safe }}
-        </div>
+        <div class="label">Current-State Flow Diagram Code</div>
+        <pre class="diagram-code">{{ analysis.dfd_diagram }}</pre>
     </div>
 
     <div class="section">
-        <div class="label">ERD Diagram</div>
-        <div class="mermaid">
-            {{ analysis.erd_diagram|safe }}
-        </div>
+        <div class="label">AI Integration Flow Diagram Code</div>
+        <pre class="diagram-code">{{ analysis.erd_diagram }}</pre>
     </div>
 
     <div class="section">
-        <div class="label">Modernization Roadmap Diagram</div>
-        <div class="mermaid">
-            {{ analysis.threat_diagram|safe }}
-        </div>
+        <div class="label">Deployment Flow Diagram Code</div>
+        <pre class="diagram-code">{{ analysis.threat_diagram }}</pre>
+    </div>
+
+    <div class="section">
+        <div class="label">Security Testing Workflow Diagram Code</div>
+        <pre class="diagram-code">{{ analysis.security_testing_diagram }}</pre>
+    </div>
+
+    <div class="section">
+        <div class="label">Migration Roadmap Diagram Code</div>
+        <pre class="diagram-code">{{ analysis.migration_roadmap_diagram }}</pre>
     </div>
 
     <div class="section">
@@ -75,6 +110,7 @@
         <div class="label">Testing And Security Validation Plan</div>
         <pre>{{ analysis.testing_plan }}</pre>
     </div>
+    {% endif %}
 
 </body>
 </html>

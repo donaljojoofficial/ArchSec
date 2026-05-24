@@ -10,9 +10,35 @@ from kombu.exceptions import OperationalError
 from core.decorators import analysis_owner_required, project_owner_required
 from core.models.project import Project
 from core.models.project_analysis import ProjectAnalysis
+from core.services.analysis_formatting import get_findings, get_quick_wins, get_roadmap, get_scorecards
 from core.tasks import generate_analysis_task
 
 logger = logging.getLogger(__name__)
+
+
+def build_assessment_comparison(analyses):
+    completed = [analysis for analysis in analyses if analysis.risk_category not in ("Pending", "Error")]
+    if len(completed) < 2:
+        return None
+
+    latest = completed[0]
+    previous = completed[1]
+    latest_findings = get_findings(latest)
+    previous_findings = get_findings(previous)
+    latest_titles = {finding["title"] for finding in latest_findings}
+    previous_titles = {finding["title"] for finding in previous_findings}
+    score_delta = latest.security_score - previous.security_score
+
+    return {
+        "latest": latest,
+        "previous": previous,
+        "score_delta": score_delta,
+        "direction": "higher" if score_delta > 0 else "lower" if score_delta < 0 else "unchanged",
+        "new_findings": sorted(latest_titles - previous_titles),
+        "resolved_findings": sorted(previous_titles - latest_titles),
+        "latest_count": len(latest_findings),
+        "previous_count": len(previous_findings),
+    }
 
 
 @project_owner_required
@@ -49,6 +75,10 @@ def view_analysis(request, analysis_id):
     return render(request, "core/view_analysis.html", {
         "analysis": analysis,
         "project": analysis.project,
+        "findings": get_findings(analysis),
+        "quick_wins": get_quick_wins(analysis),
+        "roadmap": get_roadmap(analysis),
+        "scorecards": get_scorecards(analysis),
     })
 
 
@@ -70,14 +100,30 @@ def history_analysis(request, project_id):
         "project": project,
         "analyses": analyses,
         "trend": trend_data,
+        "comparison": build_assessment_comparison(list(analyses)),
     })
 
 
 @analysis_owner_required
 def analysis_status(request, analysis_id):
     analysis = get_object_or_404(ProjectAnalysis, id=analysis_id)
-    task = AsyncResult(analysis.task_id)
-    return JsonResponse({"status": task.status})
+    task_status = "UNKNOWN"
+    if analysis.task_id:
+        task = AsyncResult(analysis.task_id)
+        task_status = task.status
+
+    payload = {
+        "task_status": task_status,
+        "assessment_status": analysis.risk_category,
+        "analysis_id": analysis.id,
+        "is_complete": analysis.risk_category not in ("Pending", "Error"),
+        "is_error": analysis.risk_category == "Error",
+    }
+    if analysis.risk_category == "Error":
+        raw_response = analysis.raw_ai_response if isinstance(analysis.raw_ai_response, dict) else {}
+        payload["message"] = raw_response.get("message", "Assessment failed.")
+
+    return JsonResponse(payload)
 
 
 @analysis_owner_required
@@ -88,6 +134,10 @@ def download_analysis_pdf(request, analysis_id):
     html = render_to_string("core/analysis_pdf.html", {
         "analysis": analysis,
         "project": project,
+        "findings": get_findings(analysis),
+        "quick_wins": get_quick_wins(analysis),
+        "roadmap": get_roadmap(analysis),
+        "scorecards": get_scorecards(analysis),
     })
 
     try:

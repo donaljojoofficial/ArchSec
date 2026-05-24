@@ -2,27 +2,71 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from core.models import Project
 
+MODERNIZATION_SECTIONS = [
+    'current_backend',
+    'current_frontend',
+    'cms_framework',
+    'database',
+    'hosting',
+    'deployment',
+    'runtime_age',
+    'testing_process',
+    'security_testing_process',
+    'observability_operations',
+    'backups_incident_response',
+    'ai_readiness',
+    'migration_constraints',
+]
+
+CRITICAL_MODERNIZATION_SECTIONS = [
+    'current_backend',
+    'current_frontend',
+    'database',
+    'hosting',
+    'deployment',
+    'runtime_age',
+    'testing_process',
+    'security_testing_process',
+    'observability_operations',
+    'ai_readiness',
+    'migration_constraints',
+]
+
+SECTION_LABELS = {
+    'current_backend': 'backend',
+    'current_frontend': 'frontend',
+    'cms_framework': 'CMS/framework',
+    'database': 'database',
+    'hosting': 'hosting',
+    'deployment': 'deployment',
+    'runtime_age': 'runtime age',
+    'testing_process': 'testing process',
+    'security_testing_process': 'security testing',
+    'observability_operations': 'observability',
+    'backups_incident_response': 'backups/incident response',
+    'ai_readiness': 'AI readiness',
+    'migration_constraints': 'migration constraints',
+}
+
 @login_required
 def dashboard(request):
     projects = Project.objects.filter(user=request.user).order_by('-created_at')
 
-    total_sections = [
-        'requirements', 'users', 'architecture', 'technology', 'security',
-        'performance', 'database', 'testing', 'deployment', 'monitoring',
-        'compliance', 'privacy', 'scalability', 'infrastructure',
-        'legacy_constraints', 'ai_readiness'
-    ]
-    critical_sections = ['security', 'monitoring', 'deployment', 'testing', 'legacy_constraints', 'ai_readiness']
-
     for project in projects:
-        if project.structured_data:
-            filled_sections = len(project.structured_data)
-            project.completeness_percentage = (filled_sections / len(total_sections)) * 100
+        structured_data = project.structured_data or {}
+        filled_sections = [
+            section for section in MODERNIZATION_SECTIONS
+            if structured_data.get(section)
+        ]
+        project.completeness_percentage = (
+            len(filled_sections) / len(MODERNIZATION_SECTIONS)
+        ) * 100
 
-            missing = [s for s in critical_sections if s not in project.structured_data]
-            project.missing_critical = missing
-        else:
-            project.completeness_percentage = 0
-            project.missing_critical = critical_sections
+        missing = [
+            SECTION_LABELS[section]
+            for section in CRITICAL_MODERNIZATION_SECTIONS
+            if section not in structured_data
+        ]
+        project.missing_critical = missing
 
     return render(request, "core/dashboard.html", {"projects": projects})

@@ -42,6 +42,30 @@
         {% endif %}
     </section>
 
+    <section class="app-card overflow-hidden">
+        <div class="border-b border-gray-200 px-5 py-4">
+            <h2 class="text-base font-bold text-gray-950">Recent failed assessments</h2>
+        </div>
+        {% if failed_analyses %}
+            <div class="divide-y divide-gray-100">
+                {% for analysis in failed_analyses %}
+                <div class="p-5">
+                    <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                        <div>
+                            <p class="font-semibold text-gray-950">{{ analysis.project.name }}</p>
+                            <p class="mt-1 text-xs text-gray-500">{{ analysis.created_at|date:"Y-m-d H:i:s" }} · {{ analysis.task_id|default:"No task id" }}</p>
+                        </div>
+                        <a href="{% url 'view_analysis' analysis.id %}" class="btn-secondary-modern px-3 py-2 text-sm">Open</a>
+                    </div>
+                    <p class="mt-3 text-sm text-red-700">{{ analysis.raw_ai_response.message|default:"No error message recorded." }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="p-8 text-center text-sm text-gray-500">No failed assessments recorded.</div>
+        {% endif %}
+    </section>
+
     <section class="grid gap-5 lg:grid-cols-2">
         <div class="app-card p-5">
             <div class="flex items-center justify-between"><h2 class="text-base font-bold text-gray-950">Active tasks</h2><span class="rounded-full bg-blue-50 px-3 py-1 text-xs font-bold text-blue-700">{{ total_active }}</span></div>

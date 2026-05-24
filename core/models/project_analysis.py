@@ -31,3 +31,5 @@ class ProjectAnalysis(models.Model):
     dfd_diagram = models.TextField(blank=True, null=True)
     erd_diagram = models.TextField(blank=True, null=True)
     threat_diagram = models.TextField(blank=True, null=True)
+    security_testing_diagram = models.TextField(blank=True, null=True)
+    migration_roadmap_diagram = models.TextField(blank=True, null=True)

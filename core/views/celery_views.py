@@ -31,6 +31,7 @@ def celery_dashboard(request):
     total_reserved = sum(len(tasks) for tasks in reserved.values()) if reserved else 0
     
     pending_analyses = ProjectAnalysis.objects.filter(risk_category="Pending").order_by("-created_at")
+    failed_analyses = ProjectAnalysis.objects.filter(risk_category="Error").order_by("-created_at")[:10]
 
     return render(request, "core/celery_dashboard.html", {
         "active": active,
@@ -40,5 +41,6 @@ def celery_dashboard(request):
         "total_scheduled": total_scheduled,
         "total_reserved": total_reserved,
         "pending_analyses": pending_analyses,
+        "failed_analyses": failed_analyses,
         "connection_error": connection_error,
     })

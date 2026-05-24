@@ -2,7 +2,41 @@ from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.core.exceptions import ValidationError
+from django.utils.html import strip_tags
+import re
 from .models import Project
+
+
+CONTROL_CHAR_RE = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
+SAFE_TEXT_LIMITS = {
+    "name": 120,
+    "description": 3000,
+    "tech_stack": 500,
+    "scale": 255,
+    "manual": 2000,
+}
+
+
+def clean_user_text(value, max_length=2000):
+    """
+    Normalize stored free-text input so it is safer to render and send to AI.
+    This does not make text "trusted"; templates should still auto-escape it.
+    """
+    if value is None:
+        return ""
+
+    value = str(value).replace("\r\n", "\n").replace("\r", "\n")
+    if len(value) > max_length * 3:
+        raise ValidationError(f"Keep this field under {max_length} characters.")
+    value = CONTROL_CHAR_RE.sub("", value)
+    value = strip_tags(value)
+    value = re.sub(r"[ \t]+", " ", value)
+    value = re.sub(r"\n{4,}", "\n\n\n", value).strip()
+
+    if len(value) > max_length:
+        raise ValidationError(f"Keep this field under {max_length} characters.")
+
+    return value
 
 
 # ========================
@@ -189,6 +223,24 @@ class OldProjectForm(forms.ModelForm):
             'budget',
             'risk_level',
         ]
+        widgets = {
+            'description': forms.Textarea(attrs={'maxlength': SAFE_TEXT_LIMITS["description"]}),
+            'name': forms.TextInput(attrs={'maxlength': SAFE_TEXT_LIMITS["name"]}),
+            'tech_stack': forms.TextInput(attrs={'maxlength': SAFE_TEXT_LIMITS["tech_stack"]}),
+            'scale': forms.TextInput(attrs={'maxlength': SAFE_TEXT_LIMITS["scale"]}),
+        }
+
+    def clean_name(self):
+        return clean_user_text(self.cleaned_data.get("name"), SAFE_TEXT_LIMITS["name"])
+
+    def clean_description(self):
+        return clean_user_text(self.cleaned_data.get("description"), SAFE_TEXT_LIMITS["description"])
+
+    def clean_tech_stack(self):
+        return clean_user_text(self.cleaned_data.get("tech_stack"), SAFE_TEXT_LIMITS["tech_stack"])
+
+    def clean_scale(self):
+        return clean_user_text(self.cleaned_data.get("scale"), SAFE_TEXT_LIMITS["scale"])
 
 # --- Constants for Structured Data ---
 
@@ -223,6 +275,37 @@ TECHNOLOGY_CHOICES = [
     ('ruby', 'Ruby on Rails'),
 ]
 
+BACKEND_CHOICES = [
+    ('php_legacy', 'Legacy PHP application'),
+    ('wordpress', 'WordPress or plugin-heavy CMS backend'),
+    ('dotnet_framework', '.NET Framework / WebForms / MVC'),
+    ('java_legacy', 'Legacy Java / Spring / JSP'),
+    ('python_legacy', 'Legacy Python / Django / Flask'),
+    ('node_legacy', 'Older Node.js / Express services'),
+    ('serverless', 'Serverless functions'),
+    ('unknown_backend', 'Unknown or poorly documented backend'),
+]
+
+FRONTEND_CHOICES = [
+    ('server_rendered', 'Server-rendered templates'),
+    ('jquery', 'jQuery or imperative JavaScript'),
+    ('legacy_spa', 'Older SPA framework/version'),
+    ('modern_spa', 'React, Vue, Angular, or Svelte'),
+    ('static_site', 'Static site'),
+    ('mobile_web', 'Mobile-oriented web frontend'),
+]
+
+CMS_FRAMEWORK_CHOICES = [
+    ('wordpress', 'WordPress'),
+    ('drupal', 'Drupal'),
+    ('joomla', 'Joomla'),
+    ('shopify', 'Shopify'),
+    ('magento', 'Magento / Adobe Commerce'),
+    ('custom_framework', 'Custom framework'),
+    ('no_cms', 'No CMS'),
+    ('unknown_cms', 'Unknown CMS/framework'),
+]
+
 SECURITY_CHOICES = [
     ('authentication', 'Authentication (OAuth, JWT, SSO)'),
     ('authorization', 'Authorization (RBAC, ABAC)'),
@@ -246,12 +329,50 @@ DATABASE_CHOICES = [
     ('graph', 'Graph (Neo4j)'),
 ]
 
+HOSTING_CHOICES = [
+    ('shared_hosting', 'Shared hosting'),
+    ('vps', 'VPS / manually managed VM'),
+    ('on_premise', 'On-premise servers'),
+    ('cloud_vm', 'Cloud VM'),
+    ('paas', 'Platform as a Service'),
+    ('containers', 'Containers / Kubernetes'),
+    ('static_cdn', 'Static hosting / CDN'),
+    ('unknown_hosting', 'Unknown hosting'),
+]
+
+RUNTIME_AGE_CHOICES = [
+    ('current', 'Current or actively supported versions'),
+    ('slightly_old', 'One to two major versions behind'),
+    ('end_of_life', 'End-of-life runtime or framework'),
+    ('unsupported_os', 'Unsupported operating system'),
+    ('unknown_versions', 'Versions are unknown or undocumented'),
+]
+
 TESTING_CHOICES = [
     ('unit', 'Unit Testing'),
     ('integration', 'Integration Testing'),
     ('e2e', 'End-to-End Testing'),
     ('security_testing', 'Security Testing (SAST, DAST)'),
     ('performance_testing', 'Performance/Load Testing'),
+]
+
+TESTING_PROCESS_CHOICES = [
+    ('manual_only', 'Manual QA only'),
+    ('ad_hoc_testing', 'Ad hoc developer testing'),
+    ('partial_automation', 'Partial automated tests'),
+    ('ci_tests', 'Tests run in CI'),
+    ('coverage_tracking', 'Coverage is tracked'),
+    ('release_gates', 'Automated release gates'),
+]
+
+SECURITY_TESTING_CHOICES = [
+    ('none', 'No formal security testing'),
+    ('sast', 'Static analysis / SAST'),
+    ('dast', 'Dynamic testing / DAST'),
+    ('sca', 'Dependency scanning / SCA'),
+    ('secrets_scanning', 'Secrets scanning'),
+    ('container_scanning', 'Container image scanning'),
+    ('pentest', 'Periodic penetration testing'),
 ]
 
 DEPLOYMENT_CHOICES = [
@@ -266,6 +387,25 @@ MONITORING_CHOICES = [
     ('metrics', 'Metrics & Visualization (Prometheus, Grafana)'),
     ('tracing', 'Distributed Tracing (Jaeger, Zipkin)'),
     ('apm', 'Application Performance Monitoring (APM)'),
+]
+
+OBSERVABILITY_CHOICES = [
+    ('basic_logs', 'Basic application/server logs'),
+    ('centralized_logs', 'Centralized logs'),
+    ('metrics_dashboards', 'Metrics dashboards'),
+    ('alerting', 'Alerting/on-call workflow'),
+    ('tracing', 'Distributed tracing'),
+    ('error_tracking', 'Error tracking'),
+    ('uptime_monitoring', 'Uptime monitoring'),
+]
+
+BACKUP_INCIDENT_CHOICES = [
+    ('manual_backups', 'Manual backups'),
+    ('automated_backups', 'Automated backups'),
+    ('restore_tests', 'Restore tests are performed'),
+    ('incident_runbook', 'Incident response runbook'),
+    ('dr_plan', 'Disaster recovery plan'),
+    ('no_known_backups', 'No known backup process'),
 ]
 
 COMPLIANCE_CHOICES = [
@@ -314,71 +454,115 @@ AI_READINESS_CHOICES = [
     ('privacy_constraints', 'Sensitive data or privacy constraints'),
 ]
 
+MIGRATION_CONSTRAINT_CHOICES = [
+    ('limited_budget', 'Limited budget'),
+    ('tight_timeline', 'Tight timeline'),
+    ('low_downtime_tolerance', 'Low downtime tolerance'),
+    ('small_team', 'Small team'),
+    ('limited_modern_stack_experience', 'Limited modern stack experience'),
+    ('compliance_requirements', 'Compliance requirements'),
+    ('legacy_vendor_lock_in', 'Legacy vendor lock-in'),
+    ('data_migration_complexity', 'Data migration complexity'),
+]
+
 
 class StructuredDataForm(forms.Form):
     # Requirements
     requirements = forms.MultipleChoiceField(choices=REQUIREMENTS_CHOICES, widget=forms.CheckboxSelectMultiple, required=False)
-    requirements_manual = forms.CharField(widget=forms.Textarea, required=False, label="Other Requirements")
+    requirements_manual = forms.CharField(widget=forms.Textarea(attrs={'maxlength': SAFE_TEXT_LIMITS["manual"]}), required=False, label="Other Requirements")
 
     # Users
     users = forms.MultipleChoiceField(choices=USERS_CHOICES, widget=forms.CheckboxSelectMultiple, required=False)
-    users_manual = forms.CharField(widget=forms.Textarea, required=False, label="Other User Types")
+    users_manual = forms.CharField(widget=forms.Textarea(attrs={'maxlength': SAFE_TEXT_LIMITS["manual"]}), required=False, label="Other User Types")
 
     # Architecture
     architecture = forms.MultipleChoiceField(choices=ARCHITECTURE_CHOICES, widget=forms.CheckboxSelectMultiple, required=False)
-    architecture_manual = forms.CharField(widget=forms.Textarea, required=False, label="Other Architecture Patterns")
+    architecture_manual = forms.CharField(widget=forms.Textarea(attrs={'maxlength': SAFE_TEXT_LIMITS["manual"]}), required=False, label="Other Architecture Patterns")
 
     # Technology
     technology = forms.MultipleChoiceField(choices=TECHNOLOGY_CHOICES, widget=forms.CheckboxSelectMultiple, required=False)
-    technology_manual = forms.CharField(widget=forms.Textarea, required=False, label="Other Technologies")
+    technology_manual = forms.CharField(widget=forms.Textarea(attrs={'maxlength': SAFE_TEXT_LIMITS["manual"]}), required=False, label="Other Technologies")
+
+    # Current stack detail
+    current_backend = forms.MultipleChoiceField(choices=BACKEND_CHOICES, widget=forms.CheckboxSelectMultiple, required=False, label="Current Backend")
+    current_backend_manual = forms.CharField(widget=forms.Textarea(attrs={'maxlength': SAFE_TEXT_LIMITS["manual"]}), required=False, label="Backend Version Notes")
+
+    current_frontend = forms.MultipleChoiceField(choices=FRONTEND_CHOICES, widget=forms.CheckboxSelectMultiple, required=False, label="Current Frontend")
+    current_frontend_manual = forms.CharField(widget=forms.Textarea(attrs={'maxlength': SAFE_TEXT_LIMITS["manual"]}), required=False, label="Frontend Version Notes")
+
+    cms_framework = forms.MultipleChoiceField(choices=CMS_FRAMEWORK_CHOICES, widget=forms.CheckboxSelectMultiple, required=False, label="CMS / Framework")
+    cms_framework_manual = forms.CharField(widget=forms.Textarea(attrs={'maxlength': SAFE_TEXT_LIMITS["manual"]}), required=False, label="CMS / Framework Notes")
+
+    runtime_age = forms.MultipleChoiceField(choices=RUNTIME_AGE_CHOICES, widget=forms.CheckboxSelectMultiple, required=False, label="Runtime / Framework Age")
+    runtime_age_manual = forms.CharField(widget=forms.Textarea(attrs={'maxlength': SAFE_TEXT_LIMITS["manual"]}), required=False, label="Version Details")
 
     # Security
     security = forms.MultipleChoiceField(choices=SECURITY_CHOICES, widget=forms.CheckboxSelectMultiple, required=False)
-    security_manual = forms.CharField(widget=forms.Textarea, required=False, label="Other Security Measures")
+    security_manual = forms.CharField(widget=forms.Textarea(attrs={'maxlength': SAFE_TEXT_LIMITS["manual"]}), required=False, label="Other Security Measures")
 
     # Performance
     performance = forms.MultipleChoiceField(choices=PERFORMANCE_CHOICES, widget=forms.CheckboxSelectMultiple, required=False)
-    performance_manual = forms.CharField(widget=forms.Textarea, required=False, label="Other Performance Strategies")
+    performance_manual = forms.CharField(widget=forms.Textarea(attrs={'maxlength': SAFE_TEXT_LIMITS["manual"]}), required=False, label="Other Performance Strategies")
 
     # Database
     database = forms.MultipleChoiceField(choices=DATABASE_CHOICES, widget=forms.CheckboxSelectMultiple, required=False)
-    database_manual = forms.CharField(widget=forms.Textarea, required=False, label="Other Database Technologies")
+    database_manual = forms.CharField(widget=forms.Textarea(attrs={'maxlength': SAFE_TEXT_LIMITS["manual"]}), required=False, label="Other Database Technologies")
+
+    # Hosting
+    hosting = forms.MultipleChoiceField(choices=HOSTING_CHOICES, widget=forms.CheckboxSelectMultiple, required=False, label="Hosting Environment")
+    hosting_manual = forms.CharField(widget=forms.Textarea(attrs={'maxlength': SAFE_TEXT_LIMITS["manual"]}), required=False, label="Hosting Notes")
 
     # Testing
     testing = forms.MultipleChoiceField(choices=TESTING_CHOICES, widget=forms.CheckboxSelectMultiple, required=False)
-    testing_manual = forms.CharField(widget=forms.Textarea, required=False, label="Other Testing Strategies")
+    testing_manual = forms.CharField(widget=forms.Textarea(attrs={'maxlength': SAFE_TEXT_LIMITS["manual"]}), required=False, label="Other Testing Strategies")
+
+    testing_process = forms.MultipleChoiceField(choices=TESTING_PROCESS_CHOICES, widget=forms.CheckboxSelectMultiple, required=False, label="Current Testing Process")
+    testing_process_manual = forms.CharField(widget=forms.Textarea(attrs={'maxlength': SAFE_TEXT_LIMITS["manual"]}), required=False, label="Testing Coverage Notes")
+
+    security_testing_process = forms.MultipleChoiceField(choices=SECURITY_TESTING_CHOICES, widget=forms.CheckboxSelectMultiple, required=False, label="Security Testing Process")
+    security_testing_process_manual = forms.CharField(widget=forms.Textarea(attrs={'maxlength': SAFE_TEXT_LIMITS["manual"]}), required=False, label="Security Testing Notes")
 
     # Deployment
     deployment = forms.MultipleChoiceField(choices=DEPLOYMENT_CHOICES, widget=forms.CheckboxSelectMultiple, required=False)
-    deployment_manual = forms.CharField(widget=forms.Textarea, required=False, label="Other Deployment Methods")
+    deployment_manual = forms.CharField(widget=forms.Textarea(attrs={'maxlength': SAFE_TEXT_LIMITS["manual"]}), required=False, label="Other Deployment Methods")
 
     # Monitoring
     monitoring = forms.MultipleChoiceField(choices=MONITORING_CHOICES, widget=forms.CheckboxSelectMultiple, required=False)
-    monitoring_manual = forms.CharField(widget=forms.Textarea, required=False, label="Other Monitoring Solutions")
+    monitoring_manual = forms.CharField(widget=forms.Textarea(attrs={'maxlength': SAFE_TEXT_LIMITS["manual"]}), required=False, label="Other Monitoring Solutions")
+
+    observability_operations = forms.MultipleChoiceField(choices=OBSERVABILITY_CHOICES, widget=forms.CheckboxSelectMultiple, required=False, label="Observability And Operations")
+    observability_operations_manual = forms.CharField(widget=forms.Textarea(attrs={'maxlength': SAFE_TEXT_LIMITS["manual"]}), required=False, label="Logging, Alerting, Or Incident Notes")
+
+    backups_incident_response = forms.MultipleChoiceField(choices=BACKUP_INCIDENT_CHOICES, widget=forms.CheckboxSelectMultiple, required=False, label="Backups And Incident Response")
+    backups_incident_response_manual = forms.CharField(widget=forms.Textarea(attrs={'maxlength': SAFE_TEXT_LIMITS["manual"]}), required=False, label="Backup Or Recovery Notes")
 
     # Compliance
     compliance = forms.MultipleChoiceField(choices=COMPLIANCE_CHOICES, widget=forms.CheckboxSelectMultiple, required=False)
-    compliance_manual = forms.CharField(widget=forms.Textarea, required=False, label="Other Compliance Requirements")
+    compliance_manual = forms.CharField(widget=forms.Textarea(attrs={'maxlength': SAFE_TEXT_LIMITS["manual"]}), required=False, label="Other Compliance Requirements")
 
     # Privacy
     privacy = forms.MultipleChoiceField(choices=PRIVACY_CHOICES, widget=forms.CheckboxSelectMultiple, required=False)
-    privacy_manual = forms.CharField(widget=forms.Textarea, required=False, label="Other Privacy Measures")
+    privacy_manual = forms.CharField(widget=forms.Textarea(attrs={'maxlength': SAFE_TEXT_LIMITS["manual"]}), required=False, label="Other Privacy Measures")
 
     # Scalability
     scalability = forms.MultipleChoiceField(choices=SCALABILITY_CHOICES, widget=forms.CheckboxSelectMultiple, required=False)
-    scalability_manual = forms.CharField(widget=forms.Textarea, required=False, label="Other Scalability Strategies")
+    scalability_manual = forms.CharField(widget=forms.Textarea(attrs={'maxlength': SAFE_TEXT_LIMITS["manual"]}), required=False, label="Other Scalability Strategies")
 
     # Infrastructure
     infrastructure = forms.MultipleChoiceField(choices=INFRASTRUCTURE_CHOICES, widget=forms.CheckboxSelectMultiple, required=False)
-    infrastructure_manual = forms.CharField(widget=forms.Textarea, required=False, label="Other Infrastructure")
+    infrastructure_manual = forms.CharField(widget=forms.Textarea(attrs={'maxlength': SAFE_TEXT_LIMITS["manual"]}), required=False, label="Other Infrastructure")
 
     # Legacy Modernization
     legacy_constraints = forms.MultipleChoiceField(choices=LEGACY_CHOICES, widget=forms.CheckboxSelectMultiple, required=False, label="Legacy Constraints")
-    legacy_constraints_manual = forms.CharField(widget=forms.Textarea, required=False, label="Other Legacy Constraints")
+    legacy_constraints_manual = forms.CharField(widget=forms.Textarea(attrs={'maxlength': SAFE_TEXT_LIMITS["manual"]}), required=False, label="Other Legacy Constraints")
 
     # AI Readiness
     ai_readiness = forms.MultipleChoiceField(choices=AI_READINESS_CHOICES, widget=forms.CheckboxSelectMultiple, required=False, label="AI Readiness")
-    ai_readiness_manual = forms.CharField(widget=forms.Textarea, required=False, label="Other AI Opportunities")
+    ai_readiness_manual = forms.CharField(widget=forms.Textarea(attrs={'maxlength': SAFE_TEXT_LIMITS["manual"]}), required=False, label="Other AI Opportunities")
+
+    # Migration Constraints
+    migration_constraints = forms.MultipleChoiceField(choices=MIGRATION_CONSTRAINT_CHOICES, widget=forms.CheckboxSelectMultiple, required=False, label="Migration Constraints")
+    migration_constraints_manual = forms.CharField(widget=forms.Textarea(attrs={'maxlength': SAFE_TEXT_LIMITS["manual"]}), required=False, label="Timeline, Downtime, Team, Or Compliance Notes")
 
     def get_structured_data(self):
         """
@@ -394,7 +578,10 @@ class StructuredDataForm(forms.Form):
                 continue
 
             selected = self.cleaned_data.get(section, [])
-            manual = self.cleaned_data.get(f"{section}_manual", "").strip()
+            manual = clean_user_text(
+                self.cleaned_data.get(f"{section}_manual", ""),
+                SAFE_TEXT_LIMITS["manual"],
+            )
 
             section_data = {}
             if selected:
@@ -410,3 +597,22 @@ class ProjectForm(OldProjectForm, StructuredDataForm):
     def __init__(self, *args, **kwargs):
         super(ProjectForm, self).__init__(*args, **kwargs)
         StructuredDataForm.__init__(self, *args, **kwargs)
+        self.fields["budget"].required = False
+        self.fields["budget"].label = "Known modernization budget"
+        self.fields["budget"].help_text = "Optional. Leave blank and ArchSec will estimate budget ranges from the assessment."
+        self.fields["risk_level"].required = False
+        self.fields["risk_level"].label = "Known business risk"
+        self.fields["risk_level"].help_text = "Optional. Leave blank and ArchSec will estimate modernization risk."
+
+    def clean(self):
+        cleaned_data = super().clean()
+        for field_name in self.fields:
+            if field_name.endswith("_manual"):
+                try:
+                    cleaned_data[field_name] = clean_user_text(
+                        cleaned_data.get(field_name, ""),
+                        SAFE_TEXT_LIMITS["manual"],
+                    )
+                except ValidationError as error:
+                    self.add_error(field_name, error)
+        return cleaned_data

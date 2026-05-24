@@ -9,7 +9,7 @@
     <p class="mt-3 text-sm text-gray-600">{{ analysis.raw_ai_response.message|default:analysis.raw_ai_response|default:"Unknown error" }}</p>
     <details class="mt-5 rounded-lg border border-gray-200 bg-gray-50 p-4">
         <summary class="cursor-pointer text-sm font-semibold text-gray-700">Raw response</summary>
-        <pre class="mt-3 whitespace-pre-wrap text-xs text-gray-600">{{ analysis.raw_ai_response|pretty_json|safe }}</pre>
+        <pre class="mt-3 whitespace-pre-wrap text-xs text-gray-600">{{ analysis.raw_ai_response|pretty_json }}</pre>
     </details>
 </div>
 {% else %}
@@ -42,24 +42,26 @@
     <section class="grid gap-4 md:grid-cols-4">
         <div class="app-card p-5">
             <p class="text-sm font-semibold text-gray-500">Priority score</p>
-            <p class="mt-2 text-4xl font-extrabold text-gray-950">{{ analysis.security_score }}</p>
+            <p class="mt-2 text-4xl font-extrabold text-gray-950">{{ scorecards.modernization_score }}</p>
             <p class="mt-1 text-sm text-gray-600">{{ analysis.risk_category }}</p>
         </div>
         <div class="app-card p-5">
-            <p class="text-sm font-semibold text-gray-500">Likelihood</p>
-            <p class="mt-2 text-4xl font-extrabold text-gray-950">{{ analysis.likelihood }}</p>
-            <p class="mt-1 text-sm text-gray-600">Change urgency</p>
+            <p class="text-sm font-semibold text-gray-500">AI readiness</p>
+            <p class="mt-2 text-4xl font-extrabold text-gray-950">{{ scorecards.ai_readiness_score|default_if_none:"-" }}</p>
+            <p class="mt-1 text-sm text-gray-600">Adoption potential</p>
         </div>
         <div class="app-card p-5">
-            <p class="text-sm font-semibold text-gray-500">Impact</p>
-            <p class="mt-2 text-4xl font-extrabold text-gray-950">{{ analysis.impact }}</p>
-            <p class="mt-1 text-sm text-gray-600">Business effect</p>
+            <p class="text-sm font-semibold text-gray-500">Technical debt</p>
+            <p class="mt-2 text-4xl font-extrabold text-gray-950">{{ scorecards.technical_debt_score|default_if_none:"-" }}</p>
+            <p class="mt-1 text-sm text-gray-600">Current friction</p>
         </div>
         <div class="app-card p-5">
             <p class="text-sm font-semibold text-gray-500">Exports</p>
-            <div class="mt-3 flex gap-2">
+            <div class="mt-3 flex flex-wrap gap-2">
                 <a href="{% url 'export_analysis_md' analysis.id %}" class="btn-secondary-modern px-3 py-2 text-sm">MD</a>
                 <a href="{% url 'export_analysis_txt' analysis.id %}" class="btn-secondary-modern px-3 py-2 text-sm">TXT</a>
+                <a href="{% url 'export_analysis_json' analysis.id %}" class="btn-secondary-modern px-3 py-2 text-sm">JSON</a>
+                <a href="{% url 'export_analysis_proposal' analysis.id %}" class="btn-secondary-modern px-3 py-2 text-sm">Proposal</a>
             </div>
         </div>
     </section>
@@ -72,8 +74,74 @@
     <section>
         <div class="mb-4">
             <h2 class="text-lg font-bold text-gray-950">Issue-by-issue modernization plan</h2>
-            <p class="mt-1 text-sm text-gray-500">Current broad sections are presented as modernization issues. The next schema update will store these as structured findings with individual costs and requirements.</p>
+            <p class="mt-1 text-sm text-gray-500">Each finding includes the issue, recommendation, costs, requirements, migration steps, risks, and benefits.</p>
         </div>
+        {% if findings %}
+        <div class="grid gap-4">
+            {% for finding in findings %}
+            <article class="app-card p-5">
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                    <div>
+                        <span class="rounded-full bg-blue-50 px-3 py-1 text-xs font-bold text-blue-700">{{ finding.category }}</span>
+                        <h3 class="mt-4 text-lg font-bold text-gray-950">{{ finding.title }}</h3>
+                    </div>
+                    <span class="w-fit rounded-full bg-gray-100 px-3 py-1 text-xs font-bold text-gray-700">{{ finding.priority }}</span>
+                </div>
+
+                <div class="mt-5 grid gap-4 lg:grid-cols-2">
+                    <div>
+                        <h4 class="text-sm font-bold text-gray-900">Current issue</h4>
+                        <p class="mt-2 whitespace-pre-wrap text-sm leading-6 text-gray-700">{{ finding.current_issue }}</p>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-bold text-gray-900">Why it matters</h4>
+                        <p class="mt-2 whitespace-pre-wrap text-sm leading-6 text-gray-700">{{ finding.why_it_matters }}</p>
+                    </div>
+                    <div class="lg:col-span-2">
+                        <h4 class="text-sm font-bold text-gray-900">Recommended solution</h4>
+                        <p class="mt-2 whitespace-pre-wrap text-sm leading-6 text-gray-700">{{ finding.recommended_solution }}</p>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-bold text-gray-900">Cost and effort</h4>
+                        <p class="mt-2 text-sm leading-6 text-gray-700">{{ finding.cost_estimate|default:"Not estimated" }}</p>
+                        <p class="mt-1 text-sm leading-6 text-gray-700">{{ finding.effort|default:"Effort not specified" }}</p>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-bold text-gray-900">Tools and skills</h4>
+                        <p class="mt-2 text-sm leading-6 text-gray-700">
+                            {% for item in finding.tools_services %}{{ item }}{% if not forloop.last %}, {% endif %}{% empty %}No tools specified{% endfor %}
+                        </p>
+                        <p class="mt-1 text-sm leading-6 text-gray-700">
+                            {% for item in finding.required_skills %}{{ item }}{% if not forloop.last %}, {% endif %}{% empty %}No skills specified{% endfor %}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="mt-5 grid gap-4 lg:grid-cols-3">
+                    <div>
+                        <h4 class="text-sm font-bold text-gray-900">Migration steps</h4>
+                        <ol class="mt-2 list-decimal space-y-1 pl-5 text-sm leading-6 text-gray-700">
+                            {% for item in finding.migration_steps %}<li>{{ item }}</li>{% empty %}<li>No steps provided</li>{% endfor %}
+                        </ol>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-bold text-gray-900">Risks and mitigations</h4>
+                        <ul class="mt-2 list-disc space-y-1 pl-5 text-sm leading-6 text-gray-700">
+                            {% for item in finding.risks %}<li>{{ item }}</li>{% empty %}<li>No risks provided</li>{% endfor %}
+                            {% for item in finding.mitigations %}<li>{{ item }}</li>{% endfor %}
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-bold text-gray-900">Expected benefits</h4>
+                        <ul class="mt-2 list-disc space-y-1 pl-5 text-sm leading-6 text-gray-700">
+                            {% for item in finding.expected_benefits %}<li>{{ item }}</li>{% empty %}<li>No benefits provided</li>{% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+        {% else %}
         <div class="grid gap-4 lg:grid-cols-2">
             <article class="app-card p-5">
                 <span class="rounded-full bg-blue-50 px-3 py-1 text-xs font-bold text-blue-700">Architecture</span>
@@ -101,7 +169,29 @@
                 <pre class="mt-3 whitespace-pre-wrap font-sans text-sm leading-6 text-gray-700">{{ analysis.testing_plan }}</pre>
             </article>
         </div>
+        {% endif %}
     </section>
+
+    {% if quick_wins or roadmap %}
+    <section class="grid gap-4 lg:grid-cols-2">
+        {% if quick_wins %}
+        <div class="app-card p-5">
+            <h2 class="text-base font-bold text-gray-950">Quick wins</h2>
+            <ul class="mt-3 list-disc space-y-1 pl-5 text-sm leading-6 text-gray-700">
+                {% for item in quick_wins %}<li>{{ item }}</li>{% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+        {% if roadmap %}
+        <div class="app-card p-5">
+            <h2 class="text-base font-bold text-gray-950">Roadmap</h2>
+            <ol class="mt-3 list-decimal space-y-1 pl-5 text-sm leading-6 text-gray-700">
+                {% for item in roadmap %}<li>{{ item }}</li>{% endfor %}
+            </ol>
+        </div>
+        {% endif %}
+    </section>
+    {% endif %}
 
     <section class="grid gap-4 lg:grid-cols-2">
         <div class="app-card p-5">

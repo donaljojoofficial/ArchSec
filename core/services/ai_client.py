@@ -1,6 +1,7 @@
 import os
 import json
 import logging
+import requests
 
 logger = logging.getLogger(__name__)
 
@@ -22,18 +23,19 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 if GEMINI_API_KEY and GEMINI_AVAILABLE:
     genai.configure(api_key=GEMINI_API_KEY)
 
-def generate_ai_analysis(prompt):
-    """
-    Generates AI analysis for a given prompt and returns a structured response.
 
-    Args:
-        prompt (str): The input prompt for the AI model.
+def parse_json_response(text_response):
+    text_response = text_response.strip()
+    if text_response.startswith("```json"):
+        text_response = text_response[7:].strip()
+    if text_response.startswith("```"):
+        text_response = text_response[3:].strip()
+    if text_response.endswith("```"):
+        text_response = text_response[:-3].strip()
+    return json.loads(text_response)
 
-    Returns:
-        tuple: A tuple containing:
-            - bool: True if the analysis was successful, False otherwise.
-            - dict: A dictionary containing the AI's response or an error message.
-    """
+
+def generate_gemini_analysis(prompt):
     if not GEMINI_AVAILABLE:
         msg = "The AI analysis feature is unavailable because the 'google-generativeai' package is not installed."
         if GEMINI_IMPORT_ERROR:
@@ -65,14 +67,7 @@ def generate_ai_analysis(prompt):
 
             response = model.generate_content(prompt, generation_config=generation_config)
             
-            text_response = response.text
-            # Clean up markdown if present (often happens with gemini-pro)
-            if text_response.strip().startswith("```json"):
-                text_response = text_response.strip()[7:].strip()
-            if text_response.strip().endswith("```"):
-                text_response = text_response.strip()[:-3].strip()
-
-            return True, json.loads(text_response)
+            return True, parse_json_response(response.text)
 
         except Exception as e:
             logger.warning(f"Model {model_name} failed: {e}")
@@ -105,14 +100,7 @@ def generate_ai_analysis(prompt):
 
                     response = model.generate_content(prompt, generation_config=generation_config)
                     
-                    text_response = response.text
-                    # Clean up markdown if present
-                    if text_response.strip().startswith("```json"):
-                        text_response = text_response.strip()[7:].strip()
-                    if text_response.strip().endswith("```"):
-                        text_response = text_response.strip()[:-3].strip()
-
-                    return True, json.loads(text_response)
+                    return True, parse_json_response(response.text)
                 except Exception as e:
                     logger.warning(f"Discovered model {name} failed: {e}")
                     errors.append(f"{name}: {e}")
@@ -124,3 +112,59 @@ def generate_ai_analysis(prompt):
     error_msg = " | ".join(errors)
     logger.error(f"All AI models failed. Errors: {error_msg}")
     return False, {"message": f"All models failed: {error_msg}"}
+
+
+def generate_openai_compatible_analysis(prompt):
+    api_key = os.getenv("OPENAI_API_KEY") or os.getenv("AI_API_KEY")
+    base_url = os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1").rstrip("/")
+    model = os.getenv("OPENAI_MODEL", os.getenv("AI_MODEL", "gpt-4o-mini"))
+
+    if not api_key:
+        return False, {"message": "No OpenAI-compatible API key configured."}
+
+    try:
+        response = requests.post(
+            f"{base_url}/chat/completions",
+            headers={
+                "Authorization": f"Bearer {api_key}",
+                "Content-Type": "application/json",
+            },
+            json={
+                "model": model,
+                "messages": [
+                    {
+                        "role": "system",
+                        "content": "Return only valid JSON that matches the requested schema.",
+                    },
+                    {"role": "user", "content": prompt},
+                ],
+                "response_format": {"type": "json_object"},
+            },
+            timeout=90,
+        )
+        response.raise_for_status()
+        payload = response.json()
+        content = payload["choices"][0]["message"]["content"]
+        return True, parse_json_response(content)
+    except Exception as exc:
+        logger.exception("OpenAI-compatible provider failed: %s", exc)
+        return False, {"message": f"OpenAI-compatible provider failed: {exc}"}
+
+
+def generate_ai_analysis(prompt):
+    """
+    Generates AI analysis using the configured provider.
+
+    AI_PROVIDER values:
+    - gemini: Google Gemini, default.
+    - openai: Any OpenAI-compatible chat completions endpoint.
+    - local: Alias for OpenAI-compatible local endpoints via OPENAI_BASE_URL.
+    """
+    provider = os.getenv("AI_PROVIDER", "gemini").strip().lower()
+
+    if provider == "gemini":
+        return generate_gemini_analysis(prompt)
+    if provider in ("openai", "openai_compatible", "local"):
+        return generate_openai_compatible_analysis(prompt)
+
+    return False, {"message": f"Unsupported AI_PROVIDER '{provider}'."}

@@ -53,12 +53,19 @@
                                 <div class="mt-4 grid gap-2 text-xs text-gray-500 sm:grid-cols-3">
                                     <span>Stack: <strong class="text-gray-700">{{ project.tech_stack }}</strong></span>
                                     <span>Scale: <strong class="text-gray-700">{{ project.scale }}</strong></span>
-                                    <span>Budget: <strong class="text-gray-700">${{ project.budget }}</strong></span>
+                                    <span>Budget: <strong class="text-gray-700">{% if project.budget %}${{ project.budget }}{% else %}AI estimated{% endif %}</strong></span>
                                 </div>
                                 <div class="mt-4 h-2 overflow-hidden rounded-full bg-gray-100">
                                     <div class="h-full rounded-full bg-blue-600" style="width: {{ project.completeness_percentage|floatformat:0 }}%"></div>
                                 </div>
                                 <p class="mt-2 text-xs text-gray-500">Profile completeness: {{ project.completeness_percentage|floatformat:0 }}%</p>
+                                {% if project.missing_critical %}
+                                <p class="mt-2 text-xs leading-5 text-amber-700">
+                                    Missing useful context:
+                                    {% for item in project.missing_critical|slice:":4" %}{{ item }}{% if not forloop.last %}, {% endif %}{% endfor %}
+                                    {% if project.missing_critical|length > 4 %}, and {{ project.missing_critical|length|add:"-4" }} more{% endif %}
+                                </p>
+                                {% endif %}
                             </div>
                             <div class="flex shrink-0 gap-2">
                                 <a href="{% url 'generate_analysis' project.id %}" class="btn-primary-modern px-3 py-2 text-sm">Analyze</a>

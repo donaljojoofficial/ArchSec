@@ -47,68 +47,68 @@ This roadmap reflects the new product direction: ArchSec is now an AI Modernizat
 
 ## Phase 2 - Legacy System Intake Model
 
-- [ ] Add intake fields for current backend, frontend, CMS/framework, database, hosting, and deployment method.
-- [ ] Add fields for runtime/framework age and version notes.
-- [ ] Add fields for current testing process, automation level, and coverage.
-- [ ] Add fields for security testing process: SAST, DAST, SCA, pentest, secrets, dependency scanning.
-- [ ] Add fields for monitoring, logging, alerting, backups, and incident response.
+- [x] Add intake fields for current backend, frontend, CMS/framework, database, hosting, and deployment method.
+- [x] Add fields for runtime/framework age and version notes.
+- [x] Add fields for current testing process, automation level, and coverage.
+- [x] Add fields for security testing process: SAST, DAST, SCA, pentest, secrets, dependency scanning.
+- [x] Add fields for monitoring, logging, alerting, backups, and incident response.
 - [x] Add first-pass fields for AI readiness: existing AI usage, candidate workflows, data availability, privacy constraints.
-- [ ] Add migration constraints: budget, timeline, downtime tolerance, team skill level, compliance needs.
-- [ ] Update dashboard completeness checks to use modernization-critical sections.
+- [x] Add migration constraints: budget, timeline, downtime tolerance, team skill level, compliance needs.
+- [x] Update dashboard completeness checks to use modernization-critical sections.
 
 ## Phase 3 - Issue-Based AI Output
 
-- [ ] Replace broad report schema with structured findings.
-- [ ] Each finding should include title, category, current issue, impact, recommendation, cost estimate, effort, requirements, migration steps, dependencies, risks, expected benefits, and priority.
-- [ ] Add top-level modernization score, AI-readiness score, technical-debt score, security-risk score, and migration-risk score.
-- [ ] Store structured findings in `ProjectAnalysis.raw_ai_response`.
+- [x] Replace broad report schema with structured findings.
+- [x] Each finding should include title, category, current issue, impact, recommendation, cost estimate, effort, requirements, migration steps, dependencies, risks, expected benefits, and priority.
+- [x] Add top-level modernization score, AI-readiness score, technical-debt score, security-risk score, and migration-risk score.
+- [x] Store structured findings in `ProjectAnalysis.raw_ai_response`.
 - [ ] Add normalized database models later if reporting/searching across findings becomes important.
-- [ ] Add AI response validation before saving.
-- [ ] Add graceful handling for incomplete or malformed AI responses.
+- [x] Add AI response validation before saving.
+- [x] Add graceful handling for incomplete or malformed AI responses.
 
 ## Phase 4 - Modernization Diagrams
 
-- [ ] Generate current-state architecture diagrams.
-- [ ] Generate proposed future-state architecture diagrams.
-- [ ] Generate deployment pipeline flow charts.
-- [ ] Generate security testing workflow diagrams.
-- [ ] Generate AI integration flow charts.
-- [ ] Generate phased migration roadmap diagrams.
-- [ ] Update PDF export so diagrams render reliably.
+- [x] Generate current-state architecture diagrams.
+- [x] Generate proposed future-state architecture diagrams.
+- [x] Generate deployment pipeline flow charts.
+- [x] Generate security testing workflow diagrams.
+- [x] Generate AI integration flow charts.
+- [x] Generate phased migration roadmap diagrams.
+- [x] Update PDF export so diagrams render reliably.
 
 ## Phase 5 - Cost And Migration Planning
 
-- [ ] Add cost ranges per recommendation.
-- [ ] Add monthly operating cost estimates.
-- [ ] Add required tools and subscription assumptions.
-- [ ] Add skill and staffing requirements.
-- [ ] Add phased rollout plans: quick wins, medium-term, long-term.
-- [ ] Add dependency ordering between recommendations.
-- [ ] Add version-to-version comparison for repeated assessments.
+- [x] Add cost ranges per recommendation.
+- [x] Add monthly operating cost estimates.
+- [x] Add required tools and subscription assumptions.
+- [x] Add skill and staffing requirements.
+- [x] Add phased rollout plans: quick wins, medium-term, long-term.
+- [x] Add dependency ordering between recommendations.
+- [x] Add version-to-version comparison for repeated assessments.
 
 ## Phase 6 - Reports And Exports
 
-- [ ] Update PDF report to match modernization assessment structure.
-- [ ] Add JSON export for structured findings.
-- [ ] Add client-ready proposal export.
-- [ ] Add executive summary organized by business impact.
-- [ ] Add roadmap summary organized by time and cost.
-- [ ] Add appendix for raw AI response and diagrams.
+- [x] Update PDF report to match modernization assessment structure.
+- [x] Add JSON export for structured findings.
+- [x] Add client-ready proposal export.
+- [x] Add executive summary organized by business impact.
+- [x] Add roadmap summary organized by time and cost.
+- [x] Add appendix for raw AI response and diagrams.
 
 ## Phase 7 - Reliability And Production Readiness
 
-- [ ] Add automated tests for forms, permissions, analysis views, exports, and AI parsing.
+- [x] Add automated tests for forms, permissions, analysis views, exports, and AI parsing.
 - [ ] Add mocked AI tests for predictable report generation.
-- [ ] Add PostgreSQL production database configuration.
-- [ ] Move sensitive settings fully into environment variables.
-- [ ] Add AI provider abstraction for Gemini, OpenAI-compatible APIs, and local models.
-- [ ] Add retry/backoff controls and clearer job failure states.
-- [ ] Add monitoring for Celery task failures and AI quota errors.
+- [x] Add PostgreSQL production database configuration.
+- [x] Move sensitive settings fully into environment variables.
+- [x] Add AI provider abstraction for Gemini, OpenAI-compatible APIs, and local models.
+- [x] Add retry/backoff controls and clearer job failure states.
+- [x] Add monitoring for Celery task failures and AI quota errors.
 
 ## Known Technical Issues
 
 - [ ] `ProjectAnalysis.sdls_recommendations` should eventually be renamed to `sdlc_recommendations`.
-- [ ] `core/tests.py` is effectively empty.
-- [ ] DRF is installed but no real API surface exists yet.
-- [ ] PDF Mermaid rendering through WeasyPrint may not execute JavaScript reliably.
-- [ ] `SECRET_KEY`, `ALLOWED_HOSTS`, and production database settings need hardening before deployment.
+- [x] `core/tests.py` is effectively empty.
+- [x] DRF is installed but no real API surface exists yet.
+- [x] PDF Mermaid rendering through WeasyPrint may not execute JavaScript reliably.
+- [x] `SECRET_KEY`, `ALLOWED_HOSTS`, and production database settings need hardening before deployment.
