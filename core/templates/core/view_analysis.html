@@ -39,23 +39,23 @@
         setTimeout(function () { location.reload(); }, 30000);
     </script>
     {% else %}
-    <section class="grid gap-4 md:grid-cols-4">
-        <div class="app-card p-5">
+    <section class="grid gap-4 border-y border-gray-200 py-4 md:grid-cols-4">
+        <div>
             <p class="text-sm font-semibold text-gray-500">Priority score</p>
             <p class="mt-2 text-4xl font-extrabold text-gray-950">{{ scorecards.modernization_score }}</p>
             <p class="mt-1 text-sm text-gray-600">{{ analysis.risk_category }}</p>
         </div>
-        <div class="app-card p-5">
+        <div>
             <p class="text-sm font-semibold text-gray-500">AI readiness</p>
             <p class="mt-2 text-4xl font-extrabold text-gray-950">{{ scorecards.ai_readiness_score|default_if_none:"-" }}</p>
             <p class="mt-1 text-sm text-gray-600">Adoption potential</p>
         </div>
-        <div class="app-card p-5">
+        <div>
             <p class="text-sm font-semibold text-gray-500">Technical debt</p>
             <p class="mt-2 text-4xl font-extrabold text-gray-950">{{ scorecards.technical_debt_score|default_if_none:"-" }}</p>
             <p class="mt-1 text-sm text-gray-600">Current friction</p>
         </div>
-        <div class="app-card p-5">
+        <div>
             <p class="text-sm font-semibold text-gray-500">Exports</p>
             <div class="mt-3 flex flex-wrap gap-2">
                 <a href="{% url 'export_analysis_md' analysis.id %}" class="btn-secondary-modern px-3 py-2 text-sm">MD</a>
@@ -66,40 +66,49 @@
         </div>
     </section>
 
-    <section class="app-card p-6">
+    <section class="border-b border-gray-200 pb-5">
         <h2 class="text-lg font-bold text-gray-950">Executive summary</h2>
         <p class="mt-3 whitespace-pre-wrap text-sm leading-7 text-gray-700">{{ analysis.executive_summary }}</p>
     </section>
 
     <section>
         <div class="mb-4">
-            <h2 class="text-lg font-bold text-gray-950">Issue-by-issue modernization plan</h2>
-            <p class="mt-1 text-sm text-gray-500">Each finding includes the issue, recommendation, costs, requirements, migration steps, risks, and benefits.</p>
+            <h2 class="text-lg font-bold text-gray-950">Existing issues and upgrade solutions</h2>
+            <p class="mt-1 text-sm text-gray-500">Each item ties a current-state problem to a specific modernization action.</p>
         </div>
         {% if findings %}
-        <div class="grid gap-4">
+        <div class="divide-y divide-gray-200 border-y border-gray-200">
             {% for finding in findings %}
-            <article class="app-card p-5">
+            <article class="py-7">
                 <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                     <div>
-                        <span class="rounded-full bg-blue-50 px-3 py-1 text-xs font-bold text-blue-700">{{ finding.category }}</span>
-                        <h3 class="mt-4 text-lg font-bold text-gray-950">{{ finding.title }}</h3>
+                        <p class="text-xs font-bold uppercase tracking-wide text-blue-700">{{ finding.category }} - {{ finding.priority }}</p>
+                        <h3 class="mt-2 text-xl font-extrabold text-gray-950">{{ forloop.counter }}. {{ finding.title }}</h3>
                     </div>
-                    <span class="w-fit rounded-full bg-gray-100 px-3 py-1 text-xs font-bold text-gray-700">{{ finding.priority }}</span>
                 </div>
 
-                <div class="mt-5 grid gap-4 lg:grid-cols-2">
-                    <div>
-                        <h4 class="text-sm font-bold text-gray-900">Current issue</h4>
-                        <p class="mt-2 whitespace-pre-wrap text-sm leading-6 text-gray-700">{{ finding.current_issue }}</p>
+                <div class="mt-5 grid gap-5 lg:grid-cols-2">
+                    <div class="border-l-2 border-gray-300 pl-4">
+                        <h4 class="text-sm font-extrabold text-gray-950">Existing system / issue</h4>
+                        <p class="mt-2 whitespace-pre-wrap text-sm leading-7 text-gray-700">{{ finding.current_issue }}</p>
                     </div>
-                    <div>
-                        <h4 class="text-sm font-bold text-gray-900">Why it matters</h4>
-                        <p class="mt-2 whitespace-pre-wrap text-sm leading-6 text-gray-700">{{ finding.why_it_matters }}</p>
+                    <div class="border-l-2 border-blue-600 pl-4">
+                        <h4 class="text-sm font-extrabold text-gray-950">Solution</h4>
+                        <p class="mt-2 whitespace-pre-wrap text-sm leading-7 text-gray-700">{{ finding.recommended_solution }}</p>
                     </div>
-                    <div class="lg:col-span-2">
-                        <h4 class="text-sm font-bold text-gray-900">Recommended solution</h4>
-                        <p class="mt-2 whitespace-pre-wrap text-sm leading-6 text-gray-700">{{ finding.recommended_solution }}</p>
+                </div>
+
+                <div class="mt-5 border-l-2 border-amber-500 pl-4">
+                    <h4 class="text-sm font-extrabold text-gray-950">Why it matters</h4>
+                    <p class="mt-2 whitespace-pre-wrap text-sm leading-7 text-gray-700">{{ finding.why_it_matters }}</p>
+                </div>
+
+                <div class="mt-6 grid gap-5 lg:grid-cols-4">
+                    <div>
+                        <h4 class="text-sm font-bold text-gray-900">Implementation steps</h4>
+                        <ol class="mt-2 list-decimal space-y-1 pl-5 text-sm leading-6 text-gray-700">
+                            {% for item in finding.migration_steps %}<li>{{ item }}</li>{% empty %}<li>Break this solution into discovery, implementation, validation, and rollout steps.</li>{% endfor %}
+                        </ol>
                     </div>
                     <div>
                         <h4 class="text-sm font-bold text-gray-900">Cost and effort</h4>
@@ -115,26 +124,12 @@
                             {% for item in finding.required_skills %}{{ item }}{% if not forloop.last %}, {% endif %}{% empty %}No skills specified{% endfor %}
                         </p>
                     </div>
-                </div>
-
-                <div class="mt-5 grid gap-4 lg:grid-cols-3">
                     <div>
-                        <h4 class="text-sm font-bold text-gray-900">Migration steps</h4>
-                        <ol class="mt-2 list-decimal space-y-1 pl-5 text-sm leading-6 text-gray-700">
-                            {% for item in finding.migration_steps %}<li>{{ item }}</li>{% empty %}<li>No steps provided</li>{% endfor %}
-                        </ol>
-                    </div>
-                    <div>
-                        <h4 class="text-sm font-bold text-gray-900">Risks and mitigations</h4>
+                        <h4 class="text-sm font-bold text-gray-900">Risks and benefits</h4>
                         <ul class="mt-2 list-disc space-y-1 pl-5 text-sm leading-6 text-gray-700">
-                            {% for item in finding.risks %}<li>{{ item }}</li>{% empty %}<li>No risks provided</li>{% endfor %}
-                            {% for item in finding.mitigations %}<li>{{ item }}</li>{% endfor %}
-                        </ul>
-                    </div>
-                    <div>
-                        <h4 class="text-sm font-bold text-gray-900">Expected benefits</h4>
-                        <ul class="mt-2 list-disc space-y-1 pl-5 text-sm leading-6 text-gray-700">
-                            {% for item in finding.expected_benefits %}<li>{{ item }}</li>{% empty %}<li>No benefits provided</li>{% endfor %}
+                            {% for item in finding.risks %}<li>Risk: {{ item }}</li>{% endfor %}
+                            {% for item in finding.mitigations %}<li>Mitigation: {{ item }}</li>{% endfor %}
+                            {% for item in finding.expected_benefits %}<li>Benefit: {{ item }}</li>{% empty %}<li>Benefit: Reduced operational risk and clearer modernization path.</li>{% endfor %}
                         </ul>
                     </div>
                 </div>

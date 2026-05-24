@@ -1,7 +1,9 @@
 import logging
 
 from celery.result import AsyncResult
+from celery.exceptions import CeleryError
 from django.contrib import messages
+from django.conf import settings
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import render_to_string
@@ -14,6 +16,14 @@ from core.services.analysis_formatting import get_findings, get_quick_wins, get_
 from core.tasks import generate_analysis_task
 
 logger = logging.getLogger(__name__)
+
+
+def run_analysis_without_broker(analysis):
+    result = generate_analysis_task.apply(args=(analysis.id,), throw=False)
+    if result.failed():
+        if isinstance(result.result, Exception):
+            raise result.result
+        raise RuntimeError(str(result.result))
 
 
 def build_assessment_comparison(analyses):
@@ -60,11 +70,31 @@ def generate_analysis(request, project_id):
             request,
             "Modernization assessment has been queued. You will be notified when it is complete.",
         )
-    except OperationalError as e:
+    except (OperationalError, CeleryError, OSError, ConnectionError) as e:
         logger.warning("Redis/Celery connection failed: %s", e)
+        if settings.DEBUG or getattr(settings, "ANALYSIS_SYNC_FALLBACK", False):
+            try:
+                run_analysis_without_broker(analysis)
+                messages.success(
+                    request,
+                    "Modernization assessment completed locally because the background queue is unavailable.",
+                )
+                return redirect("dashboard")
+            except Exception as fallback_error:
+                logger.exception("Local analysis fallback failed: %s", fallback_error)
+
         analysis.risk_category = "Error"
+        analysis.raw_ai_response = {
+            "message": "Assessment queue is unavailable. Start Redis/Celery or enable local analysis fallback."
+        }
         analysis.save()
         messages.error(request, "Assessment service is currently unavailable. Please try again later.")
+    except Exception as e:
+        logger.exception("Unexpected assessment queue failure: %s", e)
+        analysis.risk_category = "Error"
+        analysis.raw_ai_response = {"message": f"Assessment could not be queued: {e}"}
+        analysis.save()
+        messages.error(request, "Assessment could not be queued. Please try again later.")
 
     return redirect("dashboard")
 
@@ -109,8 +139,12 @@ def analysis_status(request, analysis_id):
     analysis = get_object_or_404(ProjectAnalysis, id=analysis_id)
     task_status = "UNKNOWN"
     if analysis.task_id:
-        task = AsyncResult(analysis.task_id)
-        task_status = task.status
+        try:
+            task = AsyncResult(analysis.task_id)
+            task_status = task.status
+        except (OperationalError, CeleryError, OSError, ConnectionError) as exc:
+            logger.warning("Unable to read Celery status for analysis %s: %s", analysis.id, exc)
+            task_status = "UNAVAILABLE"
 
     payload = {
         "task_status": task_status,

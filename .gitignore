@@ -78,3 +78,7 @@ htmlcov/
 .idea/
 *.swp
 *.swo
+ 
+ # other files
+ .commands.txt
+ .test_data.txt

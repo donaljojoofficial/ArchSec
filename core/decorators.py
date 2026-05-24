@@ -61,17 +61,13 @@ def project_owner_required(view_func):
         if project_id is None:
             return view_func(request, *args, **kwargs)
         
-        try:
-            project = get_object_or_404(Project, id=project_id)
-            if AuthorizationService.can_access_project(request.user, project):
-                return view_func(request, project_id, *args, **kwargs)
-            else:
-                messages.error(request, 'You do not have permission to access this project.')
-                logger.warning(f"Unauthorized project access attempt by user: {request.user.username} for project: {project_id}")
-                return redirect('dashboard')
-        except Exception as e:
-            logger.error(f"Error in project_owner_required decorator: {str(e)}")
-            return HttpResponseForbidden('Access Denied')
+        project = get_object_or_404(Project, id=project_id)
+        if AuthorizationService.can_access_project(request.user, project):
+            return view_func(request, project_id, *args, **kwargs)
+
+        messages.error(request, 'You do not have permission to access this project.')
+        logger.warning(f"Unauthorized project access attempt by user: {request.user.username} for project: {project_id}")
+        return redirect('dashboard')
     
     return wrapper
 
@@ -90,17 +86,13 @@ def analysis_owner_required(view_func):
         if analysis_id is None:
             return view_func(request, *args, **kwargs)
         
-        try:
-            analysis = get_object_or_404(ProjectAnalysis, id=analysis_id)
-            if AuthorizationService.can_access_analysis(request.user, analysis):
-                return view_func(request, analysis_id, *args, **kwargs)
-            else:
-                messages.error(request, 'You do not have permission to access this analysis.')
-                logger.warning(f"Unauthorized analysis access attempt by user: {request.user.username} for analysis: {analysis_id}")
-                return redirect('dashboard')
-        except Exception as e:
-            logger.error(f"Error in analysis_owner_required decorator: {str(e)}")
-            return HttpResponseForbidden('Access Denied')
+        analysis = get_object_or_404(ProjectAnalysis, id=analysis_id)
+        if AuthorizationService.can_access_analysis(request.user, analysis):
+            return view_func(request, analysis_id, *args, **kwargs)
+
+        messages.error(request, 'You do not have permission to access this analysis.')
+        logger.warning(f"Unauthorized analysis access attempt by user: {request.user.username} for analysis: {analysis_id}")
+        return redirect('dashboard')
     
     return wrapper
 

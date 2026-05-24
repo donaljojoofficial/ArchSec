@@ -7,14 +7,29 @@ def as_list(value):
 
 
 def get_raw_response(analysis):
-    return analysis.raw_ai_response if isinstance(analysis.raw_ai_response, dict) else {}
+    raw_response = analysis.raw_ai_response
+    if isinstance(raw_response, list):
+        for item in raw_response:
+            if isinstance(item, dict):
+                raw_response = item
+                break
+        else:
+            return {}
+    if not isinstance(raw_response, dict):
+        return {}
+
+    for key in ("assessment", "analysis", "modernization_assessment", "result", "data"):
+        nested = raw_response.get(key)
+        if isinstance(nested, dict):
+            return nested
+    return raw_response
 
 
 def get_findings(analysis):
     raw_response = get_raw_response(analysis)
     findings = raw_response.get("findings", [])
     if not isinstance(findings, list):
-        return []
+        findings = []
 
     normalized = []
     for finding in findings:
@@ -36,6 +51,36 @@ def get_findings(analysis):
             "mitigations": as_list(finding.get("mitigations")),
             "expected_benefits": as_list(finding.get("expected_benefits")),
             "priority": finding.get("priority") or "Medium",
+        })
+    if normalized:
+        return normalized
+
+    fallback_sections = [
+        ("Architecture", "Modern architecture proposal", analysis.architecture),
+        ("Security", "Security and technical debt risks", analysis.threat_model),
+        ("Process", "Development and DevOps improvements", analysis.sdls_recommendations),
+        ("Cost", "Cost and requirements", analysis.cost_estimation),
+        ("Testing", "Testing and security validation workflow", analysis.testing_plan),
+    ]
+    for category, title, text in fallback_sections:
+        if not text:
+            continue
+        normalized.append({
+            "title": title,
+            "category": category,
+            "current_issue": text,
+            "why_it_matters": "This area affects modernization risk, delivery confidence, and operational reliability.",
+            "recommended_solution": text,
+            "tools_services": [],
+            "cost_estimate": "",
+            "effort": "",
+            "required_skills": [],
+            "migration_steps": [],
+            "dependencies": [],
+            "risks": [],
+            "mitigations": [],
+            "expected_benefits": [],
+            "priority": "High" if category in ("Architecture", "Security") else "Medium",
         })
     return normalized
 
