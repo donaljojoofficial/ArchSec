@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
-from .models import Project, UserProfile, ProjectAnalysis, Notification
+from .models import Project, UserProfile, ProjectAnalysis, Notification, SystemProfileDraft
 
 
 # ========================
@@ -181,6 +181,16 @@ class NotificationAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Notification, NotificationAdmin)
+
+
+class SystemProfileDraftAdmin(admin.ModelAdmin):
+    list_display = ("id", "user", "source", "status", "original_filename", "created_at", "updated_at")
+    list_filter = ("source", "status", "created_at")
+    search_fields = ("user__username", "original_filename", "extracted_text")
+    readonly_fields = ("created_at", "updated_at")
+
+
+admin.site.register(SystemProfileDraft, SystemProfileDraftAdmin)
 
 
 # ========================

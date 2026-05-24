@@ -7,3 +7,5 @@ WeasyPrint
 celery
 redis
 psycopg[binary]
+python-docx
+pypdf

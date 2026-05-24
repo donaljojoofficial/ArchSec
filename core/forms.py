@@ -206,6 +206,46 @@ class PasswordChangeForm(forms.Form):
         return cleaned_data
 
 
+class DocumentIntakeForm(forms.Form):
+    document = forms.FileField(
+        label="Upload system document",
+        help_text="Supported: TXT, MD, DOCX, PDF. Keep files under 5 MB.",
+        widget=forms.ClearableFileInput(attrs={
+            "accept": ".txt,.md,.docx,.pdf",
+        }),
+    )
+
+    def clean_document(self):
+        document = self.cleaned_data.get("document")
+        if not document:
+            return document
+
+        allowed_extensions = {".txt", ".md", ".docx", ".pdf"}
+        extension = "." + document.name.rsplit(".", 1)[-1].lower() if "." in document.name else ""
+        if extension not in allowed_extensions:
+            raise ValidationError("Upload a TXT, MD, DOCX, or PDF file.")
+
+        max_size = 5 * 1024 * 1024
+        if document.size > max_size:
+            raise ValidationError("Keep uploaded documents under 5 MB.")
+
+        return document
+
+
+class ChatAnswerForm(forms.Form):
+    answer = forms.CharField(
+        label="Your answer",
+        widget=forms.Textarea(attrs={
+            "rows": 4,
+            "maxlength": SAFE_TEXT_LIMITS["manual"],
+            "placeholder": "Describe the current system as clearly as you can.",
+        }),
+    )
+
+    def clean_answer(self):
+        return clean_user_text(self.cleaned_data.get("answer"), SAFE_TEXT_LIMITS["manual"])
+
+
 # ========================
 # Project Forms (Existing)
 # ========================

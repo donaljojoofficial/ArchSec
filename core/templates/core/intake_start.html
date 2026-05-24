@@ -1,0 +1,31 @@
+{% extends "terminal_base.html" %}
+
+{% block content %}
+<div class="mx-auto max-w-5xl space-y-6">
+    <section class="app-card p-6 sm:p-8">
+        <p class="text-sm font-semibold text-blue-700">New assessment</p>
+        <h1 class="mt-2 text-3xl font-extrabold tracking-tight text-gray-950">Capture the current system faster.</h1>
+        <p class="mt-3 max-w-3xl text-sm leading-6 text-gray-600">
+            Start from a document, answer guided questions, or enter the system details manually. You can review and edit everything before saving.
+        </p>
+    </section>
+
+    <section class="grid gap-4 md:grid-cols-3">
+        <a href="{% url 'document_intake' %}" class="app-card p-5 transition hover:text-blue-700">
+            <h2 class="text-base font-bold text-gray-950">Upload document</h2>
+            <p class="mt-2 text-sm leading-6 text-gray-500">Import TXT, Markdown, DOCX, or PDF notes and let ArchSec draft the profile.</p>
+            <span class="btn-primary-modern mt-5 w-full">Upload</span>
+        </a>
+        <a href="{% url 'chat_intake' %}" class="app-card p-5 transition hover:text-blue-700">
+            <h2 class="text-base font-bold text-gray-950">Chat collector</h2>
+            <p class="mt-2 text-sm leading-6 text-gray-500">Answer one focused question at a time until the profile is ready to review.</p>
+            <span class="btn-primary-modern mt-5 w-full">Start chat</span>
+        </a>
+        <a href="{% url 'create_project' %}" class="app-card p-5 transition hover:text-blue-700">
+            <h2 class="text-base font-bold text-gray-950">Manual form</h2>
+            <p class="mt-2 text-sm leading-6 text-gray-500">Use the full structured form when you already know the system details.</p>
+            <span class="btn-secondary-modern mt-5 w-full">Open form</span>
+        </a>
+    </section>
+</div>
+{% endblock %}

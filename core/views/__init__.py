@@ -5,3 +5,4 @@ from .health_views import health_check
 from .celery_views import celery_dashboard
 from .diagram_views import view_diagrams
 from .public_views import landing_page, about_page, help_page
+from .intake_views import intake_start, document_intake, chat_intake, review_intake_draft

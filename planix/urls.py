@@ -2,9 +2,12 @@
 
 from django.contrib import admin
 from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
 from core.views import register_view, logout_view, profile_view, edit_profile_view, change_password_view, dashboard, celery_dashboard, health_check, view_diagrams, landing_page, about_page, help_page
 from core.views.project_views import create_project
+from core.views.intake_views import intake_start, document_intake, chat_intake, review_intake_draft
 from core.views.analysis_views import generate_analysis, view_analysis, history_analysis, download_analysis_pdf, analysis_status
 from core.views.export_views import export_analysis_json, export_analysis_md, export_analysis_proposal, export_analysis_txt
 from core.views.export_views import export_analysis_history_zip
@@ -28,6 +31,11 @@ urlpatterns = [
     path('profile/change-password/', change_password_view, name='change_password'),
 
     # Project actions
+    path("project/intake/", intake_start, name="intake_start"),
+    path("project/intake/document/", document_intake, name="document_intake"),
+    path("project/intake/chat/", chat_intake, name="chat_intake"),
+    path("project/intake/chat/<int:draft_id>/", chat_intake, name="chat_intake_draft"),
+    path("project/intake/<int:draft_id>/review/", review_intake_draft, name="review_intake_draft"),
     path("project/create/", create_project, name="create_project"),
     path("project/<int:project_id>/analysis/", generate_analysis, name="generate_analysis"),
     path("analysis/<int:analysis_id>/", view_analysis, name="view_analysis"),
@@ -62,3 +70,6 @@ urlpatterns = [
     path("dashboard/", dashboard, name="dashboard"),
     path("", landing_page, name="home"),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

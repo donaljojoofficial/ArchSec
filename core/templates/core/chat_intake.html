@@ -1,0 +1,51 @@
+{% extends "terminal_base.html" %}
+
+{% block content %}
+<div class="mx-auto max-w-4xl space-y-6">
+    <section class="app-card p-6 sm:p-8">
+        <p class="text-sm font-semibold text-blue-700">Chat collector</p>
+        <h1 class="mt-2 text-3xl font-extrabold tracking-tight text-gray-950">Build the system profile step by step.</h1>
+        <p class="mt-3 text-sm leading-6 text-gray-600">
+            Answer what you know. You can move to review as soon as there is enough context.
+        </p>
+    </section>
+
+    <section class="app-card p-6 sm:p-8">
+        <div class="space-y-4">
+            {% for item in draft.chat_history %}
+                <div class="grid gap-2">
+                    <div class="rounded-lg border border-gray-200 bg-gray-50 p-3 text-sm font-semibold text-gray-700">{{ item.question }}</div>
+                    <div class="ml-auto max-w-3xl rounded-lg bg-blue-600 p-3 text-sm text-white">{{ item.answer }}</div>
+                </div>
+            {% empty %}
+                <p class="text-sm text-gray-500">No answers yet.</p>
+            {% endfor %}
+        </div>
+
+        <div class="mt-6 border-t border-gray-200 pt-6">
+            {% if current_field %}
+                <p class="text-sm font-bold text-gray-950">{{ current_prompt }}</p>
+                <form method="POST" class="mt-3">
+                    {% csrf_token %}
+                    <style>
+                        label { display: none; }
+                        textarea { width: 100%; min-height: 110px; padding: 0.75rem 0.85rem; font-size: 0.95rem; }
+                        .errorlist { margin-bottom: 1rem; color: #dc2626; font-size: 0.875rem; }
+                    </style>
+                    {{ form.answer.errors }}
+                    {{ form.answer }}
+                    <div class="mt-4 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+                        {% if can_review %}
+                            <button type="submit" name="review" value="1" class="btn-secondary-modern">Review now</button>
+                        {% endif %}
+                        <button type="submit" class="btn-primary-modern">Save answer</button>
+                    </div>
+                </form>
+            {% else %}
+                <p class="text-sm font-semibold text-gray-700">The profile is ready for review.</p>
+                <a href="{% url 'review_intake_draft' draft.id %}" class="btn-primary-modern mt-4">Review profile</a>
+            {% endif %}
+        </div>
+    </section>
+</div>
+{% endblock %}

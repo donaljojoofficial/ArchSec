@@ -1,0 +1,85 @@
+{% extends 'terminal_base.html' %}
+
+{% block content %}
+<div class="mx-auto max-w-5xl space-y-6">
+    <div class="app-card p-6 sm:p-8">
+        <p class="text-sm font-semibold text-blue-700">Review imported profile</p>
+        <h1 class="mt-2 text-3xl font-extrabold tracking-tight text-gray-950">Confirm the system details before saving.</h1>
+        <p class="mt-3 max-w-3xl text-sm leading-6 text-gray-600">
+            ArchSec drafted this from {{ draft.get_source_display|lower }}. Edit anything that looks incomplete or incorrect.
+        </p>
+        {% if missing_fields %}
+            <p class="mt-4 text-sm leading-6 text-amber-700">Some useful details are still missing. You can save now or add more context below.</p>
+        {% endif %}
+    </div>
+
+    <form method="POST" class="app-card p-6 sm:p-8">
+        {% csrf_token %}
+        <style>
+            .form-group { margin-bottom: 1.25rem; }
+            label { display: block; margin-bottom: 0.45rem; color: #374151; font-size: 0.875rem; font-weight: 700; }
+            input[type="text"], input[type="number"], select, textarea {
+                width: 100%;
+                padding: 0.75rem 0.85rem;
+                font-size: 0.95rem;
+            }
+            textarea { min-height: 120px; }
+            ul { display: grid; gap: 0.45rem; }
+            li label { display: flex; align-items: center; gap: 0.55rem; font-weight: 500; color: #4b5563; }
+            input[type="checkbox"] { height: 1rem; width: 1rem; accent-color: #2563eb; }
+            .errorlist { margin-bottom: 0.5rem; color: #dc2626; font-size: 0.875rem; }
+        </style>
+
+        {{ form.non_field_errors }}
+        <section>
+            <h2 class="text-lg font-bold text-gray-950">System basics</h2>
+            <div class="mt-5 grid gap-4 md:grid-cols-2">
+                <div class="form-group md:col-span-2">{{ form.name.errors }}{{ form.name.label_tag }}{{ form.name }}</div>
+                <div class="form-group md:col-span-2">{{ form.description.errors }}{{ form.description.label_tag }}{{ form.description }}</div>
+                <div class="form-group">{{ form.platform.errors }}{{ form.platform.label_tag }}{{ form.platform }}</div>
+                <div class="form-group">{{ form.tech_stack.errors }}{{ form.tech_stack.label_tag }}{{ form.tech_stack }}</div>
+                <div class="form-group">{{ form.scale.errors }}{{ form.scale.label_tag }}{{ form.scale }}</div>
+                <div class="form-group">{{ form.budget.errors }}{{ form.budget.label_tag }}{{ form.budget }}</div>
+                <div class="form-group">{{ form.risk_level.errors }}{{ form.risk_level.label_tag }}{{ form.risk_level }}</div>
+            </div>
+        </section>
+
+        <section class="mt-8 border-t border-gray-200 pt-8" x-data="{ activeSection: 'current_backend' }">
+            <h2 class="text-lg font-bold text-gray-950">Modernization details</h2>
+            <div class="mt-5 grid gap-3">
+                {% for field in form %}
+                    {% if '_manual' not in field.name and field.name not in 'name,description,platform,tech_stack,scale,budget,risk_level' %}
+                    <div class="rounded-lg border border-gray-200 bg-white">
+                        <button type="button"
+                                @click="activeSection === '{{ field.name }}' ? activeSection = null : activeSection = '{{ field.name }}'"
+                                class="flex w-full items-center justify-between px-4 py-3 text-left">
+                            <span class="font-semibold text-gray-800">{{ field.label }}</span>
+                            <span class="text-sm font-bold text-blue-700" x-text="activeSection === '{{ field.name }}' ? 'Close' : 'Edit details'"></span>
+                        </button>
+                        <div x-show="activeSection === '{{ field.name }}'" x-collapse class="border-t border-gray-100 px-4 py-4">
+                            <div class="form-group">{{ field.errors }}{{ field }}</div>
+                            {% for manual_field in form %}
+                                {% with manual_name=field.name|add:"_manual" %}
+                                    {% if manual_field.name == manual_name %}
+                                    <div class="form-group">
+                                        {{ manual_field.errors }}
+                                        <label>Notes</label>
+                                        {{ manual_field }}
+                                    </div>
+                                    {% endif %}
+                                {% endwith %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </section>
+
+        <div class="mt-8 flex flex-col-reverse gap-3 border-t border-gray-200 pt-6 sm:flex-row sm:justify-end">
+            <a href="{% url 'intake_start' %}" class="btn-secondary-modern">Cancel</a>
+            <button type="submit" class="btn-primary-modern">Save system profile</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

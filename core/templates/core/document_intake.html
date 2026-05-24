@@ -1,0 +1,33 @@
+{% extends "terminal_base.html" %}
+
+{% block content %}
+<div class="mx-auto max-w-3xl space-y-6">
+    <section class="app-card p-6 sm:p-8">
+        <p class="text-sm font-semibold text-blue-700">Document intake</p>
+        <h1 class="mt-2 text-3xl font-extrabold tracking-tight text-gray-950">Upload an existing system document.</h1>
+        <p class="mt-3 text-sm leading-6 text-gray-600">
+            Architecture notes, migration briefs, README files, and support handover documents work well. You will review the extracted profile before saving.
+        </p>
+    </section>
+
+    <form method="POST" enctype="multipart/form-data" class="app-card p-6 sm:p-8">
+        {% csrf_token %}
+        <style>
+            label { display: block; margin-bottom: 0.45rem; color: #374151; font-size: 0.875rem; font-weight: 700; }
+            input[type="file"] { width: 100%; padding: 0.75rem; }
+            .errorlist { margin-bottom: 1rem; color: #dc2626; font-size: 0.875rem; }
+        </style>
+        {{ form.non_field_errors }}
+        <div>
+            {{ form.document.errors }}
+            {{ form.document.label_tag }}
+            {{ form.document }}
+            {% if form.document.help_text %}<p class="mt-2 text-xs text-gray-500">{{ form.document.help_text }}</p>{% endif %}
+        </div>
+        <div class="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+            <a href="{% url 'intake_start' %}" class="btn-secondary-modern">Back</a>
+            <button type="submit" class="btn-primary-modern">Extract profile</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

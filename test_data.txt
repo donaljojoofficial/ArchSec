@@ -1,0 +1,257 @@
+Dummy Company Test Data For ArchSec
+===================================
+
+Company / System Name
+---------------------
+Northwind HomeCare Portal
+
+Company Background
+------------------
+Northwind HomeCare is a mid-sized healthcare services company with 180 employees across three regional offices. The company manages home-care appointments, caregiver scheduling, patient intake forms, invoices, and partner referrals through an old internal web portal.
+
+The portal was built years ago by a small contractor team. It still works for daily operations, but releases are slow, outages are difficult to diagnose, and leadership wants to modernize the platform while exploring safe AI-assisted workflows.
+
+System Description
+------------------
+Legacy web portal used by operations staff, caregivers, billing coordinators, and external referral partners. The system handles patient profile lookup, appointment scheduling, document uploads, invoice status, caregiver assignment, and basic reporting.
+
+The portal is business-critical during working hours. Staff currently use spreadsheets and email to work around missing features.
+
+Platform
+--------
+Web Application
+
+Current Tech Stack
+------------------
+PHP 7.2, Laravel 5.8, MySQL 5.7, jQuery, Bootstrap 3, Apache, Ubuntu 18.04, Redis 4, cron jobs, shared file storage.
+
+Scale
+-----
+Medium. Around 250 internal users, 40 external partner users, 20,000 patient records, 75,000 appointment records, and 1,500-2,000 daily portal actions.
+
+Known Modernization Budget
+--------------------------
+Leave blank to let AI estimate.
+
+Known Business Risk
+-------------------
+Leave blank to let AI infer risk.
+
+Requirements
+------------
+- Appointment scheduling and rescheduling.
+- Patient intake and document upload.
+- Caregiver assignment workflow.
+- Partner referral submissions.
+- Billing status lookup.
+- Operational reporting.
+- Audit history for sensitive actions.
+
+Users
+-----
+- Internal operations staff.
+- Caregiver coordinators.
+- Billing staff.
+- Regional managers.
+- External referral partners.
+- System administrators.
+
+Architecture
+------------
+- Monolithic Laravel application.
+- Server-rendered pages with jQuery.
+- Background jobs handled through cron scripts.
+- File uploads stored on a mounted server directory.
+- No clean separation between business logic, database access, and presentation logic.
+
+Current Backend
+---------------
+Select:
+- Legacy PHP application
+
+Notes:
+Laravel 5.8 running on PHP 7.2. Several composer packages are pinned to old versions. Some custom modules are poorly documented and were written by a contractor who no longer supports the company.
+
+Current Frontend
+----------------
+Select:
+- jQuery or imperative JavaScript
+- Server-rendered templates
+
+Notes:
+Blade templates, Bootstrap 3, jQuery plugins, duplicated form validation logic, and several pages that are difficult to use on mobile devices.
+
+CMS / Framework
+---------------
+Select:
+- Custom framework
+
+Notes:
+Laravel-based custom portal. No CMS. Some admin screens were built quickly and are inconsistent.
+
+Runtime / Framework Age
+-----------------------
+Select:
+- End-of-life runtime or framework
+- Unsupported operating system
+
+Notes:
+PHP 7.2 and Ubuntu 18.04 are no longer acceptable for production use. Laravel version is old enough that upgrades will likely require staged refactoring.
+
+Database
+--------
+Select:
+- SQL (PostgreSQL, MySQL)
+
+Notes:
+MySQL 5.7. Large tables have limited indexing. No read replicas. Some tables mix operational data with audit notes in JSON/text columns.
+
+Hosting Environment
+-------------------
+Select:
+- VPS / manually managed VM
+
+Notes:
+Single cloud VM managed manually. Apache and MySQL run on the same server. No infrastructure as code.
+
+Deployment
+----------
+Select:
+- Manual Deployment
+
+Notes:
+Deployments happen by SSH and manual git pull. Database migrations are run manually. Rollback means restoring a VM snapshot or reverting code by hand.
+
+Testing Process
+---------------
+Select:
+- Manual QA only
+- Ad hoc developer testing
+
+Notes:
+No reliable automated test suite. QA uses a spreadsheet checklist before major releases. Bugs are often discovered after deployment.
+
+Security Testing Process
+------------------------
+Select:
+- No formal security testing
+
+Notes:
+No SAST, DAST, dependency scanning, container scanning, or secrets scanning. Occasional manual review before major releases. No recent penetration test.
+
+Security Measures
+-----------------
+Select:
+- Authentication
+- Authorization
+
+Notes:
+Username/password login with basic role checks. No SSO. MFA is not available. Some admin routes have inconsistent authorization checks.
+
+Monitoring
+----------
+Select:
+- Centralized Logging
+
+Notes:
+Basic application logs exist on the server, but there is no structured logging, metrics dashboard, uptime alerting, or error tracking.
+
+Observability And Operations
+----------------------------
+Select:
+- Basic application/server logs
+
+Notes:
+Support staff usually learn about problems from user complaints. There are no service-level dashboards or alerting thresholds.
+
+Backups And Incident Response
+-----------------------------
+Select:
+- Manual backups
+
+Notes:
+Nightly database dump exists, but restore testing is rare. No documented incident response runbook. File uploads are backed up inconsistently.
+
+Compliance
+----------
+Select:
+- HIPAA
+- SOC 2
+
+Notes:
+The company handles sensitive patient-related information and needs stronger auditability, access controls, backup discipline, and vendor review.
+
+Privacy
+-------
+Select:
+- PII Data Handling & Masking
+
+Notes:
+Patient records include names, phone numbers, addresses, care notes, uploaded documents, and insurance-related information. AI features must avoid exposing sensitive data to public models without controls.
+
+Scalability
+-----------
+Select:
+- Vertical Scaling
+
+Notes:
+The current answer to performance issues is increasing VM size. Reporting pages slow down during end-of-month billing.
+
+Infrastructure
+--------------
+Select:
+- Cloud VM
+
+Notes:
+No staging parity. Production has manual configuration not fully documented elsewhere.
+
+Legacy Constraints
+------------------
+Select:
+- Old runtime or framework version
+- Manual or FTP-based deployments
+- Limited technical documentation
+- Large monolithic codebase
+- Unsupported or unpatched dependencies
+- Development/staging/production are inconsistent
+
+Notes:
+The business cannot pause operations for a big rewrite. Migration must happen gradually and avoid extended downtime.
+
+AI Readiness
+------------
+Select:
+- No current AI integration
+- Customer support assistant opportunity
+- Internal knowledge/search assistant opportunity
+- AI-assisted reporting or analytics opportunity
+- Workflow automation opportunity
+- Sensitive data or privacy constraints
+
+Notes:
+Potential AI workflows include summarizing support tickets, helping staff search policy documents, drafting appointment follow-up messages, identifying scheduling conflicts, and generating operational reports. Sensitive patient data must be redacted or kept in a controlled environment.
+
+Migration Constraints
+---------------------
+Select:
+- Limited budget
+- Low downtime tolerance
+- Small team
+- Limited modern stack experience
+- Compliance requirements
+- Data migration complexity
+
+Notes:
+The internal engineering team has two developers and one IT administrator. Leadership prefers a phased 6-9 month modernization plan. Downtime should be under 2 hours per release window.
+
+Expected AI Recommendations To Look For
+---------------------------------------
+- Upgrade PHP/Laravel through a staged path or isolate modules before replacement.
+- Move deployments to CI/CD with automated test and security gates.
+- Add dependency scanning, secrets scanning, SAST, and DAST.
+- Introduce staging parity and infrastructure as code.
+- Improve backup, restore testing, and incident response.
+- Add centralized logs, metrics, alerting, and error tracking.
+- Create a phased migration roadmap instead of a big rewrite.
+- Estimate cost ranges and monthly operating cost.
+- Recommend safe AI workflows with privacy controls.
