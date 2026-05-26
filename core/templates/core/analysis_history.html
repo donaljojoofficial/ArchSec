@@ -1,5 +1,14 @@
 {% extends 'terminal_base.html' %}
 
+{% block page_skeleton %}
+<div class="skeleton-shell">
+    <div class="skeleton-card"><div class="skeleton-card-inner p-6 sm:p-8"><div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between"><div><div class="skeleton-pill w-40"></div><div class="skeleton-line mt-2 h-10 w-64"></div><div class="skeleton-line mt-2 w-full max-w-xl"></div></div><div class="skeleton-actions"><div class="skeleton-line h-11 w-32"></div><div class="skeleton-line h-11 w-20"></div></div></div></div></div>
+    <div class="skeleton-grid mt-6 md:grid-cols-3"><div class="skeleton-card is-compact"></div><div class="skeleton-card is-compact"></div><div class="skeleton-card is-compact"></div></div>
+    <div class="skeleton-card mt-6"><div class="skeleton-card-inner"><div class="skeleton-line h-28 w-full"></div></div></div>
+    <div class="skeleton-card mt-6"><div class="skeleton-card-inner"><div class="skeleton-line h-7 w-48"></div><div class="skeleton-list"><div class="skeleton-row"><div><div class="skeleton-line w-40"></div><div class="skeleton-line mt-2 w-64"></div></div><div class="skeleton-line h-10 w-28"></div></div><div class="skeleton-row"><div><div class="skeleton-line w-40"></div><div class="skeleton-line mt-2 w-56"></div></div><div class="skeleton-line h-10 w-28"></div></div></div></div></div>
+</div>
+{% endblock %}
+
 {% block content %}
 <div class="space-y-6">
     <section class="app-card p-6 sm:p-8">
@@ -10,8 +19,8 @@
                 <p class="mt-2 text-sm text-gray-500">Track modernization priority changes as the system profile evolves.</p>
             </div>
             <div class="flex gap-2">
-                <a href="{% url 'export_analysis_history_zip' project.id %}" class="btn-primary-modern">Download ZIP</a>
-                <a href="{% url 'dashboard' %}" class="btn-secondary-modern">Back</a>
+                <a href="{% url 'export_analysis_history_zip' project.id %}" class="btn-primary-modern" data-tooltip="Download all assessment reports for this system">Download ZIP</a>
+                <a href="{% url 'dashboard' %}" class="btn-secondary-modern" data-tooltip="Return to the dashboard">Back</a>
             </div>
         </div>
     </section>
@@ -77,7 +86,7 @@
                         <p class="text-sm font-bold text-gray-950">{{ analysis.created_at|date:"Y-m-d H:i" }}</p>
                         <p class="mt-1 text-sm text-gray-500">Priority score {{ analysis.security_score }} · {{ analysis.risk_category }}</p>
                     </div>
-                    <a href="{% url 'view_analysis' analysis.id %}" class="btn-secondary-modern px-3 py-2 text-sm">View report</a>
+                    <a href="{% url 'view_analysis' analysis.id %}" class="btn-secondary-modern px-3 py-2 text-sm" data-tooltip="Open this assessment report">View report</a>
                 </div>
                 {% endfor %}
             </div>

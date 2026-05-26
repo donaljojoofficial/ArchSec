@@ -1,6 +1,8 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
+from django.core.cache import cache
 from core.models import Project
+from core.cache_utils import USER_DATA_TIMEOUT, user_dashboard_key
 
 MODERNIZATION_SECTIONS = [
     'current_backend',
@@ -50,23 +52,38 @@ SECTION_LABELS = {
 
 @login_required
 def dashboard(request):
-    projects = Project.objects.filter(user=request.user).order_by('-created_at')
+    cache_key = user_dashboard_key(request.user.id)
+    projects = cache.get(cache_key)
+    if projects is None:
+        projects = []
+        queryset = Project.objects.filter(user=request.user).order_by('-created_at')
+        for project in queryset:
+            structured_data = project.structured_data or {}
+            filled_sections = [
+                section for section in MODERNIZATION_SECTIONS
+                if structured_data.get(section)
+            ]
+            completeness_percentage = (
+                len(filled_sections) / len(MODERNIZATION_SECTIONS)
+            ) * 100
 
-    for project in projects:
-        structured_data = project.structured_data or {}
-        filled_sections = [
-            section for section in MODERNIZATION_SECTIONS
-            if structured_data.get(section)
-        ]
-        project.completeness_percentage = (
-            len(filled_sections) / len(MODERNIZATION_SECTIONS)
-        ) * 100
-
-        missing = [
-            SECTION_LABELS[section]
-            for section in CRITICAL_MODERNIZATION_SECTIONS
-            if section not in structured_data
-        ]
-        project.missing_critical = missing
+            missing = [
+                SECTION_LABELS[section]
+                for section in CRITICAL_MODERNIZATION_SECTIONS
+                if section not in structured_data
+            ]
+            projects.append({
+                "id": project.id,
+                "name": project.name,
+                "description": project.description,
+                "platform_display": project.get_platform_display(),
+                "tech_stack": project.tech_stack,
+                "scale": project.scale,
+                "budget": project.budget,
+                "created_at": project.created_at,
+                "completeness_percentage": completeness_percentage,
+                "missing_critical": missing,
+            })
+        cache.set(cache_key, projects, USER_DATA_TIMEOUT)
 
     return render(request, "core/dashboard.html", {"projects": projects})

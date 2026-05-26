@@ -143,6 +143,14 @@ STATIC_URL = "static/"
 MEDIA_URL = "media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": os.getenv("CACHE_LOCATION", "archsec-local-cache"),
+        "TIMEOUT": int(os.getenv("CACHE_TIMEOUT", "300")),
+    }
+}
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 

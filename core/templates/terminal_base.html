@@ -39,6 +39,7 @@
             const savedTheme = localStorage.getItem("archsec-theme");
             const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
             document.documentElement.dataset.theme = savedTheme || (prefersDark ? "dark" : "light");
+            document.documentElement.classList.add("js", "is-loading");
         })();
     </script>
     <style>
@@ -155,13 +156,283 @@
             font-weight: 800;
             font-size: 0.78rem;
         }
+        [data-tooltip] {
+            position: relative;
+        }
+        [data-tooltip]::before,
+        [data-tooltip]::after {
+            position: absolute;
+            left: 50%;
+            bottom: calc(100% + 0.55rem);
+            z-index: 80;
+            pointer-events: none;
+            opacity: 0;
+            transform: translate(-50%, 0.25rem);
+            transition: opacity 0.16s ease, transform 0.16s ease;
+        }
+        [data-tooltip]::before {
+            content: attr(data-tooltip);
+            width: max-content;
+            max-width: min(18rem, calc(100vw - 2rem));
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: color-mix(in srgb, var(--text) 92%, #000 8%);
+            color: var(--panel);
+            padding: 0.45rem 0.6rem;
+            text-align: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            line-height: 1.25;
+            box-shadow: var(--shadow);
+            white-space: normal;
+        }
+        [data-tooltip]::after {
+            content: "";
+            bottom: calc(100% + 0.2rem);
+            border: 0.35rem solid transparent;
+            border-top-color: color-mix(in srgb, var(--text) 92%, #000 8%);
+        }
+        [data-tooltip]:hover::before,
+        [data-tooltip]:hover::after,
+        [data-tooltip]:focus-visible::before,
+        [data-tooltip]:focus-visible::after {
+            opacity: 1;
+            transform: translate(-50%, 0);
+        }
+        [data-tooltip][data-tooltip-position="bottom"]::before {
+            top: calc(100% + 0.55rem);
+            bottom: auto;
+        }
+        [data-tooltip][data-tooltip-position="bottom"]::after {
+            top: calc(100% + 0.2rem);
+            bottom: auto;
+            border-top-color: transparent;
+            border-bottom-color: color-mix(in srgb, var(--text) 92%, #000 8%);
+        }
+        [data-tooltip][data-tooltip-position="left"]::before {
+            left: auto;
+            right: calc(100% + 0.55rem);
+            bottom: 50%;
+            transform: translate(0.25rem, 50%);
+        }
+        [data-tooltip][data-tooltip-position="left"]::after {
+            left: auto;
+            right: calc(100% + 0.2rem);
+            bottom: 50%;
+            transform: translate(0.25rem, 50%);
+            border-top-color: transparent;
+            border-left-color: color-mix(in srgb, var(--text) 92%, #000 8%);
+        }
+        [data-tooltip][data-tooltip-position="left"]:hover::before,
+        [data-tooltip][data-tooltip-position="left"]:hover::after,
+        [data-tooltip][data-tooltip-position="left"]:focus-visible::before,
+        [data-tooltip][data-tooltip-position="left"]:focus-visible::after {
+            transform: translate(0, 50%);
+        }
+        .page-skeleton {
+            display: none;
+            position: fixed;
+            inset: 4rem 0 0;
+            z-index: 40;
+            overflow: hidden;
+            background: var(--bg);
+            color: transparent;
+            pointer-events: none;
+        }
+        html.js.is-loading .page-skeleton,
+        html.js.is-navigating .page-skeleton {
+            display: block;
+        }
+        html.js.is-loading main,
+        html.js.is-navigating main {
+            opacity: 0;
+        }
+        html.js [data-tooltip]::before,
+        html.js [data-tooltip]::after {
+            display: none;
+        }
+        .tooltip-popover {
+            position: fixed;
+            z-index: 100;
+            max-width: min(18rem, calc(100vw - 2rem));
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: color-mix(in srgb, var(--text) 92%, #000 8%);
+            color: var(--panel);
+            padding: 0.45rem 0.6rem;
+            text-align: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            line-height: 1.25;
+            box-shadow: var(--shadow);
+            pointer-events: none;
+            opacity: 0;
+            transform: translateY(0.25rem);
+            transition: opacity 0.16s ease, transform 0.16s ease;
+        }
+        .tooltip-popover.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .skeleton-shell {
+            width: min(100%, 80rem);
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+        .skeleton-grid {
+            display: grid;
+            gap: 1rem;
+        }
+        .skeleton-line,
+        .skeleton-block,
+        .skeleton-card,
+        .skeleton-pill {
+            position: relative;
+            overflow: hidden;
+            border-radius: 8px;
+            background: color-mix(in srgb, var(--border) 68%, var(--panel) 32%);
+        }
+        .skeleton-line::after,
+        .skeleton-block::after,
+        .skeleton-card::after,
+        .skeleton-pill::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            transform: translateX(-100%);
+            background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--panel) 72%, transparent), transparent);
+            animation: skeleton-shimmer 1.25s ease-in-out infinite;
+        }
+        .skeleton-pill {
+            min-height: 0.9rem;
+            border-radius: 999px;
+        }
+        .skeleton-line {
+            min-height: 1rem;
+        }
+        .skeleton-block {
+            height: 8rem;
+        }
+        .skeleton-card {
+            min-height: 9rem;
+            border: 1px solid var(--border);
+            background: var(--panel);
+        }
+        .skeleton-card.is-compact {
+            min-height: 5rem;
+        }
+        .skeleton-image {
+            min-height: 18rem;
+            border-radius: 8px;
+        }
+        .skeleton-hero {
+            min-height: calc(100vh - 4rem);
+            display: flex;
+            align-items: center;
+        }
+        .skeleton-hero-media {
+            position: absolute;
+            inset: 0;
+            background: color-mix(in srgb, var(--text) 32%, var(--bg) 68%);
+        }
+        .skeleton-form-grid {
+            display: grid;
+            gap: 1rem;
+        }
+        .skeleton-field {
+            display: grid;
+            gap: 0.55rem;
+        }
+        .skeleton-field .skeleton-line:nth-child(2) {
+            height: 2.75rem;
+        }
+        .skeleton-textarea .skeleton-line:nth-child(2) {
+            height: 7rem;
+        }
+        .skeleton-list {
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+        .skeleton-row {
+            display: grid;
+            gap: 0.75rem;
+            padding: 1.25rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .skeleton-row:last-child {
+            border-bottom: 0;
+        }
+        .skeleton-table-row {
+            display: grid;
+            grid-template-columns: 1.2fr 0.7fr 1fr;
+            gap: 1rem;
+            padding: 0.95rem 1.25rem;
+            border-bottom: 1px solid var(--border);
+        }
+        .skeleton-diagram {
+            min-height: 18rem;
+            border: 1px solid var(--border);
+            background: var(--panel-soft);
+        }
+        .skeleton-chat-bubble {
+            min-height: 3.2rem;
+            width: min(100%, 34rem);
+        }
+        .skeleton-chat-bubble.is-answer {
+            justify-self: end;
+            width: min(84%, 30rem);
+            background: color-mix(in srgb, var(--accent) 24%, var(--panel) 76%);
+        }
+        .skeleton-card-inner {
+            display: grid;
+            gap: 0.85rem;
+            padding: 1.25rem;
+        }
+        .skeleton-page-title {
+            height: clamp(2.25rem, 5vw, 4rem);
+            width: min(38rem, 92%);
+        }
+        .skeleton-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+        @keyframes skeleton-shimmer {
+            100% { transform: translateX(100%); }
+        }
+        @media (min-width: 768px) {
+            .skeleton-shell {
+                padding: 2rem 1.5rem;
+            }
+            .skeleton-grid {
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+            }
+            .skeleton-content-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+            .skeleton-form-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+            .skeleton-row {
+                grid-template-columns: 1fr auto;
+                align-items: start;
+            }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .skeleton-line::after,
+            .skeleton-block::after,
+            .skeleton-card::after,
+            .skeleton-pill::after {
+                animation: none;
+            }
+        }
     </style>
     {% block extra_head %}{% endblock %}
 </head>
 <body>
     <header class="sticky top-0 z-50 border-b theme-surface backdrop-blur">
         <div class="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-            <a href="{% url 'home' %}" class="flex items-center gap-3">
+            <a href="{% url 'home' %}" class="flex items-center gap-3" data-tooltip="Go to the ArchSec home page" data-tooltip-position="bottom">
                 <span class="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-600 text-sm font-extrabold text-white">A</span>
                 <span>
                     <span class="block text-sm font-bold theme-text">ArchSec</span>
@@ -170,23 +441,23 @@
             </a>
             <nav class="flex items-center gap-2 text-sm">
                 {% if user.is_authenticated %}
-                    <a href="{% url 'dashboard' %}" class="hidden rounded-lg px-3 py-2 font-semibold theme-muted hover:bg-gray-100 sm:inline-flex">Dashboard</a>
-                    <a href="{% url 'intake_start' %}" class="hidden rounded-lg px-3 py-2 font-semibold theme-muted hover:bg-gray-100 sm:inline-flex">New assessment</a>
+                    <a href="{% url 'dashboard' %}" class="hidden rounded-lg px-3 py-2 font-semibold theme-muted hover:bg-gray-100 sm:inline-flex" data-tooltip="View saved systems and assessment activity" data-tooltip-position="bottom">Dashboard</a>
+                    <a href="{% url 'intake_start' %}" class="hidden rounded-lg px-3 py-2 font-semibold theme-muted hover:bg-gray-100 sm:inline-flex" data-tooltip="Create a new modernization assessment" data-tooltip-position="bottom">New assessment</a>
                     {% if user.is_staff or user.is_superuser %}
-                        <a href="{% url 'admin:index' %}" class="hidden rounded-lg px-3 py-2 font-semibold theme-muted hover:bg-gray-100 sm:inline-flex">Admin</a>
+                        <a href="{% url 'admin:index' %}" class="hidden rounded-lg px-3 py-2 font-semibold theme-muted hover:bg-gray-100 sm:inline-flex" data-tooltip="Open Django administration" data-tooltip-position="bottom">Admin</a>
                     {% endif %}
-                    <a href="{% url 'profile' %}" class="hidden rounded-lg px-3 py-2 font-semibold theme-muted hover:bg-gray-100 md:inline-flex">{{ user.username }}</a>
+                    <a href="{% url 'profile' %}" class="hidden rounded-lg px-3 py-2 font-semibold theme-muted hover:bg-gray-100 md:inline-flex" data-tooltip="Manage your account profile" data-tooltip-position="bottom">{{ user.username }}</a>
                     <form method="post" action="{% url 'logout' %}">
                         {% csrf_token %}
-                        <button type="submit" class="btn-secondary-modern px-3 py-2">Logout</button>
+                        <button type="submit" class="btn-secondary-modern px-3 py-2" data-tooltip="Sign out of this session" data-tooltip-position="bottom">Logout</button>
                     </form>
                 {% else %}
-                    <a href="{% url 'about' %}" class="rounded-lg px-3 py-2 font-semibold theme-muted hover:bg-gray-100">About</a>
-                    <a href="{% url 'help' %}" class="rounded-lg px-3 py-2 font-semibold theme-muted hover:bg-gray-100">Help</a>
-                    <a href="{% url 'login' %}" class="btn-secondary-modern hidden px-3 py-2 sm:inline-flex">Login</a>
-                    <a href="{% url 'register' %}" class="btn-primary-modern px-3 py-2">Register</a>
+                    <a href="{% url 'about' %}" class="rounded-lg px-3 py-2 font-semibold theme-muted hover:bg-gray-100" data-tooltip="Learn what ArchSec evaluates" data-tooltip-position="bottom">About</a>
+                    <a href="{% url 'help' %}" class="rounded-lg px-3 py-2 font-semibold theme-muted hover:bg-gray-100" data-tooltip="Get assessment guidance" data-tooltip-position="bottom">Help</a>
+                    <a href="{% url 'login' %}" class="btn-secondary-modern hidden px-3 py-2 sm:inline-flex" data-tooltip="Sign in to your workspace" data-tooltip-position="bottom">Login</a>
+                    <a href="{% url 'register' %}" class="btn-primary-modern px-3 py-2" data-tooltip="Create a workspace account" data-tooltip-position="bottom">Register</a>
                 {% endif %}
-                <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Toggle color theme">
+                <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Toggle color theme" data-tooltip="Switch between light and dark mode" data-tooltip-position="bottom">
                     <span data-theme-label>Light</span>
                 </button>
             </nav>
@@ -206,6 +477,36 @@
     <main class="{% block main_class %}mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8{% endblock %}">
         {% block content %}{% endblock %}
     </main>
+
+    <div class="page-skeleton" aria-hidden="true">
+        {% block page_skeleton %}
+            <div class="skeleton-shell">
+                <div class="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+                    <div class="min-w-0 flex-1">
+                        <div class="skeleton-pill w-32"></div>
+                        <div class="skeleton-line skeleton-page-title mt-4"></div>
+                        <div class="skeleton-line mt-4 w-64 max-w-full"></div>
+                    </div>
+                    <div class="skeleton-actions">
+                        <div class="skeleton-line h-11 w-28"></div>
+                        <div class="skeleton-line h-11 w-36"></div>
+                    </div>
+                </div>
+                <div class="skeleton-grid mt-8">
+                    <div class="skeleton-card"><div class="skeleton-card-inner"><div class="skeleton-pill w-24"></div><div class="skeleton-line h-10 w-20"></div><div class="skeleton-line w-32"></div></div></div>
+                    <div class="skeleton-card"><div class="skeleton-card-inner"><div class="skeleton-pill w-28"></div><div class="skeleton-line h-10 w-20"></div><div class="skeleton-line w-36"></div></div></div>
+                    <div class="skeleton-card"><div class="skeleton-card-inner"><div class="skeleton-pill w-28"></div><div class="skeleton-line h-10 w-20"></div><div class="skeleton-line w-32"></div></div></div>
+                    <div class="skeleton-card"><div class="skeleton-card-inner"><div class="skeleton-pill w-20"></div><div class="skeleton-line h-10 w-28"></div><div class="skeleton-line w-36"></div></div></div>
+                </div>
+                <div class="skeleton-grid skeleton-content-grid mt-8">
+                    <div class="skeleton-block"></div>
+                    <div class="skeleton-block"></div>
+                    <div class="skeleton-block"></div>
+                    <div class="skeleton-block"></div>
+                </div>
+            </div>
+        {% endblock %}
+    </div>
 
     <script>
         (function () {
@@ -228,6 +529,131 @@
                     setTheme(root.dataset.theme === "dark" ? "light" : "dark");
                 });
             }
+
+            function hideSkeleton() {
+                root.classList.remove("is-loading", "is-navigating");
+            }
+
+            function showSkeleton() {
+                root.classList.add("is-navigating");
+            }
+
+            function shouldSkipLink(anchor) {
+                if (!anchor || anchor.target || anchor.hasAttribute("download")) {
+                    return true;
+                }
+
+                const href = anchor.getAttribute("href") || "";
+                if (!href || href.startsWith("#") || href.startsWith("mailto:") || href.startsWith("tel:") || href.startsWith("javascript:")) {
+                    return true;
+                }
+
+                const url = new URL(anchor.href, window.location.href);
+                if (url.origin !== window.location.origin || url.pathname === window.location.pathname && url.hash) {
+                    return true;
+                }
+
+                return /\/(download|export)\//.test(url.pathname);
+            }
+
+            const tooltip = document.createElement("div");
+            tooltip.className = "tooltip-popover";
+            tooltip.setAttribute("role", "tooltip");
+            document.body.appendChild(tooltip);
+
+            let activeTooltipTarget = null;
+
+            function placeTooltip(target) {
+                const text = target.getAttribute("data-tooltip");
+                if (!text) {
+                    return;
+                }
+
+                tooltip.textContent = text;
+                tooltip.classList.add("is-visible");
+
+                const targetRect = target.getBoundingClientRect();
+                const tooltipRect = tooltip.getBoundingClientRect();
+                const position = target.getAttribute("data-tooltip-position") || "top";
+                const gap = 10;
+                let top = targetRect.top - tooltipRect.height - gap;
+                let left = targetRect.left + (targetRect.width - tooltipRect.width) / 2;
+
+                if (position === "bottom" || top < gap) {
+                    top = targetRect.bottom + gap;
+                }
+                if (position === "left") {
+                    top = targetRect.top + (targetRect.height - tooltipRect.height) / 2;
+                    left = targetRect.left - tooltipRect.width - gap;
+                }
+
+                left = Math.max(gap, Math.min(left, window.innerWidth - tooltipRect.width - gap));
+                top = Math.max(gap, Math.min(top, window.innerHeight - tooltipRect.height - gap));
+
+                tooltip.style.left = left + "px";
+                tooltip.style.top = top + "px";
+            }
+
+            function showTooltip(target) {
+                activeTooltipTarget = target;
+                placeTooltip(target);
+            }
+
+            function hideTooltip() {
+                activeTooltipTarget = null;
+                tooltip.classList.remove("is-visible");
+            }
+
+            document.addEventListener("pointerover", function (event) {
+                const target = event.target.closest("[data-tooltip]");
+                if (target) {
+                    showTooltip(target);
+                }
+            });
+
+            document.addEventListener("pointerout", function (event) {
+                if (activeTooltipTarget && !activeTooltipTarget.contains(event.relatedTarget)) {
+                    hideTooltip();
+                }
+            });
+
+            document.addEventListener("focusin", function (event) {
+                const target = event.target.closest("[data-tooltip]");
+                if (target) {
+                    showTooltip(target);
+                }
+            });
+
+            document.addEventListener("focusout", hideTooltip);
+            window.addEventListener("scroll", function () {
+                if (activeTooltipTarget) {
+                    placeTooltip(activeTooltipTarget);
+                }
+            }, true);
+            window.addEventListener("resize", function () {
+                if (activeTooltipTarget) {
+                    placeTooltip(activeTooltipTarget);
+                }
+            });
+
+            window.addEventListener("pageshow", hideSkeleton);
+            window.addEventListener("load", hideSkeleton);
+
+            document.addEventListener("click", function (event) {
+                const anchor = event.target.closest("a");
+                if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || shouldSkipLink(anchor)) {
+                    return;
+                }
+                showSkeleton();
+            });
+
+            document.addEventListener("submit", function (event) {
+                const form = event.target;
+                if (event.defaultPrevented || form.target) {
+                    return;
+                }
+                showSkeleton();
+            });
         })();
     </script>
 </body>

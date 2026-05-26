@@ -1,3 +1,8 @@
+from django.core.cache import cache
+
+from core.cache_utils import ANALYSIS_FORMAT_TIMEOUT, analysis_format_key
+
+
 def as_list(value):
     if isinstance(value, list):
         return value
@@ -26,6 +31,11 @@ def get_raw_response(analysis):
 
 
 def get_findings(analysis):
+    cache_key = analysis_format_key(analysis, "findings")
+    cached = cache.get(cache_key)
+    if cached is not None:
+        return cached
+
     raw_response = get_raw_response(analysis)
     findings = raw_response.get("findings", [])
     if not isinstance(findings, list):
@@ -53,6 +63,7 @@ def get_findings(analysis):
             "priority": finding.get("priority") or "Medium",
         })
     if normalized:
+        cache.set(cache_key, normalized, ANALYSIS_FORMAT_TIMEOUT)
         return normalized
 
     fallback_sections = [
@@ -82,26 +93,46 @@ def get_findings(analysis):
             "expected_benefits": [],
             "priority": "High" if category in ("Architecture", "Security") else "Medium",
         })
+    cache.set(cache_key, normalized, ANALYSIS_FORMAT_TIMEOUT)
     return normalized
 
 
 def get_scorecards(analysis):
+    cache_key = analysis_format_key(analysis, "scorecards")
+    cached = cache.get(cache_key)
+    if cached is not None:
+        return cached
+
     raw_response = get_raw_response(analysis)
     modernization_score = raw_response.get("modernization_score")
     if modernization_score is None:
         modernization_score = analysis.security_score
-    return {
+    scorecards = {
         "modernization_score": modernization_score,
         "ai_readiness_score": raw_response.get("ai_readiness_score"),
         "technical_debt_score": raw_response.get("technical_debt_score"),
         "security_risk_score": raw_response.get("security_risk_score"),
         "migration_risk_score": raw_response.get("migration_risk_score"),
     }
+    cache.set(cache_key, scorecards, ANALYSIS_FORMAT_TIMEOUT)
+    return scorecards
 
 
 def get_roadmap(analysis):
-    return as_list(get_raw_response(analysis).get("roadmap"))
+    cache_key = analysis_format_key(analysis, "roadmap")
+    cached = cache.get(cache_key)
+    if cached is not None:
+        return cached
+    roadmap = as_list(get_raw_response(analysis).get("roadmap"))
+    cache.set(cache_key, roadmap, ANALYSIS_FORMAT_TIMEOUT)
+    return roadmap
 
 
 def get_quick_wins(analysis):
-    return as_list(get_raw_response(analysis).get("quick_wins"))
+    cache_key = analysis_format_key(analysis, "quick_wins")
+    cached = cache.get(cache_key)
+    if cached is not None:
+        return cached
+    quick_wins = as_list(get_raw_response(analysis).get("quick_wins"))
+    cache.set(cache_key, quick_wins, ANALYSIS_FORMAT_TIMEOUT)
+    return quick_wins

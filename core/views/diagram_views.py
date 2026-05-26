@@ -15,7 +15,7 @@ def view_diagrams(request, analysis_id):
     View diagrams for a specific analysis.
     Only the analysis owner or admin can view it.
     """
-    analysis = get_object_or_404(ProjectAnalysis, id=analysis_id)
+    analysis = get_object_or_404(ProjectAnalysis.objects.select_related("project"), id=analysis_id)
     fallbacks = fallback_diagrams(analysis.project)
     diagram_fields = {
         "uml_diagram": "future_state_diagram",

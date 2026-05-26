@@ -1,5 +1,12 @@
 {% extends "terminal_base.html" %}
 
+{% block page_skeleton %}
+<div class="skeleton-shell max-w-3xl">
+    <div class="skeleton-card"><div class="skeleton-card-inner p-6 sm:p-8"><div class="skeleton-pill w-24"></div><div class="skeleton-line mt-2 h-10 w-72 max-w-full"></div></div></div>
+    <div class="skeleton-card mt-6"><div class="skeleton-card-inner p-6 sm:p-8"><div class="skeleton-field"><div class="skeleton-line w-24"></div><div class="skeleton-line"></div><div class="skeleton-line w-56"></div></div><div class="skeleton-form-grid"><div class="skeleton-field md:col-span-2"><div class="skeleton-line w-20"></div><div class="skeleton-line"></div></div><div class="skeleton-field"><div class="skeleton-line w-24"></div><div class="skeleton-line"></div></div><div class="skeleton-field"><div class="skeleton-line w-24"></div><div class="skeleton-line"></div></div></div><div class="skeleton-field"><div class="skeleton-line w-28"></div><div class="skeleton-line"></div></div><div class="skeleton-field skeleton-textarea"><div class="skeleton-line w-12"></div><div class="skeleton-line"></div></div></div></div>
+</div>
+{% endblock %}
+
 {% block content %}
 <div class="mx-auto max-w-3xl space-y-6">
     <section class="app-card p-6 sm:p-8">
@@ -39,8 +46,8 @@
             <textarea id="bio" name="bio" placeholder="Optional">{{ profile.bio|default:'' }}</textarea>
         </div>
         <div class="mt-6 flex flex-col-reverse gap-3 border-t border-gray-200 pt-6 sm:flex-row sm:justify-end">
-            <a href="{% url 'profile' %}" class="btn-secondary-modern">Cancel</a>
-            <button type="submit" class="btn-primary-modern">Save changes</button>
+            <a href="{% url 'profile' %}" class="btn-secondary-modern" data-tooltip="Return without saving profile edits">Cancel</a>
+            <button type="submit" class="btn-primary-modern" data-tooltip="Save your updated account details">Save changes</button>
         </div>
     </form>
 </div>

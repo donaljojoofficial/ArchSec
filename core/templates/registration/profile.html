@@ -1,5 +1,15 @@
 {% extends "terminal_base.html" %}
 
+{% block page_skeleton %}
+<div class="skeleton-shell max-w-5xl">
+    <div class="skeleton-card"><div class="skeleton-card-inner p-6 sm:p-8"><div class="skeleton-pill w-24"></div><div class="skeleton-line mt-2 h-10 w-64"></div><div class="skeleton-line mt-2 w-full max-w-xl"></div></div></div>
+    <div class="mt-6 grid gap-6 lg:grid-cols-[1fr_320px]">
+        <div class="skeleton-card"><div class="skeleton-card-inner p-6"><div class="flex items-center justify-between border-b border-gray-200 pb-4"><div class="skeleton-line h-7 w-40"></div><div class="skeleton-line h-5 w-12"></div></div><div class="skeleton-form-grid mt-5"><div class="skeleton-field"><div class="skeleton-line w-24"></div><div class="skeleton-line w-36"></div></div><div class="skeleton-field"><div class="skeleton-line w-20"></div><div class="skeleton-line w-48"></div></div><div class="skeleton-field"><div class="skeleton-line w-24"></div><div class="skeleton-line w-40"></div></div><div class="skeleton-field"><div class="skeleton-line w-28"></div><div class="skeleton-line w-44"></div></div></div></div></div>
+        <aside class="grid gap-4"><div class="skeleton-card is-compact"></div><div class="skeleton-card is-compact"></div><div class="skeleton-line h-11 w-full"></div></aside>
+    </div>
+</div>
+{% endblock %}
+
 {% block content %}
 <div class="mx-auto max-w-5xl space-y-6">
     <section class="app-card p-6 sm:p-8">
@@ -12,7 +22,7 @@
         <div class="app-card p-6">
             <div class="flex items-center justify-between border-b border-gray-200 pb-4">
                 <h2 class="text-lg font-bold text-gray-950">Profile details</h2>
-                <a href="{% url 'edit_profile' %}" class="font-semibold text-blue-700">Edit</a>
+                <a href="{% url 'edit_profile' %}" class="font-semibold text-blue-700" data-tooltip="Update profile and organization details">Edit</a>
             </div>
             <dl class="mt-5 grid gap-5 sm:grid-cols-2">
                 <div><dt class="text-xs font-bold uppercase text-gray-500">Username</dt><dd class="mt-1 text-sm text-gray-950">{{ user.username }}</dd></div>
@@ -35,9 +45,9 @@
             <div class="app-card p-5">
                 <h3 class="text-sm font-bold text-gray-950">Security</h3>
                 <p class="mt-2 text-sm text-gray-600">Last login: {{ user.last_login|date:"Y-m-d H:i"|default:"Never" }}</p>
-                <a href="{% url 'change_password' %}" class="btn-secondary-modern mt-4 w-full">Change password</a>
+                <a href="{% url 'change_password' %}" class="btn-secondary-modern mt-4 w-full" data-tooltip="Update your account password">Change password</a>
             </div>
-            <a href="{% url 'dashboard' %}" class="btn-primary-modern w-full">Back to dashboard</a>
+            <a href="{% url 'dashboard' %}" class="btn-primary-modern w-full" data-tooltip="Return to your modernization workspace">Back to dashboard</a>
         </aside>
     </section>
 </div>

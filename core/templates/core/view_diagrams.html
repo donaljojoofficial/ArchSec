@@ -1,5 +1,17 @@
 {% extends "terminal_base.html" %}
 
+{% block page_skeleton %}
+<div class="skeleton-shell">
+    <div class="skeleton-card"><div class="skeleton-card-inner p-6 sm:p-8"><div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between"><div><div class="skeleton-pill w-40"></div><div class="skeleton-line mt-2 h-10 w-72"></div><div class="skeleton-line mt-2 w-full max-w-2xl"></div></div><div class="skeleton-line h-11 w-40"></div></div></div></div>
+    <div class="skeleton-grid skeleton-content-grid mt-6">
+        <div class="skeleton-card"><div class="skeleton-card-inner"><div class="skeleton-line h-6 w-56"></div><div class="skeleton-diagram"></div><div class="skeleton-line w-28"></div></div></div>
+        <div class="skeleton-card"><div class="skeleton-card-inner"><div class="skeleton-line h-6 w-44"></div><div class="skeleton-diagram"></div><div class="skeleton-line w-28"></div></div></div>
+        <div class="skeleton-card"><div class="skeleton-card-inner"><div class="skeleton-line h-6 w-48"></div><div class="skeleton-diagram"></div><div class="skeleton-line w-28"></div></div></div>
+        <div class="skeleton-card"><div class="skeleton-card-inner"><div class="skeleton-line h-6 w-40"></div><div class="skeleton-diagram"></div><div class="skeleton-line w-28"></div></div></div>
+    </div>
+</div>
+{% endblock %}
+
 {% block extra_head %}
 <script type="module">
     import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
@@ -26,7 +38,7 @@
                 <h1 class="mt-2 text-3xl font-extrabold text-gray-950">{{ analysis.project.name }}</h1>
                 <p class="mt-2 text-sm text-gray-500">Diagrams for current state, target architecture, deployment, security testing, AI integration, and migration planning.</p>
             </div>
-            <a href="{% url 'view_analysis' analysis.id %}" class="btn-secondary-modern">Back to assessment</a>
+            <a href="{% url 'view_analysis' analysis.id %}" class="btn-secondary-modern" data-tooltip="Return to the full assessment report">Back to assessment</a>
         </div>
     </section>
 
@@ -35,37 +47,37 @@
             <h2 class="text-base font-bold text-gray-950">Future-State Architecture</h2>
             <pre class="mermaid mt-5 overflow-auto rounded-lg border border-gray-100 bg-gray-50 p-4">{{ analysis.uml_diagram }}</pre>
             <p data-diagram-error class="hidden mt-3 text-xs text-red-700">Diagram could not be rendered. Open raw code below.</p>
-            <details class="mt-4"><summary class="cursor-pointer text-sm font-semibold text-gray-600">Raw code</summary><pre class="mt-2 whitespace-pre-wrap rounded-lg bg-gray-50 p-3 text-xs text-gray-600">{{ analysis.uml_diagram }}</pre></details>
+            <details class="mt-4"><summary class="cursor-pointer text-sm font-semibold text-gray-600" data-tooltip="Show the Mermaid source for this diagram">Raw code</summary><pre class="mt-2 whitespace-pre-wrap rounded-lg bg-gray-50 p-3 text-xs text-gray-600">{{ analysis.uml_diagram }}</pre></details>
         </article>
         <article class="app-card p-5">
             <h2 class="text-base font-bold text-gray-950">Current-State Flow</h2>
             <pre class="mermaid mt-5 overflow-auto rounded-lg border border-gray-100 bg-gray-50 p-4">{{ analysis.dfd_diagram }}</pre>
             <p data-diagram-error class="hidden mt-3 text-xs text-red-700">Diagram could not be rendered. Open raw code below.</p>
-            <details class="mt-4"><summary class="cursor-pointer text-sm font-semibold text-gray-600">Raw code</summary><pre class="mt-2 whitespace-pre-wrap rounded-lg bg-gray-50 p-3 text-xs text-gray-600">{{ analysis.dfd_diagram }}</pre></details>
+            <details class="mt-4"><summary class="cursor-pointer text-sm font-semibold text-gray-600" data-tooltip="Show the Mermaid source for this diagram">Raw code</summary><pre class="mt-2 whitespace-pre-wrap rounded-lg bg-gray-50 p-3 text-xs text-gray-600">{{ analysis.dfd_diagram }}</pre></details>
         </article>
         <article class="app-card p-5">
             <h2 class="text-base font-bold text-gray-950">AI Integration Flow</h2>
             <pre class="mermaid mt-5 overflow-auto rounded-lg border border-gray-100 bg-gray-50 p-4">{{ analysis.erd_diagram }}</pre>
             <p data-diagram-error class="hidden mt-3 text-xs text-red-700">Diagram could not be rendered. Open raw code below.</p>
-            <details class="mt-4"><summary class="cursor-pointer text-sm font-semibold text-gray-600">Raw code</summary><pre class="mt-2 whitespace-pre-wrap rounded-lg bg-gray-50 p-3 text-xs text-gray-600">{{ analysis.erd_diagram }}</pre></details>
+            <details class="mt-4"><summary class="cursor-pointer text-sm font-semibold text-gray-600" data-tooltip="Show the Mermaid source for this diagram">Raw code</summary><pre class="mt-2 whitespace-pre-wrap rounded-lg bg-gray-50 p-3 text-xs text-gray-600">{{ analysis.erd_diagram }}</pre></details>
         </article>
         <article class="app-card p-5">
             <h2 class="text-base font-bold text-gray-950">Deployment Flow</h2>
             <pre class="mermaid mt-5 overflow-auto rounded-lg border border-gray-100 bg-gray-50 p-4">{{ analysis.threat_diagram }}</pre>
             <p data-diagram-error class="hidden mt-3 text-xs text-red-700">Diagram could not be rendered. Open raw code below.</p>
-            <details class="mt-4"><summary class="cursor-pointer text-sm font-semibold text-gray-600">Raw code</summary><pre class="mt-2 whitespace-pre-wrap rounded-lg bg-gray-50 p-3 text-xs text-gray-600">{{ analysis.threat_diagram }}</pre></details>
+            <details class="mt-4"><summary class="cursor-pointer text-sm font-semibold text-gray-600" data-tooltip="Show the Mermaid source for this diagram">Raw code</summary><pre class="mt-2 whitespace-pre-wrap rounded-lg bg-gray-50 p-3 text-xs text-gray-600">{{ analysis.threat_diagram }}</pre></details>
         </article>
         <article class="app-card p-5">
             <h2 class="text-base font-bold text-gray-950">Security Testing Workflow</h2>
             <pre class="mermaid mt-5 overflow-auto rounded-lg border border-gray-100 bg-gray-50 p-4">{{ analysis.security_testing_diagram }}</pre>
             <p data-diagram-error class="hidden mt-3 text-xs text-red-700">Diagram could not be rendered. Open raw code below.</p>
-            <details class="mt-4"><summary class="cursor-pointer text-sm font-semibold text-gray-600">Raw code</summary><pre class="mt-2 whitespace-pre-wrap rounded-lg bg-gray-50 p-3 text-xs text-gray-600">{{ analysis.security_testing_diagram }}</pre></details>
+            <details class="mt-4"><summary class="cursor-pointer text-sm font-semibold text-gray-600" data-tooltip="Show the Mermaid source for this diagram">Raw code</summary><pre class="mt-2 whitespace-pre-wrap rounded-lg bg-gray-50 p-3 text-xs text-gray-600">{{ analysis.security_testing_diagram }}</pre></details>
         </article>
         <article class="app-card p-5">
             <h2 class="text-base font-bold text-gray-950">Migration Roadmap</h2>
             <pre class="mermaid mt-5 overflow-auto rounded-lg border border-gray-100 bg-gray-50 p-4">{{ analysis.migration_roadmap_diagram }}</pre>
             <p data-diagram-error class="hidden mt-3 text-xs text-red-700">Diagram could not be rendered. Open raw code below.</p>
-            <details class="mt-4"><summary class="cursor-pointer text-sm font-semibold text-gray-600">Raw code</summary><pre class="mt-2 whitespace-pre-wrap rounded-lg bg-gray-50 p-3 text-xs text-gray-600">{{ analysis.migration_roadmap_diagram }}</pre></details>
+            <details class="mt-4"><summary class="cursor-pointer text-sm font-semibold text-gray-600" data-tooltip="Show the Mermaid source for this diagram">Raw code</summary><pre class="mt-2 whitespace-pre-wrap rounded-lg bg-gray-50 p-3 text-xs text-gray-600">{{ analysis.migration_roadmap_diagram }}</pre></details>
         </article>
     </section>
 </div>

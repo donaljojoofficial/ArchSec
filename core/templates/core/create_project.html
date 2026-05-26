@@ -1,5 +1,23 @@
 {% extends 'terminal_base.html' %}
 
+{% block page_skeleton %}
+<div class="skeleton-shell max-w-5xl">
+    <div class="skeleton-card"><div class="skeleton-card-inner p-6 sm:p-8"><div class="skeleton-pill w-44"></div><div class="skeleton-line mt-3 h-10 w-full max-w-2xl"></div><div class="skeleton-line mt-3 w-full max-w-3xl"></div><div class="skeleton-line w-10/12 max-w-3xl"></div></div></div>
+    <div class="skeleton-card mt-6"><div class="skeleton-card-inner p-6 sm:p-8">
+        <div class="skeleton-line h-7 w-40"></div>
+        <div class="skeleton-form-grid mt-5">
+            <div class="skeleton-field md:col-span-2"><div class="skeleton-line w-24"></div><div class="skeleton-line"></div></div>
+            <div class="skeleton-field skeleton-textarea md:col-span-2"><div class="skeleton-line w-32"></div><div class="skeleton-line"></div></div>
+            <div class="skeleton-field"><div class="skeleton-line w-24"></div><div class="skeleton-line"></div></div>
+            <div class="skeleton-field"><div class="skeleton-line w-28"></div><div class="skeleton-line"></div></div>
+            <div class="skeleton-field"><div class="skeleton-line w-20"></div><div class="skeleton-line"></div></div>
+            <div class="skeleton-field"><div class="skeleton-line w-20"></div><div class="skeleton-line"></div></div>
+        </div>
+        <div class="mt-8 border-t border-gray-200 pt-8"><div class="skeleton-line h-7 w-56"></div><div class="mt-5 grid gap-3"><div class="skeleton-line h-12"></div><div class="skeleton-line h-12"></div><div class="skeleton-line h-12"></div></div></div>
+    </div></div>
+</div>
+{% endblock %}
+
 {% block content %}
 <div class="mx-auto max-w-5xl space-y-6">
     <div class="app-card p-6 sm:p-8">
@@ -56,7 +74,8 @@
                     <div class="rounded-lg border border-gray-200 bg-white">
                         <button type="button"
                                 @click="activeSection === '{{ field.name }}' ? activeSection = null : activeSection = '{{ field.name }}'"
-                                class="flex w-full items-center justify-between px-4 py-3 text-left">
+                                class="flex w-full items-center justify-between px-4 py-3 text-left"
+                                data-tooltip="Expand this section to select options and add notes">
                             <span class="font-semibold text-gray-800">{{ field.label }}</span>
                             <span class="text-sm font-bold text-blue-700" x-text="activeSection === '{{ field.name }}' ? 'Close' : 'Add details'"></span>
                         </button>
@@ -80,8 +99,8 @@
         </section>
 
         <div class="mt-8 flex flex-col-reverse gap-3 border-t border-gray-200 pt-6 sm:flex-row sm:justify-end">
-            <a href="{% url 'dashboard' %}" class="btn-secondary-modern">Cancel</a>
-            <button type="submit" class="btn-primary-modern">Save system profile</button>
+            <a href="{% url 'dashboard' %}" class="btn-secondary-modern" data-tooltip="Return without saving this profile">Cancel</a>
+            <button type="submit" class="btn-primary-modern" data-tooltip="Save this system so it can be analyzed">Save system profile</button>
         </div>
     </form>
 </div>

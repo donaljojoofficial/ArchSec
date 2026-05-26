@@ -1,5 +1,43 @@
 {% extends "terminal_base.html" %}
 
+{% block page_skeleton %}
+<div class="skeleton-shell">
+    <div class="grid gap-8 border-b border-gray-200 pb-8 lg:grid-cols-[1fr_280px]">
+        <div>
+            <div class="skeleton-pill w-44"></div>
+            <div class="skeleton-line mt-5 h-10 w-full max-w-3xl"></div>
+            <div class="skeleton-line mt-4 w-full max-w-3xl"></div>
+            <div class="skeleton-line mt-2 w-10/12 max-w-3xl"></div>
+        </div>
+        <div class="lg:border-l lg:pl-8">
+            <div class="skeleton-line w-24"></div>
+            <div class="mt-4 grid grid-cols-2 gap-4">
+                <div><div class="skeleton-line h-10 w-16"></div><div class="skeleton-line mt-2 w-20"></div></div>
+                <div><div class="skeleton-line h-10 w-16"></div><div class="skeleton-line mt-2 w-20"></div></div>
+            </div>
+        </div>
+    </div>
+    <div class="mt-8 grid gap-10 lg:grid-cols-[1fr_320px]">
+        <div>
+            <div class="skeleton-line h-7 w-28"></div>
+            <div class="skeleton-line mt-2 w-72 max-w-full"></div>
+            <div class="skeleton-list mt-5">
+                <div class="skeleton-row"><div><div class="skeleton-line h-6 w-56"></div><div class="skeleton-line mt-3 w-full"></div><div class="skeleton-line mt-3 w-10/12"></div><div class="skeleton-line mt-4 h-2 w-full"></div></div><div class="skeleton-actions"><div class="skeleton-line h-10 w-20"></div><div class="skeleton-line h-10 w-20"></div></div></div>
+                <div class="skeleton-row"><div><div class="skeleton-line h-6 w-48"></div><div class="skeleton-line mt-3 w-11/12"></div><div class="skeleton-line mt-3 w-9/12"></div><div class="skeleton-line mt-4 h-2 w-full"></div></div><div class="skeleton-actions"><div class="skeleton-line h-10 w-20"></div><div class="skeleton-line h-10 w-20"></div></div></div>
+            </div>
+        </div>
+        <aside>
+            <div class="skeleton-list py-5">
+                <div class="skeleton-line h-5 w-40"></div>
+                <div class="skeleton-line mt-5 h-8 w-full"></div>
+                <div class="skeleton-line mt-3 h-8 w-11/12"></div>
+                <div class="skeleton-line mt-3 h-8 w-10/12"></div>
+            </div>
+        </aside>
+    </div>
+</div>
+{% endblock %}
+
 {% block content %}
 <div class="space-y-10">
     <section class="grid gap-8 border-b border-gray-200 pb-8 lg:grid-cols-[1fr_280px]">
@@ -12,7 +50,7 @@
                         Capture the current stack, deployment, testing, security, operations, and AI-readiness details. ArchSec turns them into modernization findings with costs, requirements, migration steps, and diagrams.
                     </p>
                 </div>
-                <a href="{% url 'intake_start' %}" class="btn-primary-modern shrink-0">New assessment</a>
+                <a href="{% url 'intake_start' %}" class="btn-primary-modern shrink-0" data-tooltip="Start by uploading, chatting, or using the manual form">New assessment</a>
             </div>
         </div>
         <div class="border-l-0 border-gray-200 lg:border-l lg:pl-8">
@@ -47,7 +85,7 @@
                             <div class="min-w-0">
                                 <div class="flex flex-wrap items-center gap-2">
                                     <h3 class="text-lg font-bold text-gray-950">{{ project.name }}</h3>
-                                    <span class="text-xs font-semibold text-blue-700">{{ project.get_platform_display }}</span>
+                                    <span class="text-xs font-semibold text-blue-700">{{ project.platform_display }}</span>
                                 </div>
                                 <p class="mt-2 line-clamp-2 text-sm leading-6 text-gray-600">{{ project.description }}</p>
                                 <div class="mt-4 grid gap-2 text-xs text-gray-500 sm:grid-cols-3">
@@ -68,8 +106,8 @@
                                 {% endif %}
                             </div>
                             <div class="flex shrink-0 gap-2">
-                                <a href="{% url 'generate_analysis' project.id %}" class="btn-primary-modern px-3 py-2 text-sm">Analyze</a>
-                                <a href="{% url 'analysis_history' project.id %}" class="btn-secondary-modern px-3 py-2 text-sm">History</a>
+                                <a href="{% url 'generate_analysis' project.id %}" class="btn-primary-modern px-3 py-2 text-sm" data-tooltip="Queue a modernization assessment for this system">Analyze</a>
+                                <a href="{% url 'analysis_history' project.id %}" class="btn-secondary-modern px-3 py-2 text-sm" data-tooltip="Review previous reports and score changes">History</a>
                             </div>
                         </div>
                     </article>
@@ -79,7 +117,7 @@
                 <div class="border-y border-dashed border-gray-300 py-10 text-center">
                     <h3 class="text-lg font-bold text-gray-950">No systems assessed yet</h3>
                     <p class="mx-auto mt-2 max-w-md text-sm text-gray-600">Create a legacy system profile to receive modernization issues, solution options, costs, and architecture diagrams.</p>
-                    <a href="{% url 'intake_start' %}" class="btn-primary-modern mt-5">Create first assessment</a>
+                    <a href="{% url 'intake_start' %}" class="btn-primary-modern mt-5" data-tooltip="Create your first legacy system profile">Create first assessment</a>
                 </div>
             {% endif %}
         </div>
@@ -100,11 +138,11 @@
         <div>
             <div class="flex items-center justify-between">
                 <h3 class="text-sm font-bold text-gray-950">Recent updates</h3>
-                <a href="{% url 'notifications' %}" class="text-xs font-semibold text-blue-700">View all</a>
+                <a href="{% url 'notifications' %}" class="text-xs font-semibold text-blue-700" data-tooltip="Open the full notification inbox">View all</a>
             </div>
             <div class="mt-4 divide-y divide-gray-200 border-y border-gray-200">
                 {% for notification in unread_notifications %}
-                    <a href="{% url 'mark_notification_as_read' notification.id %}" class="block py-3 text-sm text-gray-600 hover:text-blue-700">
+                    <a href="{% url 'mark_notification_as_read' notification.id %}" class="block py-3 text-sm text-gray-600 hover:text-blue-700" data-tooltip="Mark this update as read and open its link">
                         {{ notification.message }}
                     </a>
                 {% empty %}
@@ -123,8 +161,8 @@
                 <span class="text-xs font-bold text-blue-700">Support</span>
             </div>
             <div class="mt-4 grid gap-2">
-                <a href="{% url 'help' %}" class="btn-secondary-modern w-full">Open help center</a>
-                <a href="mailto:support@archsec.local?subject=ArchSec%20Support%20Request" class="btn-secondary-modern w-full">Email support</a>
+                <a href="{% url 'help' %}" class="btn-secondary-modern w-full" data-tooltip="Read guidance for better assessments">Open help center</a>
+                <a href="mailto:support@archsec.local?subject=ArchSec%20Support%20Request" class="btn-secondary-modern w-full" data-tooltip="Start an email to ArchSec support">Email support</a>
             </div>
             <p class="mt-3 text-xs text-gray-500">Share your system name, assessment ID, and the recommendation you want reviewed.</p>
         </div>
@@ -132,14 +170,14 @@
             <div>
                 <h3 class="text-sm font-bold text-gray-950">Admin operations</h3>
                 <p class="mt-2 text-sm leading-6 text-gray-500">Monitor background analysis jobs and manage registered users.</p>
-                <a href="{% url 'celery_dashboard' %}" class="btn-secondary-modern mt-4 w-full">Task monitor</a>
-                <a href="{% url 'admin:index' %}" class="btn-secondary-modern mt-3 w-full">User administration</a>
+                <a href="{% url 'celery_dashboard' %}" class="btn-secondary-modern mt-4 w-full" data-tooltip="Inspect queued and running background tasks">Task monitor</a>
+                <a href="{% url 'admin:index' %}" class="btn-secondary-modern mt-3 w-full" data-tooltip="Manage users and application records">User administration</a>
             </div>
         {% else %}
             <div>
                 <h3 class="text-sm font-bold text-gray-950">Assessment intake</h3>
                 <p class="mt-2 text-sm leading-6 text-gray-500">Upload a document, use chat collection, or open the manual form.</p>
-                <a href="{% url 'intake_start' %}" class="btn-primary-modern mt-4 w-full">Start new intake</a>
+                <a href="{% url 'intake_start' %}" class="btn-primary-modern mt-4 w-full" data-tooltip="Capture another system profile">Start new intake</a>
             </div>
         {% endif %}
     </section>

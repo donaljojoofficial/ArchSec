@@ -1,6 +1,28 @@
 {% extends "terminal_base.html" %}
 
 {% block title %}About ArchSec{% endblock %}
+{% block page_skeleton %}
+<div class="skeleton-shell">
+    <div class="grid gap-0 lg:grid-cols-[1fr_0.9fr]">
+        <div class="skeleton-card min-h-80">
+            <div class="skeleton-card-inner p-8 sm:p-10">
+                <div class="skeleton-pill w-28"></div>
+                <div class="skeleton-line mt-3 h-12 w-full max-w-2xl"></div>
+                <div class="skeleton-line h-12 w-10/12 max-w-xl"></div>
+                <div class="skeleton-line mt-4 w-full max-w-xl"></div>
+                <div class="skeleton-line w-11/12 max-w-xl"></div>
+            </div>
+        </div>
+        <div class="skeleton-image"></div>
+    </div>
+    <div class="skeleton-grid mt-8 md:grid-cols-3">
+        <div class="skeleton-card is-compact"></div>
+        <div class="skeleton-card is-compact"></div>
+        <div class="skeleton-card is-compact"></div>
+    </div>
+    <div class="skeleton-card mt-8"><div class="skeleton-card-inner"><div class="skeleton-line h-8 w-64"></div><div class="skeleton-grid skeleton-content-grid"><div class="skeleton-line h-16"></div><div class="skeleton-line h-16"></div><div class="skeleton-line h-16"></div><div class="skeleton-line h-16"></div></div></div></div>
+</div>
+{% endblock %}
 
 {% block content %}
 <div class="space-y-10">

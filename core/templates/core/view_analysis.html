@@ -1,6 +1,15 @@
 {% extends 'terminal_base.html' %}
 {% load json_filters %}
 
+{% block page_skeleton %}
+<div class="skeleton-shell">
+    <div class="skeleton-card"><div class="skeleton-card-inner p-6 sm:p-8"><div class="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between"><div><div class="skeleton-pill w-48"></div><div class="skeleton-line mt-2 h-10 w-80 max-w-full"></div><div class="skeleton-line mt-2 w-72 max-w-full"></div></div><div class="skeleton-actions"><div class="skeleton-line h-11 w-24"></div><div class="skeleton-line h-11 w-32"></div></div></div></div></div>
+    <div class="skeleton-grid mt-6"><div class="skeleton-card is-compact"></div><div class="skeleton-card is-compact"></div><div class="skeleton-card is-compact"></div><div class="skeleton-card is-compact"></div></div>
+    <div class="mt-6 border-b border-gray-200 pb-5"><div class="skeleton-line h-7 w-48"></div><div class="skeleton-line mt-3 w-full"></div><div class="skeleton-line mt-2 w-11/12"></div><div class="skeleton-line mt-2 w-9/12"></div></div>
+    <div class="mt-6"><div class="skeleton-line h-7 w-80 max-w-full"></div><div class="skeleton-list mt-4"><div class="skeleton-row"><div><div class="skeleton-pill w-32"></div><div class="skeleton-line mt-3 h-7 w-72 max-w-full"></div><div class="skeleton-grid skeleton-content-grid mt-5"><div class="skeleton-block"></div><div class="skeleton-block"></div></div></div></div><div class="skeleton-row"><div><div class="skeleton-pill w-32"></div><div class="skeleton-line mt-3 h-7 w-64 max-w-full"></div><div class="skeleton-grid skeleton-content-grid mt-5"><div class="skeleton-block"></div><div class="skeleton-block"></div></div></div></div></div></div>
+</div>
+{% endblock %}
+
 {% block content %}
 {% if analysis.risk_category == "Error" %}
 <div class="mx-auto max-w-3xl app-card p-6">
@@ -22,18 +31,34 @@
                 <p class="mt-2 text-sm text-gray-500">Generated {{ analysis.created_at }} · Assessment ID {{ analysis.id }}</p>
             </div>
             <div class="flex flex-wrap gap-2">
-                <a href="{% url 'view_diagrams' analysis.id %}" class="btn-secondary-modern">Diagrams</a>
-                <a href="{% url 'download_analysis_pdf' analysis.id %}" class="btn-primary-modern">Download PDF</a>
+                <a href="{% url 'view_diagrams' analysis.id %}" class="btn-secondary-modern" data-tooltip="Open all generated architecture diagrams">Diagrams</a>
+                <a href="{% url 'download_analysis_pdf' analysis.id %}" class="btn-primary-modern" data-tooltip="Download this assessment as a PDF">Download PDF</a>
             </div>
         </div>
     </section>
 
     {% if analysis.risk_category == "Pending" %}
-    <section class="app-card p-8 text-center">
-        <div class="mx-auto h-12 w-12 animate-spin rounded-full border-4 border-blue-100 border-t-blue-600"></div>
-        <h2 class="mt-5 text-xl font-bold text-gray-950">Assessment in progress</h2>
-        <p class="mt-2 text-sm text-gray-600">ArchSec is reviewing the current system and preparing modernization recommendations.</p>
-        <a href="{% url 'dashboard' %}" class="btn-secondary-modern mt-5">Back to dashboard</a>
+    <section class="border-y border-gray-200 py-8" aria-live="polite">
+        <div class="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <p class="text-sm font-semibold text-blue-700">Assessment in progress</p>
+                <h2 class="mt-2 text-xl font-bold text-gray-950">Preparing modernization recommendations</h2>
+                <p class="mt-2 text-sm text-gray-600">ArchSec is reviewing the current system. This page refreshes automatically.</p>
+            </div>
+            <a href="{% url 'dashboard' %}" class="btn-secondary-modern" data-tooltip="Return to your modernization workspace">Back to dashboard</a>
+        </div>
+        <div class="skeleton-grid mt-8">
+            <div class="skeleton-card"><div class="skeleton-card-inner"><div class="skeleton-pill w-24"></div><div class="skeleton-line h-10 w-20"></div><div class="skeleton-line w-32"></div></div></div>
+            <div class="skeleton-card"><div class="skeleton-card-inner"><div class="skeleton-pill w-28"></div><div class="skeleton-line h-10 w-20"></div><div class="skeleton-line w-36"></div></div></div>
+            <div class="skeleton-card"><div class="skeleton-card-inner"><div class="skeleton-pill w-28"></div><div class="skeleton-line h-10 w-20"></div><div class="skeleton-line w-32"></div></div></div>
+            <div class="skeleton-card"><div class="skeleton-card-inner"><div class="skeleton-pill w-20"></div><div class="skeleton-line h-10 w-28"></div><div class="skeleton-line w-36"></div></div></div>
+        </div>
+        <div class="skeleton-grid skeleton-content-grid mt-8">
+            <div class="skeleton-block"></div>
+            <div class="skeleton-block"></div>
+            <div class="skeleton-block"></div>
+            <div class="skeleton-block"></div>
+        </div>
     </section>
     <script>
         setTimeout(function () { location.reload(); }, 30000);
@@ -58,10 +83,10 @@
         <div>
             <p class="text-sm font-semibold text-gray-500">Exports</p>
             <div class="mt-3 flex flex-wrap gap-2">
-                <a href="{% url 'export_analysis_md' analysis.id %}" class="btn-secondary-modern px-3 py-2 text-sm">MD</a>
-                <a href="{% url 'export_analysis_txt' analysis.id %}" class="btn-secondary-modern px-3 py-2 text-sm">TXT</a>
-                <a href="{% url 'export_analysis_json' analysis.id %}" class="btn-secondary-modern px-3 py-2 text-sm">JSON</a>
-                <a href="{% url 'export_analysis_proposal' analysis.id %}" class="btn-secondary-modern px-3 py-2 text-sm">Proposal</a>
+                <a href="{% url 'export_analysis_md' analysis.id %}" class="btn-secondary-modern px-3 py-2 text-sm" data-tooltip="Export a Markdown report">MD</a>
+                <a href="{% url 'export_analysis_txt' analysis.id %}" class="btn-secondary-modern px-3 py-2 text-sm" data-tooltip="Export a plain text report">TXT</a>
+                <a href="{% url 'export_analysis_json' analysis.id %}" class="btn-secondary-modern px-3 py-2 text-sm" data-tooltip="Export structured assessment data">JSON</a>
+                <a href="{% url 'export_analysis_proposal' analysis.id %}" class="btn-secondary-modern px-3 py-2 text-sm" data-tooltip="Export a client-ready proposal draft">Proposal</a>
             </div>
         </div>
     </section>
@@ -200,8 +225,8 @@
     </section>
 
     <div class="flex flex-wrap justify-end gap-3">
-        <a href="{% url 'analysis_history' project.id %}" class="btn-secondary-modern">Assessment history</a>
-        <a href="{% url 'dashboard' %}" class="btn-secondary-modern">Back to dashboard</a>
+        <a href="{% url 'analysis_history' project.id %}" class="btn-secondary-modern" data-tooltip="Compare this report with previous assessments">Assessment history</a>
+        <a href="{% url 'dashboard' %}" class="btn-secondary-modern" data-tooltip="Return to your modernization workspace">Back to dashboard</a>
     </div>
     {% endif %}
 </div>

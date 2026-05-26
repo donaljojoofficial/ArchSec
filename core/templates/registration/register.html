@@ -1,5 +1,24 @@
 {% extends "terminal_base.html" %}
 
+{% block page_skeleton %}
+<div class="skeleton-shell max-w-lg">
+    <div class="skeleton-card"><div class="skeleton-card-inner p-8">
+        <div class="skeleton-pill w-44"></div>
+        <div class="skeleton-line mt-2 h-8 w-64"></div>
+        <div class="skeleton-line mt-2 w-full"></div>
+        <div class="mt-6 grid gap-4">
+            <div class="skeleton-field"><div class="skeleton-line w-24"></div><div class="skeleton-line"></div></div>
+            <div class="skeleton-field"><div class="skeleton-line w-20"></div><div class="skeleton-line"></div></div>
+            <div class="skeleton-field"><div class="skeleton-line w-28"></div><div class="skeleton-line"></div></div>
+            <div class="skeleton-field"><div class="skeleton-line w-36"></div><div class="skeleton-line"></div></div>
+            <div class="skeleton-line h-11 w-full"></div>
+        </div>
+        <div class="skeleton-line mt-6 h-px w-full"></div>
+        <div class="skeleton-line mt-5 w-72 max-w-full"></div>
+    </div></div>
+</div>
+{% endblock %}
+
 {% block content %}
 <div class="mx-auto max-w-lg">
     <div class="app-card p-8">
@@ -28,11 +47,11 @@
                     {% if field.help_text %}<small class="helptext">{{ field.help_text|safe }}</small>{% endif %}
                 </div>
             {% endfor %}
-            <button type="submit" class="btn-primary-modern w-full">Create account</button>
+            <button type="submit" class="btn-primary-modern w-full" data-tooltip="Create your account and open the workspace">Create account</button>
         </form>
 
         <p class="mt-6 border-t border-gray-200 pt-5 text-center text-sm text-gray-600">
-            Already registered? <a href="{% url 'login' %}" class="font-semibold text-blue-700 hover:text-blue-800">Sign in</a>
+            Already registered? <a href="{% url 'login' %}" class="font-semibold text-blue-700 hover:text-blue-800" data-tooltip="Sign in with an existing account">Sign in</a>
         </p>
     </div>
 </div>

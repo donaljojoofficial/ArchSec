@@ -1,5 +1,12 @@
 {% extends "terminal_base.html" %}
 
+{% block page_skeleton %}
+<div class="skeleton-shell max-w-3xl">
+    <div class="skeleton-card"><div class="skeleton-card-inner p-6 sm:p-8"><div class="skeleton-pill w-36"></div><div class="skeleton-line mt-3 h-10 w-full max-w-2xl"></div><div class="skeleton-line mt-3 w-full"></div><div class="skeleton-line w-10/12"></div></div></div>
+    <div class="skeleton-card mt-6"><div class="skeleton-card-inner p-6 sm:p-8"><div class="skeleton-field"><div class="skeleton-line w-36"></div><div class="skeleton-line h-14 w-full"></div><div class="skeleton-line w-64 max-w-full"></div></div><div class="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end"><div class="skeleton-line h-11 w-24"></div><div class="skeleton-line h-11 w-36"></div></div></div></div>
+</div>
+{% endblock %}
+
 {% block content %}
 <div class="mx-auto max-w-3xl space-y-6">
     <section class="app-card p-6 sm:p-8">
@@ -25,8 +32,8 @@
             {% if form.document.help_text %}<p class="mt-2 text-xs text-gray-500">{{ form.document.help_text }}</p>{% endif %}
         </div>
         <div class="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-            <a href="{% url 'intake_start' %}" class="btn-secondary-modern">Back</a>
-            <button type="submit" class="btn-primary-modern">Extract profile</button>
+            <a href="{% url 'intake_start' %}" class="btn-secondary-modern" data-tooltip="Choose a different intake method">Back</a>
+            <button type="submit" class="btn-primary-modern" data-tooltip="Read the uploaded document and draft a profile">Extract profile</button>
         </div>
     </form>
 </div>

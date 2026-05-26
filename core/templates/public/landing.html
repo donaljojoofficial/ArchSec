@@ -2,6 +2,24 @@
 
 {% block title %}ArchSec - Modernize Legacy Systems With AI{% endblock %}
 {% block main_class %}w-full{% endblock %}
+{% block page_skeleton %}
+<div class="relative min-h-[calc(100vh-4rem)] overflow-hidden">
+    <div class="skeleton-hero-media"></div>
+    <div class="relative mx-auto flex min-h-[calc(100vh-4rem)] max-w-7xl items-center px-4 py-16 sm:px-6 lg:px-8">
+        <div class="w-full max-w-3xl pt-10">
+            <div class="skeleton-pill w-52"></div>
+            <div class="skeleton-line mt-6 h-16 w-full max-w-3xl sm:h-20"></div>
+            <div class="skeleton-line mt-4 h-16 w-11/12 sm:h-20"></div>
+            <div class="skeleton-line mt-8 h-5 w-full max-w-2xl"></div>
+            <div class="skeleton-line mt-3 h-5 w-10/12 max-w-2xl"></div>
+            <div class="mt-8 flex flex-col gap-3 sm:flex-row">
+                <div class="skeleton-line h-12 w-48"></div>
+                <div class="skeleton-line h-12 w-40"></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
 
 {% block content %}
 <section class="relative min-h-[calc(100vh-4rem)] overflow-hidden">
@@ -16,11 +34,11 @@
             </p>
             <div class="mt-8 flex flex-col gap-3 sm:flex-row">
                 {% if user.is_authenticated %}
-                    <a href="{% url 'dashboard' %}" class="btn-primary-modern px-5 py-3">Open dashboard</a>
+                    <a href="{% url 'dashboard' %}" class="btn-primary-modern px-5 py-3" data-tooltip="Go to your saved systems and assessments">Open dashboard</a>
                 {% else %}
-                    <a href="{% url 'register' %}" class="btn-primary-modern px-5 py-3">Start free assessment</a>
+                    <a href="{% url 'register' %}" class="btn-primary-modern px-5 py-3" data-tooltip="Create an account to start an assessment">Start free assessment</a>
                 {% endif %}
-                <a href="{% url 'about' %}" class="inline-flex items-center justify-center rounded-lg border border-white/35 bg-white/10 px-5 py-3 font-extrabold text-white backdrop-blur transition hover:bg-white/20">Explore platform</a>
+                <a href="{% url 'about' %}" class="inline-flex items-center justify-center rounded-lg border border-white/35 bg-white/10 px-5 py-3 font-extrabold text-white backdrop-blur transition hover:bg-white/20" data-tooltip="Learn how ArchSec evaluates modernization needs">Explore platform</a>
             </div>
         </div>
     </div>
@@ -114,11 +132,11 @@
             <p class="mt-3 text-sm leading-6 text-blue-50">Create a system profile, run an AI modernization assessment, and turn uncertain upgrades into a clear roadmap.</p>
             <div class="mt-6 flex flex-col gap-3 sm:flex-row">
                 {% if user.is_authenticated %}
-                    <a href="{% url 'create_project' %}" class="inline-flex items-center justify-center rounded-lg bg-white px-5 py-3 font-extrabold text-blue-700">New assessment</a>
+                    <a href="{% url 'create_project' %}" class="inline-flex items-center justify-center rounded-lg bg-white px-5 py-3 font-extrabold text-blue-700" data-tooltip="Open the manual system profile form">New assessment</a>
                 {% else %}
-                    <a href="{% url 'register' %}" class="inline-flex items-center justify-center rounded-lg bg-white px-5 py-3 font-extrabold text-blue-700">Create account</a>
+                    <a href="{% url 'register' %}" class="inline-flex items-center justify-center rounded-lg bg-white px-5 py-3 font-extrabold text-blue-700" data-tooltip="Create an ArchSec workspace account">Create account</a>
                 {% endif %}
-                <a href="{% url 'help' %}" class="inline-flex items-center justify-center rounded-lg border border-white/35 px-5 py-3 font-extrabold text-white">Read help</a>
+                <a href="{% url 'help' %}" class="inline-flex items-center justify-center rounded-lg border border-white/35 px-5 py-3 font-extrabold text-white" data-tooltip="Read tips for better assessments">Read help</a>
             </div>
         </div>
     </div>

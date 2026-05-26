@@ -1,6 +1,7 @@
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from django.db.models import Prefetch
 
 from core.models import Project, ProjectAnalysis
 from core.services.analysis_formatting import get_findings, get_quick_wins, get_roadmap, get_scorecards
@@ -39,7 +40,9 @@ def api_project_list(request):
 @permission_classes([IsAuthenticated])
 def api_project_detail(request, project_id):
     try:
-        project = Project.objects.get(id=project_id)
+        project = Project.objects.prefetch_related(
+            Prefetch("analyses", queryset=ProjectAnalysis.objects.order_by("-created_at"))
+        ).get(id=project_id)
     except Project.DoesNotExist:
         return Response({"detail": "Not found."}, status=404)
 
@@ -64,7 +67,7 @@ def api_project_detail(request, project_id):
                 "risk_category": analysis.risk_category,
                 "modernization_score": analysis.security_score,
             }
-            for analysis in project.analyses.order_by("-created_at")
+            for analysis in project.analyses.all()
         ],
     })
 

@@ -101,7 +101,7 @@ def generate_analysis(request, project_id):
 
 @analysis_owner_required
 def view_analysis(request, analysis_id):
-    analysis = get_object_or_404(ProjectAnalysis, id=analysis_id)
+    analysis = get_object_or_404(ProjectAnalysis.objects.select_related("project"), id=analysis_id)
     return render(request, "core/view_analysis.html", {
         "analysis": analysis,
         "project": analysis.project,
@@ -136,7 +136,7 @@ def history_analysis(request, project_id):
 
 @analysis_owner_required
 def analysis_status(request, analysis_id):
-    analysis = get_object_or_404(ProjectAnalysis, id=analysis_id)
+    analysis = get_object_or_404(ProjectAnalysis.objects.only("id", "task_id", "risk_category", "raw_ai_response"), id=analysis_id)
     task_status = "UNKNOWN"
     if analysis.task_id:
         try:
@@ -162,7 +162,7 @@ def analysis_status(request, analysis_id):
 
 @analysis_owner_required
 def download_analysis_pdf(request, analysis_id):
-    analysis = get_object_or_404(ProjectAnalysis, id=analysis_id)
+    analysis = get_object_or_404(ProjectAnalysis.objects.select_related("project"), id=analysis_id)
     project = analysis.project
 
     html = render_to_string("core/analysis_pdf.html", {

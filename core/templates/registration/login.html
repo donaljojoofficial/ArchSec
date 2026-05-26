@@ -1,5 +1,22 @@
 {% extends "terminal_base.html" %}
 
+{% block page_skeleton %}
+<div class="skeleton-shell max-w-md">
+    <div class="skeleton-card"><div class="skeleton-card-inner p-8">
+        <div class="skeleton-pill w-28"></div>
+        <div class="skeleton-line mt-2 h-8 w-56"></div>
+        <div class="skeleton-line mt-2 w-full"></div>
+        <div class="mt-6 grid gap-4">
+            <div class="skeleton-field"><div class="skeleton-line w-24"></div><div class="skeleton-line"></div></div>
+            <div class="skeleton-field"><div class="skeleton-line w-24"></div><div class="skeleton-line"></div></div>
+            <div class="skeleton-line h-11 w-full"></div>
+        </div>
+        <div class="skeleton-line mt-6 h-px w-full"></div>
+        <div class="skeleton-line mt-5 w-64 max-w-full"></div>
+    </div></div>
+</div>
+{% endblock %}
+
 {% block content %}
 <div class="mx-auto max-w-md">
     <div class="app-card p-8">
@@ -15,11 +32,11 @@
                 form input { width: 100%; padding: 0.75rem 0.85rem; }
             </style>
             {{ form.as_p }}
-            <button type="submit" class="btn-primary-modern w-full">Sign in</button>
+            <button type="submit" class="btn-primary-modern w-full" data-tooltip="Sign in and open your dashboard">Sign in</button>
         </form>
 
         <p class="mt-6 border-t border-gray-200 pt-5 text-center text-sm text-gray-600">
-            New here? <a href="{% url 'register' %}" class="font-semibold text-blue-700 hover:text-blue-800">Create an account</a>
+            New here? <a href="{% url 'register' %}" class="font-semibold text-blue-700 hover:text-blue-800" data-tooltip="Register a new ArchSec workspace account">Create an account</a>
         </p>
     </div>
 </div>

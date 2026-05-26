@@ -1,5 +1,12 @@
 {% extends 'terminal_base.html' %}
 
+{% block page_skeleton %}
+<div class="skeleton-shell max-w-4xl">
+    <div class="skeleton-card"><div class="skeleton-card-inner p-6 sm:p-8"><div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between"><div><div class="skeleton-pill w-28"></div><div class="skeleton-line mt-2 h-10 w-72"></div><div class="skeleton-line mt-2 w-full max-w-lg"></div></div><div class="skeleton-line h-11 w-24"></div></div></div></div>
+    <div class="skeleton-card mt-6"><div class="skeleton-list"><div class="skeleton-row px-5"><div class="skeleton-line w-10/12"></div><div class="skeleton-line w-20"></div></div><div class="skeleton-row px-5"><div class="skeleton-line w-8/12"></div><div class="skeleton-line w-20"></div></div><div class="skeleton-row px-5"><div class="skeleton-line w-9/12"></div><div class="skeleton-line w-20"></div></div></div></div>
+</div>
+{% endblock %}
+
 {% block content %}
 <div class="mx-auto max-w-4xl space-y-6">
     <section class="app-card p-6 sm:p-8">
@@ -9,13 +16,13 @@
                 <h1 class="mt-2 text-3xl font-extrabold text-gray-950">Assessment updates</h1>
                 <p class="mt-2 text-sm text-gray-500">Background analysis, export, and system messages appear here.</p>
             </div>
-            <a href="{% url 'clear_all_notifications' %}" class="btn-secondary-modern">Clear all</a>
+            <a href="{% url 'clear_all_notifications' %}" class="btn-secondary-modern" data-tooltip="Delete all notifications from this list">Clear all</a>
         </div>
     </section>
 
     <section class="app-card overflow-hidden">
         {% for notification in notifications %}
-            <a href="{% url 'mark_notification_as_read' notification.id %}" class="block border-b border-gray-100 p-5 transition last:border-b-0 hover:bg-blue-50">
+            <a href="{% url 'mark_notification_as_read' notification.id %}" class="block border-b border-gray-100 p-5 transition last:border-b-0 hover:bg-blue-50" data-tooltip="Mark as read and open linked assessment if available">
                 <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                     <p class="text-sm font-semibold {% if not notification.is_read %}text-gray-950{% else %}text-gray-600{% endif %}">{{ notification.message }}</p>
                     <span class="text-xs text-gray-500">{{ notification.created_at|timesince }} ago</span>

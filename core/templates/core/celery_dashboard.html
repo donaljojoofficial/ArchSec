@@ -1,5 +1,14 @@
 {% extends "terminal_base.html" %}
 
+{% block page_skeleton %}
+<div class="skeleton-shell">
+    <div class="skeleton-card"><div class="skeleton-card-inner p-6 sm:p-8"><div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between"><div><div class="skeleton-pill w-28"></div><div class="skeleton-line mt-2 h-10 w-80"></div><div class="skeleton-line mt-2 w-full max-w-xl"></div></div><div class="skeleton-line h-11 w-24"></div></div></div></div>
+    <div class="skeleton-card mt-6"><div class="border-b border-gray-200 px-5 py-4"><div class="skeleton-line h-6 w-48"></div></div><div class="skeleton-table-row"><div class="skeleton-line"></div><div class="skeleton-line"></div><div class="skeleton-line"></div></div><div class="skeleton-table-row"><div class="skeleton-line"></div><div class="skeleton-line"></div><div class="skeleton-line"></div></div><div class="skeleton-table-row"><div class="skeleton-line"></div><div class="skeleton-line"></div><div class="skeleton-line"></div></div></div>
+    <div class="skeleton-card mt-6"><div class="border-b border-gray-200 px-5 py-4"><div class="skeleton-line h-6 w-56"></div></div><div class="skeleton-list px-5"><div class="skeleton-row"><div><div class="skeleton-line w-52"></div><div class="skeleton-line mt-2 w-72 max-w-full"></div></div><div class="skeleton-line h-10 w-20"></div></div></div></div>
+    <div class="skeleton-grid skeleton-content-grid mt-6"><div class="skeleton-card is-compact"></div><div class="skeleton-card is-compact"></div></div>
+</div>
+{% endblock %}
+
 {% block content %}
 <div class="space-y-6">
     <section class="app-card p-6 sm:p-8">
@@ -9,7 +18,7 @@
                 <h1 class="mt-2 text-3xl font-extrabold text-gray-950">Background task monitor</h1>
                 <p class="mt-2 text-sm text-gray-500">Inspect queued modernization assessments and Celery worker state.</p>
             </div>
-            <a href="." class="btn-primary-modern">Refresh</a>
+            <a href="." class="btn-primary-modern" data-tooltip="Reload the latest worker and queue state">Refresh</a>
         </div>
     </section>
 
@@ -55,7 +64,7 @@
                             <p class="font-semibold text-gray-950">{{ analysis.project.name }}</p>
                             <p class="mt-1 text-xs text-gray-500">{{ analysis.created_at|date:"Y-m-d H:i:s" }} · {{ analysis.task_id|default:"No task id" }}</p>
                         </div>
-                        <a href="{% url 'view_analysis' analysis.id %}" class="btn-secondary-modern px-3 py-2 text-sm">Open</a>
+                        <a href="{% url 'view_analysis' analysis.id %}" class="btn-secondary-modern px-3 py-2 text-sm" data-tooltip="Open the failed assessment details">Open</a>
                     </div>
                     <p class="mt-3 text-sm text-red-700">{{ analysis.raw_ai_response.message|default:"No error message recorded." }}</p>
                 </div>

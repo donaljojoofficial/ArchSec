@@ -2,7 +2,9 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import Http404
+from django.core.cache import cache
 from core.models.notification import Notification
+from core.cache_utils import USER_DATA_TIMEOUT, invalidate_user_cache, notification_list_key
 import logging
 
 logger = logging.getLogger(__name__)
@@ -12,7 +14,16 @@ def notification_list(request):
     """
     Display all notifications for the logged-in user.
     """
-    notifications = Notification.objects.filter(user=request.user).order_by('-created_at')
+    cache_key = notification_list_key(request.user.id)
+    notifications = cache.get(cache_key)
+    if notifications is None:
+        notifications = list(
+            Notification.objects
+            .filter(user=request.user)
+            .order_by('-created_at')
+            .values("id", "message", "is_read", "created_at", "link")[:50]
+        )
+        cache.set(cache_key, notifications, USER_DATA_TIMEOUT)
     return render(request, 'core/notification_list.html', {'notifications': notifications})
 
 @login_required(login_url='login')
@@ -25,6 +36,7 @@ def mark_notification_as_read(request, notification_id):
         notification = Notification.objects.get(id=notification_id, user=request.user)
         notification.is_read = True
         notification.save()
+        invalidate_user_cache(request.user.id)
         messages.success(request, 'Notification marked as read.')
         logger.info(f"Notification {notification_id} marked as read by user: {request.user.username}")
         
@@ -41,8 +53,10 @@ def clear_all_notifications(request):
     """
     Clear all notifications for the logged-in user.
     """
-    count = Notification.objects.filter(user=request.user).count()
-    Notification.objects.filter(user=request.user).delete()
+    queryset = Notification.objects.filter(user=request.user)
+    count = queryset.count()
+    queryset.delete()
+    invalidate_user_cache(request.user.id)
     messages.success(request, f'Cleared {count} notification(s).')
     logger.info(f"User {request.user.username} cleared all notifications.")
     return redirect('notifications')

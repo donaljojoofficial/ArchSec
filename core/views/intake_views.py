@@ -4,6 +4,7 @@ from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404, redirect, render
 
 from core.forms import ChatAnswerForm, DocumentIntakeForm, ProjectForm
+from core.cache_utils import invalidate_user_cache
 from core.models import SystemProfileDraft
 from core.services.intake import (
     apply_chat_answer,
@@ -105,6 +106,7 @@ def review_intake_draft(request, draft_id):
             project.user = request.user
             project.structured_data = form.get_structured_data()
             project.save()
+            invalidate_user_cache(request.user.id)
 
             draft.project = project
             draft.status = "converted"

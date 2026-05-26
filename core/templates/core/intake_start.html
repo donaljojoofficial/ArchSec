@@ -1,5 +1,16 @@
 {% extends "terminal_base.html" %}
 
+{% block page_skeleton %}
+<div class="skeleton-shell max-w-5xl">
+    <div class="skeleton-card"><div class="skeleton-card-inner p-6 sm:p-8"><div class="skeleton-pill w-32"></div><div class="skeleton-line mt-3 h-10 w-full max-w-2xl"></div><div class="skeleton-line mt-3 w-full max-w-3xl"></div><div class="skeleton-line w-9/12 max-w-3xl"></div></div></div>
+    <div class="skeleton-grid mt-6 md:grid-cols-3">
+        <div class="skeleton-card"><div class="skeleton-card-inner"><div class="skeleton-line h-6 w-40"></div><div class="skeleton-line w-full"></div><div class="skeleton-line w-10/12"></div><div class="skeleton-line mt-3 h-11 w-full"></div></div></div>
+        <div class="skeleton-card"><div class="skeleton-card-inner"><div class="skeleton-line h-6 w-40"></div><div class="skeleton-line w-full"></div><div class="skeleton-line w-9/12"></div><div class="skeleton-line mt-3 h-11 w-full"></div></div></div>
+        <div class="skeleton-card"><div class="skeleton-card-inner"><div class="skeleton-line h-6 w-36"></div><div class="skeleton-line w-full"></div><div class="skeleton-line w-8/12"></div><div class="skeleton-line mt-3 h-11 w-full"></div></div></div>
+    </div>
+</div>
+{% endblock %}
+
 {% block content %}
 <div class="mx-auto max-w-5xl space-y-6">
     <section class="app-card p-6 sm:p-8">
@@ -11,17 +22,17 @@
     </section>
 
     <section class="grid gap-4 md:grid-cols-3">
-        <a href="{% url 'document_intake' %}" class="app-card p-5 transition hover:text-blue-700">
+        <a href="{% url 'document_intake' %}" class="app-card p-5 transition hover:text-blue-700" data-tooltip="Extract a profile from existing notes or documents">
             <h2 class="text-base font-bold text-gray-950">Upload document</h2>
             <p class="mt-2 text-sm leading-6 text-gray-500">Import TXT, Markdown, DOCX, or PDF notes and let ArchSec draft the profile.</p>
             <span class="btn-primary-modern mt-5 w-full">Upload</span>
         </a>
-        <a href="{% url 'chat_intake' %}" class="app-card p-5 transition hover:text-blue-700">
+        <a href="{% url 'chat_intake' %}" class="app-card p-5 transition hover:text-blue-700" data-tooltip="Answer guided questions one at a time">
             <h2 class="text-base font-bold text-gray-950">Chat collector</h2>
             <p class="mt-2 text-sm leading-6 text-gray-500">Answer one focused question at a time until the profile is ready to review.</p>
             <span class="btn-primary-modern mt-5 w-full">Start chat</span>
         </a>
-        <a href="{% url 'create_project' %}" class="app-card p-5 transition hover:text-blue-700">
+        <a href="{% url 'create_project' %}" class="app-card p-5 transition hover:text-blue-700" data-tooltip="Open the complete structured profile form">
             <h2 class="text-base font-bold text-gray-950">Manual form</h2>
             <p class="mt-2 text-sm leading-6 text-gray-500">Use the full structured form when you already know the system details.</p>
             <span class="btn-secondary-modern mt-5 w-full">Open form</span>
